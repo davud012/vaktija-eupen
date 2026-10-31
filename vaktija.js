@@ -22,6 +22,10 @@ var POSTAVKE = {
   /* Font / Schrift: "" (standard), "Montserrat", "Cormorant", "Josefin", "Cinzel", "Outfit" */
   font: "",
 
+  /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
+     Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
+  lagano: false,
+
   /* Naziv džemata / Name der Gemeinde */
   naziv: "Džemat EKC Elif Eupen",
 

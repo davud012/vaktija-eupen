@@ -467,6 +467,13 @@
   .ve-sljedeci b { color: var(--gold); }
   .ve-sljedeci .de { color: var(--muted); font-size: 0.82em; }
   .ve-sat { position: absolute; top: 4vh; right: 3vw; font-size: 3.6vw; font-weight: 300; font-variant-numeric: tabular-nums; text-shadow: 0 0.3vh 1.2vh rgba(0,0,0,0.5); }
+
+  /* ---------- Lagana verzija / Leichte Version ---------- */
+  body.lagano .vakat.sljedeci-vakat::before { animation: none; opacity: 0.6; }
+  body.lagano .ve-ornament g, body.lagano .nebo-trepti, body.lagano .sat .dvotacka { animation: none; }
+  body.lagano .vakat-ekran.svjez .valovi { display: none; }
+  body.lagano .ve-ornament .crta { stroke-dasharray: none; stroke-dashoffset: 0; }
+  body.lagano .vakat-ekran.vidljiv .ve-ornament .crta { animation: none; }
 </style>
 </head>
 <body>
@@ -573,6 +580,9 @@
   var trazeniFont = /[?&]font=([a-z]+)/i.exec(location.search);
   var FONT = (trazeniFont ? trazeniFont[1] : (P.font || "")).toLowerCase().split(" ")[0];
   if (FONT) document.body.classList.add("font-" + FONT);
+  // Leichte Version für schwache Boxen: vaktija.js -> lagano: true (oder ?lagano=1)
+  var LAGANO = /[?&]lagano=1/.test(location.search) || P.lagano === true;
+  if (LAGANO) document.body.classList.add("lagano");
 
   var pomak = 0;
   var trazeno = /[?&]vrijeme=([^&]+)/.exec(location.search);
@@ -909,10 +919,16 @@
   };
   if (DIZAJN === 5 && window.Nebo) {
     var o = NEBO_RASPORED[RASPORED] || NEBO_RASPORED[1];
+    o.lagano = LAGANO;
     Nebo.init($("nebo"), o);
-    if (window.Prilike) Prilike.init(document.body);
+    if (window.Prilike) Prilike.init(document.body, { lagano: LAGANO });
   }
   provjeriNovuVerziju(false);
+  // Stranica se pamti na uređaju i radi i bez interneta nakon ponovnog pokretanja
+  // Die Seite wird auf dem Gerät gespeichert und läuft nach einem Neustart auch ohne Internet
+  if (prekoInterneta && "serviceWorker" in navigator) {
+    try { navigator.serviceWorker.register("sw.js"); } catch (e) { /* stari preglednik / alter Browser */ }
+  }
   setInterval(function () { provjeriNovuVerziju(false); }, 5 * 60 * 1000);
 
   osvjezi();

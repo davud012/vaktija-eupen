@@ -1,0 +1,30 @@
+/* Service Worker: pamti stranicu na uređaju, da radi i bez interneta.
+   Speichert die Seite auf dem Gerät, damit sie auch ohne Internet läuft.
+   Uvijek prvo internet (da dođu nove verzije), tek bez interneta sačuvana kopija.
+   Immer zuerst Internet (damit Updates ankommen), nur ohne Internet die gespeicherte Kopie. */
+var CACHE = "vaktija-v1";
+var OSNOVA = ["./", "index.html", "vaktija.js", "nebo.js", "prilike.js", "nebeski-kalendar.js"];
+
+self.addEventListener("install", function (e) {
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(OSNOVA); }).then(function () { return self.skipWaiting(); }));
+});
+
+self.addEventListener("activate", function (e) {
+  e.waitUntil(self.clients.claim());
+});
+
+self.addEventListener("fetch", function (e) {
+  var url = new URL(e.request.url);
+  if (e.request.method !== "GET" || url.origin !== location.origin) return;
+  // Provjera nove verzije i tačnog vremena uvijek ide na internet
+  // Update- und Zeitprüfung immer direkt ans Internet
+  if (/[?&]v=/.test(url.search)) return;
+  e.respondWith(
+    fetch(e.request).then(function (odgovor) {
+      if (odgovor.ok) { var kopija = odgovor.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, kopija); }); }
+      return odgovor;
+    }).catch(function () {
+      return caches.match(e.request, { ignoreSearch: true }).then(function (r) { return r || caches.match("index.html"); });
+    })
+  );
+});

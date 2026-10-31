@@ -382,7 +382,7 @@
       zadnjeTesko = t;
       crtajZvijezde(st, h, mjesecina);
       crtajPlanete(datum, st, h);
-      crtajMlijecni(st, h, mjesecina);
+      if (!opcije.lagano) crtajMlijecni(st, h, mjesecina);
       el.zvijezde.setAttribute("opacity", (+el.zvijezde.getAttribute("opacity") * (1 - zastor)).toFixed(2));
       el.linije.setAttribute("opacity", (+el.linije.getAttribute("opacity") * (1 - zastor)).toFixed(3));
       el.planete.setAttribute("opacity", (1 - zastor).toFixed(2));
@@ -404,7 +404,7 @@
     el.linije.setAttribute("opacity", (0.16 * vid).toFixed(3));
     if (vid <= 0) { el.zvijezde.innerHTML = ""; el.linije.innerHTML = ""; return; }
     var pos = {}, html = "";
-    for (var n = 0; n < SLABE.length; n++) {
+    for (var n = 0; n < (opcije.lagano ? 0 : SLABE.length); n++) {
       var sl = SLABE[n], hs = horizont(sl[0] * 15, sl[1], st.lst);
       if (hs.alt < 3 || hs.az < opcije.azOd || hs.az > opcije.azDo) continue;
       var ps = projekcija(hs.alt, hs.az);

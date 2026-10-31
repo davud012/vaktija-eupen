@@ -22,6 +22,7 @@
   };
 
   var Prilike = {}, el = {}, s = { kod: 0, oblaci: 0, padavine: 0, snijeg: 0, vjetar: 5 };
+  var lagano = false, okvir = 0;
   var vrsta = "vedro", jacina = 0, cestice = [], kapi = [], radi = false, zadnjaBoja = "", sljedecaMunja = 0;
 
   function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
@@ -50,7 +51,8 @@
     return clamp(z, 0, 1);
   };
 
-  Prilike.init = function (kontejner) {
+  Prilike.init = function (kontejner, o) {
+    lagano = !!(o && o.lagano);
     el.oblaci = document.createElement("div"); el.oblaci.className = "prilike-oblaci";
     el.veo = document.createElement("div"); el.veo.className = "prilike-veo";
     el.magla = document.createElement("div"); el.magla.className = "prilike-magla";
@@ -73,8 +75,9 @@
   };
 
   function velicina() {
-    el.padavine.width = Math.round(window.innerWidth * 0.75); el.padavine.height = Math.round(window.innerHeight * 0.75);
-    el.staklo.width = Math.round(window.innerWidth * 0.75); el.staklo.height = Math.round(window.innerHeight * 0.75);
+    var f = lagano ? 0.5 : 0.75;
+    el.padavine.width = Math.round(window.innerWidth * f); el.padavine.height = Math.round(window.innerHeight * f);
+    el.staklo.width = Math.round(window.innerWidth * f); el.staklo.height = Math.round(window.innerHeight * f);
   }
 
   function ucitaj() {
@@ -99,6 +102,7 @@
     cestice = [];
     var broj = vrsta === "snijeg" ? clamp(90 + jacina * 140, 90, 500)
       : (vrsta === "kisa" || vrsta === "oluja" || vrsta === "rosulja") ? clamp(50 + jacina * 60, 50, 480) : 0;
+    if (lagano) broj = Math.round(broj * 0.4);
     for (var i = 0; i < broj; i++) cestice.push(novaCestica(true));
     if (!(vrsta === "kisa" || vrsta === "oluja" || vrsta === "rosulja")) kapi = [];
     sljedecaMunja = Date.now() + 3000;
@@ -108,6 +112,7 @@
   // ---------- Oblaci / Wolken ----------
   function napraviOblake() {
     var broj = s.oblaci < 10 ? 0 : Math.round(2 + s.oblaci / 100 * 10), html = "";
+    if (lagano) broj = Math.min(broj, 4);
     for (var i = 0; i < broj; i++) {
       var sir = 26 + Math.random() * 22, vis = sir * (0.28 + Math.random() * 0.12);
       var traj = 160 + Math.random() * 220, kasni = -Math.random() * traj;
@@ -154,6 +159,8 @@
   }
 
   function petlja() {
+    // leichte Version: nur jedes zweite Bild zeichnen / lagana verzija: svaka druga slika
+    if (lagano && (okvir++ % 2)) { requestAnimationFrame(petlja); return; }
     var c = el.padavine.getContext("2d"), W = el.padavine.width, H = el.padavine.height;
     c.clearRect(0, 0, W, H);
     var nagib = clamp(s.vjetar / 60, 0, 0.6);
@@ -176,7 +183,7 @@
       }
       c.stroke();
     }
-    staklo();
+    if (!lagano) staklo();
     if (vrsta === "oluja" && Date.now() > sljedecaMunja) { munja(); sljedecaMunja = Date.now() + 6000 + Math.random() * 16000; }
     if (cestice.length || kapi.length || vrsta === "oluja") requestAnimationFrame(petlja);
     else { radi = false; c.clearRect(0, 0, W, H); el.staklo.getContext("2d").clearRect(0, 0, W, H); }
