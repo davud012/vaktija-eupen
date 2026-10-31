@@ -856,6 +856,9 @@
     x.open("GET", "vaktija.js?v=" + Date.now());
     x.onload = function () {
       if (x.status !== 200 || x.responseText.indexOf("var VAKTIJA") < 0) return;
+      // Sigurnost: neispravnu datoteku (npr. zaboravljen zarez) ne preuzimamo
+      // Sicherheit: eine fehlerhafte Datei (z. B. vergessenes Komma) wird nicht übernommen
+      try { new Function(x.responseText); } catch (e) { return; }
       // Tačno vrijeme sa servera: ako sat uređaja kasni ili žuri, ispravi ga
       // Genaue Zeit vom Server: geht die Geräteuhr falsch, wird sie korrigiert
       var zaglavlje = x.getResponseHeader("Date");
