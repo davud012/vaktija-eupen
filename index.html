@@ -879,9 +879,11 @@
         // sonst geht die Uhr vor. Plus halbe Anfragedauer für den Weg zu uns.
         var server = Date.parse(zaglavlje) + 500 + (Date.now() - poslano) / 2;
         var razlika = server - Date.now();
-        // Samo ako sat uređaja očito nije tačan (više od 2 minute), inače vrijedi sat uređaja
-        // Nur wenn die Geräteuhr deutlich falsch geht (über 2 Minuten), sonst gilt die Geräteuhr
-        if (!isNaN(razlika)) korekcija = Math.abs(razlika) > 120000 ? razlika : 0;
+        // Vrijeme iz međuspremnika može odstupati do ~10 minuta. Zato ispravljamo samo ako je sat
+        // uređaja potpuno pogrešan (više od 1 sata, npr. nakon nestanka struje). Inače vrijedi sat uređaja.
+        // Die Zeit aus dem Zwischenspeicher kann bis ~10 Minuten abweichen. Deshalb nur korrigieren,
+        // wenn die Geräteuhr völlig falsch ist (über 1 Stunde, z. B. nach Stromausfall). Sonst gilt die Geräteuhr.
+        if (!isNaN(razlika)) korekcija = Math.abs(razlika) > 3600000 ? razlika : 0;
       }
       if (zadnjaVerzija === null) zadnjaVerzija = x.responseText;
       if (ucitajAkoUspije || x.responseText !== zadnjaVerzija) location.reload();

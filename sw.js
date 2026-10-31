@@ -20,7 +20,9 @@ self.addEventListener("fetch", function (e) {
   // Update- und Zeitprüfung immer direkt ans Internet
   if (/[?&]v=/.test(url.search)) return;
   e.respondWith(
-    fetch(e.request).then(function (odgovor) {
+    // "no-cache": uvijek pitati server da li ima novije (brzo, šalje se samo ako se promijenilo)
+    // "no-cache": immer beim Server nachfragen, ob es Neueres gibt (schnell, nur bei Änderung neu geladen)
+    fetch(e.request, { cache: "no-cache" }).then(function (odgovor) {
       if (odgovor.ok) { var kopija = odgovor.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, kopija); }); }
       return odgovor;
     }).catch(function () {
