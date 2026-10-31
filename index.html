@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaktija Eupen</title>
+<style>
+  :root {
+    --gold: #e3c27a;
+    --gold-soft: rgba(227, 194, 122, 0.18);
+    --text: #fbf8f1;
+    --muted: rgba(251, 248, 241, 0.72);
+    --card: rgba(8, 28, 22, 0.62);
+    --card-past: rgba(8, 28, 22, 0.38);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    background-color: #0b3b2e;
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(227, 194, 122, 0.10), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(227, 194, 122, 0.08), transparent 40%),
+      linear-gradient(160deg, #0f4a3a 0%, #072a20 100%);
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* ---------- Pozadina: uzorak i svjetla / Hintergrund: Muster und Lichter ---------- */
+  .uzorak {
+    position: fixed; top: -160px; left: -160px; right: -160px; bottom: -160px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23e3c27a' stroke-width='1.3'%3E%3Crect x='47' y='47' width='66' height='66'/%3E%3Crect x='47' y='47' width='66' height='66' transform='rotate(45 80 80)'/%3E%3Ccircle cx='80' cy='80' r='16'/%3E%3Cpath d='M0 0L33 33M160 0L127 33M0 160L33 127M160 160L127 127'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: 0.06;
+    animation: drift 120s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes drift { to { transform: translate(160px, 160px); } }
+
+  .svjetla { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
+  .svjetla span {
+    position: absolute; bottom: -5vh; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 233, 180, 0.9) 0%, rgba(227, 194, 122, 0) 70%);
+    animation-name: uzlet; animation-timing-function: linear; animation-iteration-count: infinite;
+  }
+  @keyframes uzlet {
+    0%   { transform: translateY(0); opacity: 0; }
+    15%  { opacity: 0.55; }
+    85%  { opacity: 0.35; }
+    100% { transform: translateY(-115vh); opacity: 0; }
+  }
+
+  .overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    padding: 3vh 3vw;
+  }
+  body.has-photo .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%); }
+
+  /* ---------- Zaglavlje / Kopfbereich ---------- */
+  header { display: flex; justify-content: space-between; align-items: flex-start; animation: odozgo 1s ease-out both; }
+  .naziv { font-size: 3.2vw; font-weight: 600; letter-spacing: 0.04em; color: var(--gold); }
+  .datum { font-size: 1.7vw; margin-top: 1vh; line-height: 1.45; }
+  .datum .de, .hidzra { color: var(--muted); }
+  .hidzra { font-size: 1.5vw; margin-top: 0.6vh; }
+  .sat { font-size: 8vw; font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .sat .dvotacka { animation: treptaj 2s ease-in-out infinite; }
+  .sat .sek { display: inline-block; font-size: 3.5vw; color: var(--muted); min-width: 2.2ch; text-align: left; }
+  .sat .sek.tik { animation: tik 0.45s ease-out; }
+  .sat .hhmm.nova { animation: nova-minuta 0.7s ease-out; }
+  @keyframes treptaj { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @keyframes tik { from { transform: translateY(-0.35em); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes nova-minuta { from { transform: translateY(-0.12em); opacity: 0.2; } to { transform: none; opacity: 1; } }
+  @keyframes odozgo { from { transform: translateY(-3vh); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* ---------- Sljedeći vakat / Nächstes Gebet ---------- */
+  .sljedeci { height: 15vh; margin: 2vh 0 2vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+  .sljedeci-tekst { font-size: 2.1vw; line-height: 1.4; width: 60%; }
+  .sljedeci-tekst b { color: var(--gold); font-weight: 600; }
+  .sljedeci-tekst .odbrojavanje { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .sljedeci-tekst .de { font-size: 1.6vw; color: var(--muted); }
+  .napredak { height: 0.5vh; margin-top: 1.2vh; background: rgba(251, 248, 241, 0.12); border-radius: 1vh; overflow: hidden; }
+  .napredak div {
+    height: 100%; width: 100%; transform-origin: left center; transform: scaleX(0);
+    background: linear-gradient(90deg, rgba(227, 194, 122, 0.4), var(--gold));
+    transition: transform 1s linear;
+  }
+  .sljedeci.uskoro .odbrojavanje { color: var(--gold); display: inline-block; animation: puls-tekst 1.2s ease-in-out infinite; }
+  @keyframes puls-tekst { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+  .ikamet-panel { display: none; align-items: center; gap: 2.5vw; animation: pojava 0.8s ease-out both; }
+  .prsten { position: relative; width: 13vh; height: 13vh; }
+  .prsten svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .prsten circle { fill: none; stroke-width: 6; }
+  .prsten .pozadina-k { stroke: rgba(251, 248, 241, 0.15); }
+  .prsten .luk { stroke: var(--gold); stroke-linecap: round; stroke-dasharray: 283; transition: stroke-dashoffset 1s linear; }
+  .prsten .broj {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 2.2vw; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .ikamet-tekst { text-align: left; font-size: 2.3vw; line-height: 1.35; }
+  .ikamet-tekst b { color: var(--gold); }
+  .ikamet-tekst .de { font-size: 1.6vw; color: var(--muted); }
+  @keyframes pojava { from { transform: scale(0.92); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* ---------- Vakti / Gebetszeiten ---------- */
+  .vakti { flex: 1; display: flex; gap: 1.2vw; align-items: stretch; }
+  .vakat {
+    position: relative;
+    flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: var(--card); border: 0.25vw solid transparent; border-radius: 1.2vw;
+    padding: 2vh 0.5vw; text-align: center;
+    animation: uvod 0.9s cubic-bezier(.2, .8, .2, 1) both;
+    transition: background 1.5s, opacity 1.5s, border-color 1.5s;
+  }
+  @keyframes uvod { from { transform: translateY(6vh); opacity: 0; } to { transform: none; opacity: 1; } }
+  .vakat.prosao { background: var(--card-past); opacity: 0.6; }
+  .vakat.sljedeci-vakat { border-color: var(--gold); background: var(--gold-soft); }
+  .vakat.sljedeci-vakat::before {
+    content: ""; position: absolute; top: -0.25vw; left: -0.25vw; right: -0.25vw; bottom: -0.25vw;
+    border-radius: 1.2vw; box-shadow: 0 0 3vw 0.4vw rgba(227, 194, 122, 0.55);
+    animation: disanje 3.5s ease-in-out infinite; pointer-events: none;
+  }
+  .vakat.uskoro::before { animation-duration: 1.4s; }
+  .vakat.aktivan { background: rgba(227, 194, 122, 0.28); }
+  .vakat.aktivan::before { animation-duration: 2s; box-shadow: 0 0 4vw 0.8vw rgba(227, 194, 122, 0.7); }
+  @keyframes disanje { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+  .vakat .ime { font-size: 2.1vw; font-weight: 600; }
+  .vakat .ime-de { font-size: 1.4vw; color: var(--muted); margin-top: 0.3vh; }
+  .vakat .ezan { font-size: 4.3vw; font-weight: 300; margin: 1.5vh 0; font-variant-numeric: tabular-nums; }
+  .vakat.sljedeci-vakat .ezan { color: var(--gold); font-weight: 400; }
+  .vakat .namaz { font-size: 1.4vw; color: var(--muted); min-height: 4em; line-height: 1.4; }
+  .vakat .namaz b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  footer { margin-top: 2.5vh; display: flex; justify-content: center; animation: odozdo 1s 0.6s ease-out both; }
+  @keyframes odozdo { from { transform: translateY(3vh); opacity: 0; } to { transform: none; opacity: 1; } }
+  .dzuma {
+    background: var(--card); border-radius: 1vw; padding: 1.4vh 2.5vw;
+    font-size: 1.8vw; border-left: 0.4vw solid var(--gold);
+  }
+  .dzuma .naslov { color: var(--gold); font-weight: 600; margin-right: 1.5vw; }
+  .dzuma b { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Ekrani preko svega / Vollbild-Einblendungen ---------- */
+  .ekran {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(circle at 50% 50%, #0f4a3a 0%, #041611 75%);
+    opacity: 0; visibility: hidden; transition: opacity 1.5s ease, visibility 0s linear 1.5s;
+  }
+  .ekran.vidljiv { opacity: 1; visibility: visible; transition: opacity 1.5s ease, visibility 0s; }
+  .valovi { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
+  .valovi span {
+    position: absolute; width: 40vh; height: 40vh; margin: -20vh 0 0 -20vh; border-radius: 50%;
+    border: 0.4vh solid var(--gold); opacity: 0;
+    animation: val 4.5s ease-out infinite;
+  }
+  .valovi span:nth-child(2) { animation-delay: 1.5s; }
+  .valovi span:nth-child(3) { animation-delay: 3s; }
+  @keyframes val { from { transform: scale(0.4); opacity: 0.8; } to { transform: scale(3.2); opacity: 0; } }
+  .ekran .sadrzaj { position: relative; }
+  .ekran.vidljiv .sadrzaj > * { animation: uvod 1.2s cubic-bezier(.2, .8, .2, 1) both; }
+  .ekran.vidljiv .sadrzaj > *:nth-child(2) { animation-delay: 0.25s; }
+  .ekran.vidljiv .sadrzaj > *:nth-child(3) { animation-delay: 0.5s; }
+  .ekran.vidljiv .sadrzaj > *:nth-child(4) { animation-delay: 0.75s; }
+  .ekran.vidljiv .sadrzaj > *:nth-child(5) { animation-delay: 1s; }
+  .ekran .arapski { font-size: 6vw; color: var(--gold); line-height: 1.3; font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; }
+  .ekran .veliko { font-size: 6vw; font-weight: 300; color: var(--gold); line-height: 1.2; }
+  .ekran .naslov-bs { font-size: 3.4vw; font-weight: 600; margin-top: 2vh; }
+  .ekran .naslov-de { font-size: 2.3vw; color: var(--muted); margin-top: 1vh; }
+  .ekran .mobitel {
+    display: inline-block; margin-top: 5vh; padding: 1.5vh 2.5vw; border-radius: 1vw;
+    border: 0.2vw solid rgba(227, 194, 122, 0.5); font-size: 1.9vw; line-height: 1.5;
+  }
+  .ekran .mobitel .de { color: var(--muted); }
+  .ekran .mali-sat { position: absolute; bottom: 4vh; right: 4vw; font-size: 3vw; font-weight: 300; color: var(--muted); font-variant-numeric: tabular-nums; }
+  @keyframes lebdenje { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2vh); } }
+
+  .primjer {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 20;
+    background: #b3261e; color: #fff; font-size: 1.1vw; font-weight: 600;
+    padding: 0.5vh 1.5vw; border-radius: 0 0 0.6vw 0.6vw; display: none;
+  }
+  .greska {
+    display: none; margin: auto; text-align: center; font-size: 2.4vw; line-height: 1.6;
+    background: var(--card); padding: 4vh 4vw; border-radius: 1.2vw;
+  }
+  /* ===================== DIZAJNI / DESIGNS =====================
+     Bira se u vaktija.js (dizajn: 1–5) ili za probu: index.html?dizajn=3 */
+
+  .nebo { display: none; }
+
+  /* ---------- Dizajn 2: Lista – noćno plava i zlato / Liste – Nachtblau & Gold ---------- */
+  body.dizajn-2 {
+    --gold: #d9b46a; --gold-soft: rgba(217, 180, 106, 0.16);
+    --card: rgba(255, 255, 255, 0.05); --card-past: rgba(255, 255, 255, 0.02);
+    background: linear-gradient(135deg, #0b1a2e 0%, #132a46 60%, #0b1a2e 100%);
+  }
+  body.dizajn-2 .overlay {
+    display: grid; grid-template-columns: 40% 1fr; grid-template-rows: auto 1fr auto; column-gap: 4vw;
+    grid-template-areas: "glava vakti" "slj vakti" "dno vakti";
+  }
+  body.dizajn-2 header { grid-area: glava; flex-direction: column; }
+  body.dizajn-2 .sat { text-align: left; margin-top: 4vh; font-size: 9vw; }
+  body.dizajn-2 .sljedeci { grid-area: slj; height: auto; margin: 0; justify-content: flex-start; text-align: left; }
+  body.dizajn-2 .sljedeci-tekst { width: 100%; font-size: 1.9vw; }
+  body.dizajn-2 .vakti, body.dizajn-2 .greska { grid-area: vakti; }
+  body.dizajn-2 .vakti { flex-direction: column; gap: 1.4vh; }
+  body.dizajn-2 footer { grid-area: dno; justify-content: flex-start; }
+  body.dizajn-2 .dzuma { font-size: 1.4vw; }
+  body.dizajn-2 .dzuma .naslov { display: block; margin-bottom: 0.5vh; }
+  body.dizajn-2 .vakat {
+    display: grid; grid-template-columns: 1fr auto 11vw; grid-template-areas: "ime ezan namaz" "de ezan namaz";
+    align-items: center; text-align: left; padding: 0 2vw; border-radius: 0.8vw;
+    border-width: 0 0 0 0.4vw; animation-name: slijeva;
+  }
+  @keyframes slijeva { from { transform: translateX(8vw); opacity: 0; } to { transform: none; opacity: 1; } }
+  body.dizajn-2 .vakat .ime { grid-area: ime; font-size: 2vw; align-self: end; }
+  body.dizajn-2 .vakat .ime-de { grid-area: de; font-size: 1.2vw; align-self: start; }
+  body.dizajn-2 .vakat .ezan { grid-area: ezan; margin: 0 2vw; font-size: 4vw; }
+  body.dizajn-2 .vakat .namaz { grid-area: namaz; min-height: 0; text-align: right; font-size: 1.15vw; }
+  body.dizajn-2 .vakat.sljedeci-vakat::before { border-radius: 0.8vw; }
+  body.dizajn-2 .ekran { background: radial-gradient(circle at 50% 50%, #17335a 0%, #070f1c 75%); }
+
+  /* ---------- Dizajn 3: Svijetli – mreža / Hell – Raster ---------- */
+  body.dizajn-3 {
+    --gold: #a07c34; --gold-soft: rgba(160, 124, 52, 0.12);
+    --text: #123f2f; --muted: rgba(18, 63, 47, 0.62);
+    --card: #ffffff; --card-past: rgba(255, 255, 255, 0.5);
+    background: #f4efe4;
+    background-image: radial-gradient(circle at 12% 8%, rgba(160, 124, 52, 0.14), transparent 40%),
+                      radial-gradient(circle at 92% 95%, rgba(29, 107, 60, 0.12), transparent 45%);
+  }
+  body.dizajn-3 .naziv { color: #1d6b3c; }
+  body.dizajn-3 .svjetla { display: none; }
+  body.dizajn-3 .uzorak { opacity: 0.1; }
+  body.dizajn-3 .vakti { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 1.6vw; }
+  body.dizajn-3 .vakat {
+    display: grid; grid-template-columns: 1fr auto; grid-template-areas: "ime ezan" "de ezan" "namaz namaz";
+    align-content: center; text-align: left; padding: 2vh 2vw;
+    box-shadow: 0 0.6vh 2.5vh rgba(18, 63, 47, 0.08);
+  }
+  body.dizajn-3 .vakat .ime { grid-area: ime; }
+  body.dizajn-3 .vakat .ime-de { grid-area: de; }
+  body.dizajn-3 .vakat .ezan { grid-area: ezan; margin: 0; font-size: 4.6vw; }
+  body.dizajn-3 .vakat .namaz { grid-area: namaz; min-height: 0; margin-top: 1vh; }
+  body.dizajn-3 .vakat.sljedeci-vakat .ezan { color: #1d6b3c; }
+  body.dizajn-3 .vakat.sljedeci-vakat::before { box-shadow: 0 0 2.5vw 0.3vw rgba(160, 124, 52, 0.45); }
+  body.dizajn-3 .napredak { background: rgba(18, 63, 47, 0.1); }
+  body.dizajn-3 .prsten .pozadina-k { stroke: rgba(18, 63, 47, 0.12); }
+  body.dizajn-3 .dzuma { box-shadow: 0 0.6vh 2.5vh rgba(18, 63, 47, 0.08); }
+  body.dizajn-3 .ekran { background: radial-gradient(circle at 50% 50%, #fffaf0 0%, #ece2cc 80%); }
+
+  /* ---------- Dizajn 4: Mihrab – luk u sredini / Mihrab – Bogen in der Mitte ---------- */
+  body.dizajn-4 {
+    --gold: #d6a874; --gold-soft: rgba(214, 168, 116, 0.16);
+    --card: rgba(255, 255, 255, 0.05); --card-past: rgba(255, 255, 255, 0.02);
+    background: radial-gradient(ellipse at 50% 35%, #154150 0%, #0b222b 70%);
+  }
+  body.dizajn-4 .naziv { font-size: 2.6vw; }
+  body.dizajn-4 .datum { font-size: 1.4vw; }
+  body.dizajn-4 .hidzra { font-size: 1.25vw; }
+  body.dizajn-4 .sat { font-size: 6.5vw; }
+  body.dizajn-4 .sljedeci {
+    position: relative; width: 56vw; height: 31vh; margin: 1vh auto 3vh; padding-top: 5vh;
+    border: 0.25vw solid var(--gold); border-bottom: none;
+    border-radius: 28vw 28vw 0 0 / 16vw 16vw 0 0;
+    background: linear-gradient(180deg, rgba(214, 168, 116, 0.10), rgba(214, 168, 116, 0));
+  }
+  body.dizajn-4 .sljedeci::before {
+    content: ""; position: absolute; top: 1.2vh; left: 1vw; right: 1vw; bottom: 0;
+    border: 0.1vw solid rgba(214, 168, 116, 0.45); border-bottom: none;
+    border-radius: 27vw 27vw 0 0 / 15vw 15vw 0 0;
+  }
+  body.dizajn-4 .sljedeci-tekst { width: 80%; font-size: 2.6vw; }
+  body.dizajn-4 .sljedeci-tekst .de { font-size: 1.8vw; }
+  body.dizajn-4 .vakti { flex: none; height: 31vh; }
+  body.dizajn-4 .vakat { border-radius: 0.6vw; }
+  body.dizajn-4 .vakat .ime { font-size: 1.8vw; }
+  body.dizajn-4 .vakat .ezan { font-size: 3.6vw; margin: 0.8vh 0; }
+  body.dizajn-4 .vakat .namaz { font-size: 1.2vw; }
+  body.dizajn-4 .vakat.sljedeci-vakat::before { border-radius: 0.6vw; }
+  body.dizajn-4 .ekran { background: radial-gradient(circle at 50% 50%, #1a4a5a 0%, #071419 75%); }
+
+  /* ---------- Dizajn 5: Nebo – pravo nebo iznad Eupena / Der echte Himmel über Eupen ---------- */
+  body.dizajn-5 { background: #061223; }
+  body.dizajn-5 .uzorak, body.dizajn-5 .svjetla { display: none; }
+  body.dizajn-5 .nebo { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
+  .nebo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .nebo-oznaka { font-size: 20px; fill: rgba(255, 255, 255, 0.6); letter-spacing: 0.04em; }
+  .nebo-trepti { animation: treperenje 3.5s ease-in-out infinite; }
+  @keyframes treperenje { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  .nebo-meteori { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+  .nebo-meteor { position: absolute; width: 13vw; height: 0.16vw; margin-top: -0.08vw; transform-origin: 0 50%; overflow: hidden; }
+  .nebo-meteor::after {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1vw;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95));
+    animation: let 1.1s ease-out forwards;
+  }
+  @keyframes let {
+    0% { transform: translateX(-100%); opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: translateX(70%); opacity: 0; }
+  }
+  .nebo-info { display: none; }
+  body.dizajn-5 .nebo-info {
+    display: block; text-align: center; font-size: 1.45vw; line-height: 1.45; min-height: 2.9em;
+    text-shadow: 0 0.2vh 1vh rgba(0, 0, 0, 0.6); transition: opacity 0.6s;
+  }
+  .nebo-info.nestaje { opacity: 0; }
+  .nebo-info-bs { display: block; }
+  .nebo-info-de { display: block; color: var(--muted); font-size: 0.85em; }
+  body.dizajn-5 .naziv { text-shadow: 0 0.2vh 1vh rgba(0, 0, 0, 0.35); }
+  body.dizajn-5 .datum, body.dizajn-5 .sat, body.dizajn-5 .sljedeci { text-shadow: 0 0.2vh 1.2vh rgba(0, 0, 0, 0.5); }
+  body.dizajn-5 .ekran { background: radial-gradient(circle at 50% 50%, #13294d 0%, #050b18 75%); }
+  body.dizajn-5 .vakat.sljedeci-vakat::before { border-radius: inherit; }
+
+  /* Raspored 1: kartice dole / Layout 1: Karten unten */
+  body.dizajn-5.raspored-1 .sljedeci { height: 12vh; margin: 1vh 0; }
+  body.dizajn-5.raspored-1 .vakti { flex: none; height: 36vh; margin-top: auto; }
+  body.dizajn-5.raspored-1 .vakat { background: rgba(6, 16, 34, 0.45); border-radius: 2vw; }
+  body.dizajn-5.raspored-1 .vakat.prosao { background: rgba(6, 16, 34, 0.28); }
+  body.dizajn-5.raspored-1 .vakat.sljedeci-vakat { background: rgba(227, 194, 122, 0.25); }
+  body.dizajn-5.raspored-1 .dzuma { background: rgba(6, 16, 34, 0.45); }
+
+  /* Raspored 2: traka na horizontu / Layout 2: Leiste am Horizont */
+  body.dizajn-5.raspored-2 .sljedeci { height: 11vh; margin: 0; }
+  body.dizajn-5.raspored-2 .vakti {
+    flex: none; height: 21vh; margin-top: auto; gap: 0.6vw; padding: 0.8vh 0.8vw;
+    background: rgba(6, 16, 34, 0.5); border-radius: 1.6vw;
+  }
+  body.dizajn-5.raspored-2 .vakat { background: transparent; border-radius: 1.1vw; padding: 0.5vh 0.3vw; }
+  body.dizajn-5.raspored-2 .vakat.sljedeci-vakat { background: rgba(227, 194, 122, 0.22); }
+  body.dizajn-5.raspored-2 .vakat .ime { font-size: 1.55vw; }
+  body.dizajn-5.raspored-2 .vakat .ime-de { font-size: 1vw; margin: 0; }
+  body.dizajn-5.raspored-2 .vakat .ezan { font-size: 3vw; margin: 0.2vh 0; }
+  body.dizajn-5.raspored-2 .vakat .namaz { font-size: 0.9vw; min-height: 0; line-height: 1.3; }
+  body.dizajn-5.raspored-2 footer { margin-top: 1.2vh; }
+  body.dizajn-5.raspored-2 .dzuma { background: rgba(6, 16, 34, 0.5); font-size: 1.4vw; padding: 0.8vh 2vw; }
+
+  /* Raspored 3: lista desno / Layout 3: Liste rechts */
+  body.dizajn-5.raspored-3 .overlay {
+    display: grid; grid-template-columns: 1fr 34vw; grid-template-rows: auto auto 1fr auto; column-gap: 3vw;
+    grid-template-areas: "glava vakti" "slj vakti" "info vakti" "dno vakti";
+  }
+  body.dizajn-5.raspored-3 header { grid-area: glava; }
+  body.dizajn-5.raspored-3 .sljedeci { grid-area: slj; height: 13vh; margin: 2vh 0 0; justify-content: flex-start; text-align: left; }
+  body.dizajn-5.raspored-3 .sljedeci-tekst { width: 100%; font-size: 1.9vw; }
+  body.dizajn-5.raspored-3 .nebo-info { grid-area: info; text-align: left; align-self: start; margin-top: 2vh; }
+  body.dizajn-5.raspored-3 .vakti, body.dizajn-5.raspored-3 .greska { grid-area: vakti; }
+  body.dizajn-5.raspored-3 .vakti {
+    flex-direction: column; gap: 0.8vh; padding: 1.2vh 1vw; background: rgba(6, 16, 34, 0.5); border-radius: 1.6vw;
+  }
+  body.dizajn-5.raspored-3 footer { grid-area: dno; justify-content: flex-start; }
+  body.dizajn-5.raspored-3 .dzuma { background: rgba(6, 16, 34, 0.5); font-size: 1.4vw; }
+  body.dizajn-5.raspored-3 .vakat {
+    display: grid; grid-template-columns: 1fr auto; grid-template-areas: "ime ezan" "de ezan" "namaz namaz";
+    align-content: center; text-align: left; padding: 0 1.4vw; border-radius: 1vw; background: transparent;
+  }
+  body.dizajn-5.raspored-3 .vakat.sljedeci-vakat { background: rgba(227, 194, 122, 0.22); }
+  body.dizajn-5.raspored-3 .vakat .ime { grid-area: ime; font-size: 1.7vw; }
+  body.dizajn-5.raspored-3 .vakat .ime-de { grid-area: de; font-size: 1vw; }
+  body.dizajn-5.raspored-3 .vakat .ezan { grid-area: ezan; font-size: 3.3vw; margin: 0; }
+  body.dizajn-5.raspored-3 .vakat .namaz { grid-area: namaz; min-height: 0; font-size: 0.95vw; }
+  body.dizajn-5.raspored-3 .vakat .namaz br { display: none; }
+  body.dizajn-5.raspored-3 .vakat .namaz b { margin: 0 0.8vw 0 0.3vw; }
+
+  /* Raspored 4: minimalno, sat u sredini / Layout 4: minimal, Uhr in der Mitte */
+  body.dizajn-5.raspored-4 header { flex-direction: column-reverse; align-items: center; text-align: center; }
+  body.dizajn-5.raspored-4 .sat { font-size: 10vw; text-align: center; }
+  body.dizajn-5.raspored-4 .naziv { font-size: 2.2vw; }
+  body.dizajn-5.raspored-4 .datum { font-size: 1.4vw; margin-top: 0.4vh; }
+  body.dizajn-5.raspored-4 .datum div { display: inline; }
+  body.dizajn-5.raspored-4 .datum .de::before { content: " · "; }
+  body.dizajn-5.raspored-4 .hidzra { font-size: 1.25vw; }
+  body.dizajn-5.raspored-4 .sljedeci { height: auto; margin: 1.5vh 0 1vh; }
+  body.dizajn-5.raspored-4 .vakti { flex: none; height: 21vh; margin-top: auto; gap: 0.5vw; }
+  body.dizajn-5.raspored-4 .vakat { background: transparent; border-color: transparent; border-radius: 1vw; padding: 0.5vh 0; }
+  body.dizajn-5.raspored-4 .vakat.prosao { opacity: 0.5; }
+  body.dizajn-5.raspored-4 .vakat.sljedeci-vakat { background: rgba(227, 194, 122, 0.12); border-color: rgba(227, 194, 122, 0.6); }
+  body.dizajn-5.raspored-4 .vakat .ime { font-size: 1.6vw; }
+  body.dizajn-5.raspored-4 .vakat .ime-de { font-size: 1vw; }
+  body.dizajn-5.raspored-4 .vakat .ezan { font-size: 3.4vw; margin: 0.3vh 0; }
+  body.dizajn-5.raspored-4 .vakat .namaz { font-size: 1vw; min-height: 0; }
+  body.dizajn-5.raspored-4 footer { margin-top: 1vh; }
+  body.dizajn-5.raspored-4 .dzuma { background: transparent; border-left: none; font-size: 1.3vw; padding: 0.5vh 1vw; }
+
+  /* ---------- Fontovi / Schriften ---------- */
+  @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Cormorant Garamond"; src: url("fonts/CormorantGaramond.ttf"); font-weight: 300 700; }
+  @font-face { font-family: "Josefin Sans"; src: url("fonts/JosefinSans.ttf"); font-weight: 100 700; }
+  @font-face { font-family: "Cinzel"; src: url("fonts/Cinzel.ttf"); font-weight: 400 900; }
+  @font-face { font-family: "Outfit"; src: url("fonts/Outfit.ttf"); font-weight: 100 900; }
+  body.font-montserrat { font-family: "Montserrat", sans-serif; }
+  body.font-cormorant { font-family: "Cormorant Garamond", Georgia, serif; font-variant-numeric: lining-nums; }
+  body.font-cormorant .sat, body.font-cormorant .vakat .ezan, body.font-cormorant .vakat .namaz b { font-variant-numeric: lining-nums proportional-nums; }
+  body.font-cormorant .vakat .ezan, body.font-cormorant .sat { font-weight: 400; }
+  body.font-josefin { font-family: "Josefin Sans", sans-serif; }
+  body.font-cinzel { font-family: "Cinzel", Georgia, serif; }
+  body.font-cinzel .vakat .ezan, body.font-cinzel .sat { font-weight: 400; }
+  body.font-outfit { font-family: "Outfit", sans-serif; }
+  body.font-outfit .vakat .ezan, body.font-outfit .sat { font-weight: 200; }
+
+  /* ---------- Vrijeme / Wetter ---------- */
+  .prilike-veo, .prilike-oblaci, .prilike-magla, .prilike-munja, .prilike-padavine {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+  }
+  .prilike-veo { opacity: 0; transition: opacity 20s; }
+  .prilike-oblaci .oblak { position: absolute; left: 0; animation: plovi linear infinite; }
+  .prilike-oblaci .oblak i {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(ellipse at center, var(--oblak, rgba(240,244,250,0.9)) 0%, rgba(255,255,255,0) 68%);
+  }
+  @keyframes plovi { from { transform: translateX(-50vw); } to { transform: translateX(110vw); } }
+  .prilike-magla {
+    opacity: 0; transition: opacity 20s;
+    background: linear-gradient(0deg, var(--magla, rgba(214,218,226,0.75)) 0%, rgba(214,218,226,0.35) 45%, rgba(214,218,226,0) 85%);
+  }
+  .prilike-munja { opacity: 0; }
+  .prilike-munja.vidljiva { animation: munja 0.5s ease-out; }
+  @keyframes munja { 0% { opacity: 1; } 20% { opacity: 0.2; } 30% { opacity: 1; } 100% { opacity: 0; } }
+  .prilike-bljesak { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #eef3ff; opacity: 0; pointer-events: none; z-index: 2; }
+  .prilike-bljesak.bljesni { animation: bljesak 0.7s ease-out; }
+  @keyframes bljesak { 0% { opacity: 0.55; } 12% { opacity: 0.05; } 22% { opacity: 0.4; } 100% { opacity: 0; } }
+  .prilike-staklo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
+
+  /* ---------- Ekran vakta (30 min od ezana) / Gebetsbildschirm (30 Min. ab Ezan) ---------- */
+  .overlay { transition: opacity 1.2s ease, transform 1.4s ease; }
+  body.vakat-aktivan .overlay { opacity: 0; transform: translateY(6vh) scale(0.97); }
+  .vakat-ekran {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(ellipse at 50% 45%, rgba(4, 10, 24, 0.25) 0%, rgba(4, 10, 24, 0.68) 85%);
+    opacity: 0; visibility: hidden; transition: opacity 1.6s ease, visibility 0s linear 1.6s;
+  }
+  .vakat-ekran.vidljiv { opacity: 1; visibility: visible; transition: opacity 1.6s ease, visibility 0s; }
+  .ve-ornament { position: absolute; top: 50%; left: 50%; width: 70vh; height: 70vh; margin: -38vh 0 0 -35vh; opacity: 0.24; }
+  .ve-ornament g { transform-origin: 0 0; animation: okret 240s linear infinite; }
+  .ve-ornament .crta { fill: none; stroke: var(--gold); stroke-width: 0.8; stroke-dasharray: 1600; stroke-dashoffset: 1600; }
+  .vakat-ekran.vidljiv .ve-ornament .crta { animation: crtanje 5s ease-out forwards; }
+  @keyframes crtanje { to { stroke-dashoffset: 0; } }
+  @keyframes okret { to { transform: rotate(360deg); } }
+  .vakat-ekran .valovi { display: none; }
+  .vakat-ekran.svjez .valovi { display: block; }
+  .ve-sadrzaj { position: relative; text-shadow: 0 0.3vh 1.5vh rgba(0, 0, 0, 0.5); }
+  .vakat-ekran.vidljiv .ve-sadrzaj > * { animation: uvod 1.3s cubic-bezier(.2, .8, .2, 1) both; }
+  .vakat-ekran.vidljiv .ve-sadrzaj > *:nth-child(2) { animation-delay: 0.3s; }
+  .vakat-ekran.vidljiv .ve-sadrzaj > *:nth-child(3) { animation-delay: 0.55s; }
+  .vakat-ekran.vidljiv .ve-sadrzaj > *:nth-child(4) { animation-delay: 0.9s; }
+  .ve-arapski { font-size: 4.4vw; color: var(--gold); line-height: 1.4; font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; }
+  .ve-ime { font-size: 8vw; font-weight: 300; line-height: 1.05; letter-spacing: 0.02em; }
+  .ve-ime-de { font-size: 2.5vw; color: var(--muted); margin-top: 0.5vh; }
+  .ve-status { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-top: 5vh; min-height: 14vh; }
+  .ve-status .prsten { width: 12vh; height: 12vh; }
+  .ve-status-tekst { font-size: 2.2vw; line-height: 1.4; text-align: left; }
+  .ve-status-tekst.sredina { text-align: center; }
+  .ve-status-tekst b { color: var(--gold); font-variant-numeric: tabular-nums; }
+  .ve-status-tekst .de { font-size: 1.6vw; color: var(--muted); }
+  .vakat-ekran.puls .ve-ime { animation: zlatni-puls 2.6s ease-out; }
+  @keyframes zlatni-puls { 0% { color: var(--gold); text-shadow: 0 0 4vw rgba(227, 194, 122, 0.9); } 100% { color: inherit; } }
+  .ve-sljedeci {
+    position: absolute; bottom: 5vh; left: 0; right: 0; margin: 0 auto; width: max-content; white-space: nowrap;
+    padding: 1.3vh 2.6vw; border-radius: 5vh; background: rgba(6, 16, 34, 0.45); border: 0.15vw solid rgba(227, 194, 122, 0.35);
+    font-size: 1.8vw; line-height: 1.45; animation: odozdo 1.2s 1.2s ease-out both;
+  }
+  .ve-sljedeci b { color: var(--gold); }
+  .ve-sljedeci .de { color: var(--muted); font-size: 0.82em; }
+  .ve-sat { position: absolute; top: 4vh; right: 3vw; font-size: 3.6vw; font-weight: 300; font-variant-numeric: tabular-nums; text-shadow: 0 0.3vh 1.2vh rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+<div class="uzorak"></div>
+<div class="svjetla" id="svjetla"></div>
+<div class="nebo" id="nebo"></div>
+<div class="primjer" id="primjer">PRIMJER – nisu službena vremena · BEISPIEL – keine offiziellen Zeiten</div>
+
+<div class="overlay">
+  <header>
+    <div>
+      <div class="naziv" id="naziv"></div>
+      <div class="datum"><div id="datum-bs"></div><div class="de" id="datum-de"></div></div>
+      <div class="hidzra" id="hidzra"></div>
+    </div>
+    <div class="sat"><span class="hhmm" id="hhmm"></span><span class="sek" id="sek"></span></div>
+  </header>
+
+  <div class="sljedeci" id="sljedeci">
+    <div class="sljedeci-tekst" id="sljedeci-tekst">
+      <div id="sljedeci-redovi"></div>
+      <div class="napredak"><div id="napredak"></div></div>
+    </div>
+    <div class="ikamet-panel" id="ikamet-panel">
+      <div class="prsten">
+        <svg viewBox="0 0 100 100"><circle class="pozadina-k" cx="50" cy="50" r="45"></circle><circle class="luk" id="luk" cx="50" cy="50" r="45"></circle></svg>
+        <div class="broj" id="ikamet-broj"></div>
+      </div>
+      <div class="ikamet-tekst" id="ikamet-tekst"></div>
+    </div>
+  </div>
+
+  <div class="vakti" id="vakti"></div>
+  <div class="greska" id="greska">
+    Nema vaktije za današnji datum.<br>
+    <span style="color: var(--muted)">Keine Gebetszeiten für heute vorhanden – bitte Takvim aktualisieren.</span>
+  </div>
+
+  <footer><div class="dzuma" id="dzuma"></div></footer>
+</div>
+
+<!-- Ekran vakta: 30 min od ezana / Gebetsbildschirm: 30 Min. ab dem Ezan -->
+<div class="vakat-ekran" id="vakat-ekran">
+  <svg class="ve-ornament" viewBox="-100 -100 200 200"><g>
+    <rect class="crta" x="-70" y="-70" width="140" height="140"/>
+    <rect class="crta" x="-70" y="-70" width="140" height="140" transform="rotate(45)"/>
+    <circle class="crta" r="96"/><circle class="crta" r="50"/><circle class="crta" r="99"/>
+  </g></svg>
+  <div class="valovi"><span></span><span></span><span></span></div>
+  <div class="ve-sadrzaj">
+    <div class="ve-arapski" id="ve-arapski"></div>
+    <div class="ve-ime" id="ve-ime"></div>
+    <div class="ve-ime-de" id="ve-ime-de"></div>
+    <div class="ve-status">
+      <div class="prsten" id="ve-prsten">
+        <svg viewBox="0 0 100 100"><circle class="pozadina-k" cx="50" cy="50" r="45"></circle><circle class="luk" id="ve-luk" cx="50" cy="50" r="45"></circle></svg>
+        <div class="broj" id="ve-broj"></div>
+      </div>
+      <div class="ve-status-tekst" id="ve-status"></div>
+    </div>
+  </div>
+  <div class="ve-sljedeci" id="ve-sljedeci"></div>
+  <div class="ve-sat" id="ve-sat"></div>
+</div>
+
+<script src="vaktija.js"></script>
+<script src="nebeski-kalendar.js"></script>
+<script src="nebo.js"></script>
+<script src="prilike.js"></script>
+<script>
+(function () {
+  var VAKTI = [
+    { kljuc: "zora",     bs: "Zora",          de: "Fadschr",       namazBs: "sabah-namaz",    namazDe: "Fadschr-Gebet", ekran: "Sabah", ar: "صَلَاةُ الْفَجْرِ" },
+    { kljuc: "izlazak",  bs: "Izlazak sunca", de: "Sonnenaufgang" },
+    { kljuc: "podne",    bs: "Podne",         de: "Dhuhr",         namazBs: "podne-namaz",    namazDe: "Dhuhr-Gebet", ar: "صَلَاةُ الظُّهْرِ" },
+    { kljuc: "ikindija", bs: "Ikindija",      de: "Asr",           namazBs: "ikindija-namaz", namazDe: "Asr-Gebet", ar: "صَلَاةُ الْعَصْرِ" },
+    { kljuc: "aksam",    bs: "Akšam",         de: "Maghrib",       namazBs: "akšam-namaz",    namazDe: "Maghrib-Gebet", ar: "صَلَاةُ الْمَغْرِبِ" },
+    { kljuc: "jacija",   bs: "Jacija",        de: "Ischa",         namazBs: "jacija-namaz",   namazDe: "Ischa-Gebet", ar: "صَلَاةُ الْعِشَاءِ" }
+  ];
+  var DZUMA = { kljuc: "podne", bs: "Džuma", de: "Freitagsgebet", namazBs: "džuma-namaz", namazDe: "Freitagsgebet", ar: "صَلَاةُ الْجُمُعَةِ" };
+  var DANI_BS = ["nedjelja", "ponedjeljak", "utorak", "srijeda", "četvrtak", "petak", "subota"];
+  var DANI_DE = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+  var MJESECI_BS = ["januar", "februar", "mart", "april", "maj", "juni", "juli", "august", "septembar", "oktobar", "novembar", "decembar"];
+  var MJESECI_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+  var HIDZRI_MJESECI = ["muharrem", "safer", "rebiu-l-evvel", "rebiu-l-ahir", "džumade-l-ula", "džumade-l-uhra",
+                        "redžeb", "šaban", "ramazan", "ševval", "zu-l-kade", "zu-l-hidždže"];
+  var EZAN_EKRAN_SEKUNDI = 60;
+
+  var P = window.POSTAVKE || {};
+  var V = window.VAKTIJA || {};
+  var D = P.dzuma || null;
+  var IKAMET = P.ikametNakon === undefined ? 10 : P.ikametNakon;
+  var TRAJANJE = P.trajanjeNamaza === undefined ? 10 : P.trajanjeNamaza;
+  var SABAH = P.sabahPrijeIzlaska === undefined ? 60 : P.sabahPrijeIzlaska;
+  var EKRAN = P.trajanjeEkranaVakta === undefined ? 30 : P.trajanjeEkranaVakta;
+
+  // Za probu: index.html?vrijeme=2026-10-22T18:31:30 / Zum Testen einer bestimmten Uhrzeit
+  var trazeniDizajn = /[?&]dizajn=(\d)/.exec(location.search);
+  var DIZAJN = trazeniDizajn ? +trazeniDizajn[1] : (P.dizajn || 1);
+  document.body.classList.add("dizajn-" + DIZAJN);
+  var trazeniRaspored = /[?&]raspored=(\d)/.exec(location.search);
+  var RASPORED = trazeniRaspored ? +trazeniRaspored[1] : (P.raspored || 1);
+  document.body.classList.add("raspored-" + RASPORED);
+  var trazeniFont = /[?&]font=([a-z]+)/i.exec(location.search);
+  var FONT = (trazeniFont ? trazeniFont[1] : (P.font || "")).toLowerCase().split(" ")[0];
+  if (FONT) document.body.classList.add("font-" + FONT);
+
+  var pomak = 0;
+  var trazeno = /[?&]vrijeme=([^&]+)/.exec(location.search);
+  if (trazeno) {
+    var dio = decodeURIComponent(trazeno[1]).split(/[-T:]/);
+    var cilj = new Date(+dio[0], +dio[1] - 1, +dio[2], +(dio[3] || 0), +(dio[4] || 0), +(dio[5] || 0));
+    if (!isNaN(cilj.getTime())) pomak = cilj.getTime() - Date.now();
+  }
+  // Zeitraffer zum Anschauen: index.html?brzina=600 -> 1 Sekunde = 10 Minuten
+  var trazenaBrzina = /[?&]brzina=(\d+)/.exec(location.search);
+  var BRZINA = trazenaBrzina ? Math.max(1, +trazenaBrzina[1]) : 1;
+  var pocetak = Date.now();
+  // korekcija: razlika između sata uređaja i tačnog vremena sa servera (vidi provjeriNovuVerziju)
+  // Korrektur: Unterschied zwischen Geräteuhr und genauer Serverzeit (siehe provjeriNovuVerziju)
+  var korekcija = 0;
+  function sada() { var n = Date.now(); return new Date(pocetak + pomak + korekcija + (n - pocetak) * BRZINA); }
+
+  function $(id) { return document.getElementById(id); }
+  function dvije(n) { return (n < 10 ? "0" : "") + n; }
+  function kljucDatuma(d) { return d.getFullYear() + "-" + dvije(d.getMonth() + 1) + "-" + dvije(d.getDate()); }
+  function uMinute(hhmm) { var p = hhmm.split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+  function uVrijeme(min) { min = ((min % 1440) + 1440) % 1440; return dvije(Math.floor(min / 60)) + ":" + dvije(min % 60); }
+  function postavi(id, html) { var el = $(id); if (el.innerHTML !== html) el.innerHTML = html; }
+
+  function ljetnoVrijeme(d) {
+    var jan = new Date(d.getFullYear(), 0, 1).getTimezoneOffset();
+    var jul = new Date(d.getFullYear(), 6, 1).getTimezoneOffset();
+    return d.getTimezoneOffset() < Math.max(jan, jul);
+  }
+  function hutbaZa(d) { return D ? (ljetnoVrijeme(d) ? D.hutbaLjeti : D.hutbaZimi) : null; }
+
+  // Raspored dana u minutama / Tagesplan in Minuten
+  function rasporedZa(d) {
+    var red = V[kljucDatuma(d)];
+    if (!red) return null;
+    var t = red.split(/\s+/);
+    var petak = d.getDay() === 5 && D;
+    var namazi = [];
+    for (var i = 0; i < VAKTI.length; i++) {
+      var v = VAKTI[i];
+      if (v.kljuc === "izlazak") continue;
+      var n = { i: i, info: v, vakat: uMinute(t[i]), dzuma: false };
+      if (v.kljuc === "zora") {
+        n.ezan = uMinute(t[1]) - SABAH;
+      } else if (v.kljuc === "podne" && petak) {
+        n.info = DZUMA; n.dzuma = true;
+        n.ezan = uMinute(hutbaZa(d));
+      } else {
+        n.ezan = n.vakat;
+      }
+      n.ikamet = n.dzuma ? n.ezan : n.ezan + IKAMET;
+      n.kraj = n.dzuma ? n.ezan + D.trajanje : Math.max(n.ezan + EKRAN, n.ikamet + TRAJANJE);
+      namazi.push(n);
+    }
+    return { vremena: t, namazi: namazi, petak: petak };
+  }
+
+  function hidzriDatum(d) {
+    try {
+      var dijelovi = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn",
+        { day: "numeric", month: "numeric", year: "numeric" }).formatToParts(d);
+      var dan, mj, god;
+      for (var i = 0; i < dijelovi.length; i++) {
+        if (dijelovi[i].type === "day") dan = parseInt(dijelovi[i].value, 10);
+        if (dijelovi[i].type === "month") mj = parseInt(dijelovi[i].value, 10);
+        if (dijelovi[i].type === "year") god = parseInt(dijelovi[i].value, 10);
+      }
+      if (!dan || !mj || !god) return "";
+      return dan + ". " + HIDZRI_MJESECI[mj - 1] + " " + god + ". h.g.";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function trajanjeTekst(sekundi) {
+    var h = Math.floor(sekundi / 3600), m = Math.floor((sekundi % 3600) / 60), s = sekundi % 60;
+    return (h > 0 ? h + ":" + dvije(m) : m) + ":" + dvije(s);
+  }
+
+  function crtajVakte(r) {
+    var html = "";
+    for (var i = 0; i < VAKTI.length; i++) {
+      var v = VAKTI[i], ime = v.bs, imeDe = v.de, dole = "";
+      for (var j = 0; j < r.namazi.length; j++) {
+        var n = r.namazi[j];
+        if (n.i !== i) continue;
+        ime = n.info.bs; imeDe = n.info.de;
+        if (n.dzuma) {
+          dole = "Hutba / Predigt<br><b>" + uVrijeme(n.ezan) + "</b>";
+        } else if (v.kljuc === "zora") {
+          dole = "Sabah-ezan <b>" + uVrijeme(n.ezan) + "</b><br>Namaz / Gebet <b>" + uVrijeme(n.ikamet) + "</b>";
+        } else {
+          dole = "Namaz / Gebet<br><b>" + uVrijeme(n.ikamet) + "</b>";
+        }
+      }
+      html += '<div class="vakat" id="vakat-' + v.kljuc + '" style="animation-delay:' + (0.3 + i * 0.1) + 's">' +
+        '<div class="ime">' + ime + '</div>' +
+        '<div class="ime-de">' + imeDe + '</div>' +
+        '<div class="ezan">' + r.vremena[i] + '</div>' +
+        '<div class="namaz">' + dole + '</div>' +
+        '</div>';
+    }
+    $("vakti").innerHTML = html;
+  }
+
+  // Ekran vakta / Gebetsbildschirm
+  var veAktivan = false, veFaza = "";
+  function sakrijVakatEkran() {
+    if (!veAktivan) return;
+    veAktivan = false; veFaza = "";
+    $("vakat-ekran").className = "vakat-ekran";
+    document.body.classList.remove("vakat-aktivan");
+    if (danas) crtajVakte(danas);          // kartice ponovo uleću / Karten fliegen wieder herein
+  }
+  function prikaziVakatEkran(cilj, s, ezan, ikamet, kraj, sljedeci, sljedeciSutra) {
+    if (BRZINA > 1) return;
+    var info = cilj.info, ve = $("vakat-ekran");
+    if (!veAktivan) {
+      veAktivan = true;
+      document.body.classList.add("vakat-aktivan");
+      ve.className = "vakat-ekran vidljiv" + (s - ezan < EZAN_EKRAN_SEKUNDI ? " svjez" : "");
+      postavi("ve-arapski", info.ar || "");
+      postavi("ve-ime", info.ekran || info.bs);
+      postavi("ve-ime-de", info.de);
+      if (sljedeci) {
+        var sv = sljedeci.info, imeS = sv.ekran || sv.bs, kad = uVrijeme(sljedeci.dzuma ? sljedeci.ezan : sljedeci.ikamet);
+        postavi("ve-sljedeci", "Sljedeći namaz: <b>" + imeS + "</b> " + (sljedeciSutra ? "sutra " : "") + "u <b>" + kad + "</b>" +
+          '<br><span class="de">Nächstes Gebet: ' + sv.de + " " + (sljedeciSutra ? "morgen " : "") + "um " + kad + "</span>");
+      } else postavi("ve-sljedeci", "");
+    }
+    if (s - ezan >= EZAN_EKRAN_SEKUNDI && ve.className.indexOf("svjez") >= 0) ve.className = "vakat-ekran vidljiv";
+    var faza = cilj.dzuma ? "hutba" : (s < ikamet ? "ezan" : (s < ikamet + TRAJANJE * 60 ? "namaz" : "poslije"));
+    if (faza !== veFaza) {
+      if (veFaza === "ezan" && faza === "namaz") { ve.className = "vakat-ekran vidljiv puls"; }
+      veFaza = faza;
+    }
+    $("ve-prsten").style.display = faza === "ezan" ? "" : "none";
+    var st = $("ve-status");
+    if (faza === "ezan") {
+      var doIkameta = ikamet - s;
+      postavi("ve-broj", trajanjeTekst(doIkameta));
+      $("ve-luk").style.strokeDashoffset = (283 * (1 - doIkameta / Math.max(1, ikamet - ezan))).toFixed(1);
+      st.className = "ve-status-tekst";
+      postavi("ve-status", "Namaz počinje za <b>" + trajanjeTekst(doIkameta) + "</b><br>" +
+        '<span class="de">Das Gebet beginnt in ' + trajanjeTekst(doIkameta) + "</span>");
+    } else if (faza === "namaz" || faza === "hutba") {
+      st.className = "ve-status-tekst sredina";
+      postavi("ve-status", (faza === "hutba" ? "Hutba je počela" : "Namaz je počeo") + " · molimo utišajte mobitele<br>" +
+        '<span class="de">' + (faza === "hutba" ? "Die Predigt hat begonnen" : "Das Gebet hat begonnen") + " · bitte Handys lautlos stellen</span>");
+    } else {
+      st.className = "ve-status-tekst sredina";
+      postavi("ve-status", 'Allah neka primi namaz<br><span class="de">Möge Allah das Gebet annehmen</span>');
+    }
+  }
+
+  var zadnjiDatum = "", zadnjaMinuta = "", danas = null;
+
+  function osvjezi() {
+    var sad = sada();
+    var kljuc = kljucDatuma(sad);
+
+    // Sat / Uhr
+    var hhmm = dvije(sad.getHours()) + '<span class="dvotacka">:</span>' + dvije(sad.getMinutes());
+    if (hhmm !== zadnjaMinuta) {
+      var el = $("hhmm");
+      el.innerHTML = hhmm;
+      if (zadnjaMinuta && BRZINA === 1) { el.className = "hhmm"; void el.offsetWidth; el.className = "hhmm nova"; }
+      zadnjaMinuta = hhmm;
+    }
+    var sek = $("sek");
+    sek.textContent = ":" + dvije(sad.getSeconds());
+    if (BRZINA === 1) { sek.className = "sek"; void sek.offsetWidth; sek.className = "sek tik"; }
+    $("ve-sat").textContent = dvije(sad.getHours()) + ":" + dvije(sad.getMinutes());
+
+    // Novi dan / Neuer Tag
+    if (kljuc !== zadnjiDatum) {
+      zadnjiDatum = kljuc;
+      danas = rasporedZa(sad);
+      $("datum-bs").textContent = DANI_BS[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_BS[sad.getMonth()] + " " + sad.getFullYear() + ".";
+      $("datum-de").textContent = DANI_DE[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_DE[sad.getMonth()] + " " + sad.getFullYear();
+      $("hidzra").textContent = hidzriDatum(sad);
+      $("vakti").style.display = danas ? "" : "none";
+      $("sljedeci").style.display = danas ? "" : "none";
+      $("greska").style.display = danas ? "none" : "block";
+      if (danas) crtajVakte(danas);
+      var hutba = hutbaZa(sad);
+      $("dzuma").style.display = hutba ? "" : "none";
+      if (hutba) $("dzuma").innerHTML = '<span class="naslov">Džuma namaz · Freitagsgebet</span><b>' + hutba + '</b>';
+      var pr = window.PROVJERENO;
+      if (!pomak && kljuc < "2026-10-01") {
+        // Sat uređaja očito nije tačan (npr. nakon nestanka struje bez interneta)
+        // Geräteuhr offensichtlich falsch (z. B. nach Stromausfall ohne Internet)
+        $("primjer").textContent = "Sat na uređaju nije tačan – provjerite internet · Uhrzeit am Gerät falsch – bitte Internet prüfen";
+        $("primjer").style.display = "block";
+      } else {
+        $("primjer").textContent = "PRIMJER – nisu službena vremena · BEISPIEL – keine offiziellen Zeiten";
+        $("primjer").style.display = P.primjer || (pr && (kljuc < pr.od || kljuc > pr["do"])) ? "block" : "none";
+      }
+    }
+    if (!danas) { sakrijVakatEkran(); return; }
+
+    var s = sad.getHours() * 3600 + sad.getMinutes() * 60 + sad.getSeconds();
+    if (DIZAJN === 5 && window.Nebo) {
+      Nebo.azuriraj(sad);
+      if (window.Prilike && Nebo.zadnje) Prilike.azuriraj(Nebo.zadnje.sunce.alt);
+    }
+
+    // Koji je namaz sljedeći? / Welches Gebet ist als Nächstes?
+    var cilj = null, prethodniKraj = 0, iCilj = -1;
+    for (var i = 0; i < danas.namazi.length; i++) {
+      if (danas.namazi[i].kraj * 60 > s) { cilj = danas.namazi[i]; iCilj = i; break; }
+      prethodniKraj = danas.namazi[i].kraj * 60;
+    }
+    var pomakDana = 0;
+    var sutra = rasporedZa(new Date(sad.getFullYear(), sad.getMonth(), sad.getDate() + 1));
+    if (!cilj && sutra) { cilj = sutra.namazi[0]; pomakDana = 86400; }
+
+    // Kartice / Karten
+    for (var k = 0; k < VAKTI.length; k++) {
+      var kartica = $("vakat-" + VAKTI[k].kljuc), prosao;
+      if (VAKTI[k].kljuc === "izlazak") prosao = uMinute(danas.vremena[1]) * 60 <= s;
+      else {
+        prosao = false;
+        for (var m = 0; m < danas.namazi.length; m++) if (danas.namazi[m].i === k) prosao = danas.namazi[m].kraj * 60 <= s;
+      }
+      var klasa = "vakat" + (prosao ? " prosao" : "");
+      if (cilj && !pomakDana && cilj.i === k) klasa = "vakat sljedeci-vakat";
+      kartica.setAttribute("data-klasa", klasa);
+    }
+
+    if (!cilj) {
+      postavi("sljedeci-redovi", "");
+      sakrijVakatEkran();
+      primijeniKlase();
+      return;
+    }
+
+    var ezan = cilj.ezan * 60 + pomakDana, ikamet = cilj.ikamet * 60 + pomakDana;
+    var info = cilj.info;
+    var faza = s < ezan ? "prije" : "vakat";
+    var karticaCilja = $("vakat-" + VAKTI[cilj.i].kljuc);
+
+    if (faza === "prije") {
+      var ostalo = ezan - s;
+      var uskoro = ostalo <= 15 * 60;
+      var naziv = cilj.dzuma ? "Džuma – hutba" : (VAKTI[cilj.i].kljuc === "zora" ? "Sabah-ezan" : info.bs);
+      var nazivDe = cilj.dzuma ? "Freitagspredigt" : (VAKTI[cilj.i].kljuc === "zora" ? "Fadschr-Ezan" : info.de);
+      postavi("sljedeci-redovi",
+        'Sljedeće: <b>' + naziv + '</b> za <span class="odbrojavanje">' + trajanjeTekst(ostalo) + '</span><br>' +
+        '<span class="de">Als Nächstes: ' + nazivDe + ' in ' + trajanjeTekst(ostalo) + '</span>');
+      var ukupno = Math.max(1, ezan - prethodniKraj);
+      $("napredak").style.transform = "scaleX(" + Math.min(1, Math.max(0, 1 - ostalo / ukupno)).toFixed(4) + ")";
+      $("sljedeci").className = "sljedeci" + (uskoro ? " uskoro" : "");
+      if (uskoro && !pomakDana) karticaCilja.setAttribute("data-klasa", "vakat sljedeci-vakat uskoro");
+      $("sljedeci-tekst").style.display = "";
+      $("ikamet-panel").style.display = "none";
+      sakrijVakatEkran();
+    } else {
+      karticaCilja.setAttribute("data-klasa", "vakat sljedeci-vakat aktivan");
+      var sljedeci = !pomakDana && iCilj + 1 < danas.namazi.length ? danas.namazi[iCilj + 1] : (sutra ? sutra.namazi[0] : null);
+      var sljedeciSutra = pomakDana > 0 || iCilj + 1 >= danas.namazi.length;
+      if (pomakDana && sutra && sutra.namazi.length > 1) sljedeci = sutra.namazi[1];
+      prikaziVakatEkran(cilj, s, ezan, ikamet, cilj.kraj * 60 + pomakDana, sljedeci, sljedeciSutra);
+    }
+    primijeniKlase();
+
+    // Svaki dan u 03:00 ponovo učitaj stranicu / Täglich um 03:00 neu laden
+    if (!pomak && BRZINA === 1 && sad.getHours() === 3 && sad.getMinutes() === 0 && sad.getSeconds() === 0) {
+      if (prekoInterneta) provjeriNovuVerziju(true); else location.reload();
+    }
+  }
+
+  // Ako stranica dolazi s interneta: svakih 5 minuta provjeri ima li novih podataka i učitaj ih.
+  // Wenn die Seite aus dem Internet kommt: alle 5 Minuten nach Änderungen schauen und neu laden.
+  // Bez interneta stranica jednostavno radi dalje sa starim podacima. / Ohne Internet läuft sie einfach weiter.
+  var prekoInterneta = location.protocol === "http:" || location.protocol === "https:";
+  var zadnjaVerzija = null;
+  function provjeriNovuVerziju(ucitajAkoUspije) {
+    if (!prekoInterneta) return;
+    var x = new XMLHttpRequest();
+    x.open("GET", "vaktija.js?v=" + Date.now());
+    x.onload = function () {
+      if (x.status !== 200 || x.responseText.indexOf("var VAKTIJA") < 0) return;
+      // Tačno vrijeme sa servera: ako sat uređaja kasni ili žuri, ispravi ga
+      // Genaue Zeit vom Server: geht die Geräteuhr falsch, wird sie korrigiert
+      var zaglavlje = x.getResponseHeader("Date");
+      if (zaglavlje && !pomak) {
+        var server = Date.parse(zaglavlje) + (+(x.getResponseHeader("Age") || 0)) * 1000 + 500;
+        var razlika = server - Date.now();
+        if (!isNaN(razlika)) korekcija = Math.abs(razlika) > 5000 ? razlika : 0;
+      }
+      if (zadnjaVerzija === null) zadnjaVerzija = x.responseText;
+      if (ucitajAkoUspije || x.responseText !== zadnjaVerzija) location.reload();
+    };
+    x.send();
+  }
+
+  // Klasu mijenjamo samo kad se promijeni, da animacije ne počinju ispočetka.
+  // Klasse nur bei Änderung setzen, damit Animationen nicht neu starten.
+  function primijeniKlase() {
+    var kartice = $("vakti").children;
+    for (var i = 0; i < kartice.length; i++) {
+      var nova = kartice[i].getAttribute("data-klasa");
+      if (nova && kartice[i].className !== nova) kartice[i].className = nova;
+    }
+  }
+
+  function napraviSvjetla() {
+    var html = "";
+    for (var i = 0; i < 18; i++) {
+      var vel = (0.4 + Math.random() * 0.9).toFixed(2);
+      html += '<span style="left:' + (Math.random() * 100).toFixed(1) + 'vw;width:' + vel + 'vw;height:' + vel + 'vw;' +
+        'animation-duration:' + (22 + Math.random() * 26).toFixed(1) + 's;animation-delay:-' + (Math.random() * 40).toFixed(1) + 's"></span>';
+    }
+    $("svjetla").innerHTML = html;
+  }
+
+  $("naziv").textContent = P.naziv || "";
+  if (P.pozadina) {
+    document.body.style.backgroundImage = 'url("' + P.pozadina + '")';
+    document.body.classList.add("has-photo");
+  }
+  napraviSvjetla();
+  // Horizont i dio neba za svaki raspored (u pikselima od 1920 × 1080)
+  // Horizont und Himmelsausschnitt je Layout (in Pixeln von 1920 × 1080)
+  var NEBO_RASPORED = {
+    1: { horizont: 575, dzamijaX: 1500 },
+    2: { horizont: 770, dzamijaX: 1450 },
+    3: { horizont: 900, x1: 1240, azOd: 70, azDo: 290, dzamijaX: 820 },
+    4: { horizont: 760, dzamijaX: 1450 }
+  };
+  if (DIZAJN === 5 && window.Nebo) {
+    var o = NEBO_RASPORED[RASPORED] || NEBO_RASPORED[1];
+    Nebo.init($("nebo"), o);
+    if (window.Prilike) Prilike.init(document.body);
+  }
+  provjeriNovuVerziju(false);
+  setInterval(function () { provjeriNovuVerziju(false); }, 5 * 60 * 1000);
+
+  osvjezi();
+  setInterval(osvjezi, BRZINA > 1 ? 100 : 1000);
+})();
+</script>
+</body>
+</html>
