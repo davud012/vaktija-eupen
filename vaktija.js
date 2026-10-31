@@ -23,7 +23,7 @@ var POSTAVKE = {
   font: "",
 
   /* Naziv džemata / Name der Gemeinde */
-  naziv: "Džemat Eupen",
+  naziv: "Džemat EKC Elif",
 
   /* Slika u pozadini (npr. "dzamija.jpg"). Prazno = bez slike.
      Hintergrundbild (z. B. "dzamija.jpg"). Leer = ohne Bild. */
