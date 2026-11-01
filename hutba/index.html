@@ -571,11 +571,11 @@
     veza.posalji("stanje", {
       aktivno: aktivno, s: sesija, t: Date.now(), c: ciljKod(),
       // Nakon završetka ništa ne ostaje na serveru / Nach dem Ende bleibt nichts auf dem Server
-      zadnje: aktivno ? recenice.filter(function (r) { return r.gotovo && r.id > tvOd; }).slice(-3) : []
+      zadnje: aktivno ? recenice.filter(function (r) { return r.gotovo && !r.neuspio && r.id > tvOd; }).slice(-3) : []
     }, true);
   }
   function posaljiRecenicu(r) {
-    if (veza && aktivno && r.id > tvOd) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo, p: r.p ? 1 : 0 });
+    if (veza && aktivno && r.id > tvOd) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.neuspio ? "-" : (r.de || ""), gotovo: !!r.gotovo, p: r.p ? 1 : 0 });
   }
   function prikaziTVDugme() {
     $("tv-dugme").classList.toggle("ukljucen", aktivno);
@@ -708,6 +708,28 @@
     r.maxAlternatives = 1;
     var trenutna = null;     // rečenica koja se upravo govori / Satz, der gerade gesprochen wird
 
+    // Neki preglednici (npr. Safari na iPhoneu) dugo ne završavaju rečenicu. Zato šaljemo dio teksta
+    // čim imam napravi kratku pauzu (1 s) ili kad se skupi ~20 riječi.
+    // Manche Browser (z. B. Safari auf dem iPhone) schließen Sätze lange nicht ab. Darum wird Text
+    // weitergegeben, sobald der Imam kurz pausiert (1 s) oder sich ~20 Wörter angesammelt haben.
+    var predato = 0, zadnjiInterim = "", zadnjaPromjena = 0;
+    function rijeciOd(tekst) { return tekst.split(/\s+/).filter(Boolean); }
+    function predaj(tekst) {
+      var s1 = trenutna || novaRecenica(); trenutna = null;
+      s1.bs = tekst; s1.konacno = true; zadnjiKraj = Date.now();
+      prevedi(s1);
+    }
+    var mirnoTimer = setInterval(function () {
+      if (prepoznavanje !== r || !zadnjiInterim) return;
+      var w = rijeciOd(zadnjiInterim), nepredato = w.length - predato;
+      var mirno = Date.now() - zadnjaPromjena > 1100;
+      if (nepredato > 0 && (mirno || nepredato >= 22)) {
+        var uzmi = mirno ? nepredato : nepredato - 4;   // zadnje riječi se još mijenjaju / letzte Wörter ändern sich noch
+        predaj(w.slice(predato, predato + uzmi).join(" "));
+        predato += uzmi;
+      }
+    }, 300);
+
     r.onresult = function (e) {
       var privremeno = "";
       for (var i = e.resultIndex; i < e.results.length; i++) {
@@ -717,21 +739,24 @@
           // Neki telefoni ponavljaju već izgovoreno – samo novi dio
           // Manche Handys wiederholen Gesagtes – nur den neuen Teil nehmen
           if (zadnjaKonacna && tx.indexOf(zadnjaKonacna) === 0) tx = tx.slice(zadnjaKonacna.length).trim();
-          if (!tx) continue;
           zadnjaKonacna = e.results[i][0].transcript.trim();
-          if (!trenutna) trenutna = novaRecenica();
-          trenutna.bs = tx; trenutna.konacno = true; zadnjiKraj = Date.now();
-          prevedi(trenutna);
-          trenutna = null;
+          var ostatak = rijeciOd(tx).slice(predato).join(" ");
+          predato = 0; zadnjiInterim = "";
+          if (ostatak) predaj(ostatak);
+          else if (trenutna) { ukloni(trenutna); trenutna = null; }
         } else {
           privremeno += (privremeno ? " " : "") + tx;
         }
       }
       if (privremeno) {
-        if (!trenutna) trenutna = novaRecenica();
-        trenutna.bs = privremeno;
-        prikaziTok();
-        if (Date.now() - zadnjiPrivremeni > 700) { zadnjiPrivremeni = Date.now(); posaljiRecenicu(trenutna); }
+        if (privremeno !== zadnjiInterim) { zadnjiInterim = privremeno; zadnjaPromjena = Date.now(); }
+        var dio = rijeciOd(privremeno).slice(predato).join(" ");
+        if (dio) {
+          if (!trenutna) trenutna = novaRecenica();
+          trenutna.bs = dio;
+          prikaziTok();
+          if (Date.now() - zadnjiPrivremeni > 700) { zadnjiPrivremeni = Date.now(); posaljiRecenicu(trenutna); }
+        }
       }
     };
     r.onerror = function (e) {
@@ -746,8 +771,9 @@
     };
     r.onend = function () {
       // Mikrofon ostaje uključen: odmah ponovo slušati / Mikrofon bleibt an: sofort weiter zuhören
-      zadnjaKonacna = "";
+      zadnjaKonacna = ""; clearInterval(mirnoTimer); zadnjiInterim = ""; predato = 0;
       if (trenutna && trenutna.bs && !trenutna.konacno) { trenutna.konacno = true; prevedi(trenutna); }
+      trenutna = null;
       if (snima && slusa && prepoznavanje === r) {
         setTimeout(function () { if (snima && slusa && prepoznavanje === r) { try { slusaj(); } catch (e) {} } }, 250);
       }
@@ -915,12 +941,24 @@
     prikaziTok(); posaljiRecenicu(r);
     var c = claude(), iz = izvor(), ck = ciljKod();
     var posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
-    posao.catch(function () { return c ? prevediGoogle(r.bs, iz.g, ck) : ""; }).then(function (de) {
+    var greska = "";
+    posao.catch(function (e) {
+      greska = String((e && e.message) || e);
+      return c ? prevediGoogle(r.bs, iz.g, ck) : "";
+    }).catch(function (e) { greska = String((e && e.message) || e); return ""; }).then(function (de) {
       de = (de || "").trim();
       if (de === "-" || de === "–") { ukloni(r); return; }
       if (/^¶/.test(de)) { r.p = true; de = de.replace(/^¶\s*/, ""); }
-      r.de = de || t("neuspjelo");
-      r.gotovo = true;
+      if (!de) {
+        // Neuspjeh se ne prikazuje na TV-u / Fehler wird nicht am Fernseher gezeigt
+        r.neuspio = true; r.de = t("neuspjelo"); r.gotovo = true;
+        var fn = function () { return "<b>" + t("neuspjelo") + "</b>" + kodHtml(esc(greska.slice(0, 160))); }; fn.prevod = true;
+        upozori(fn);
+        prikaziTok(); posaljiRecenicu(r);
+        return;
+      }
+      if (upozorenjeFn && upozorenjeFn.prevod) upozori(null);
+      r.de = de; r.gotovo = true;
       prikaziTok(); posaljiRecenicu(r);
     });
   }
@@ -945,9 +983,25 @@
 
   function prevediGoogle(tekst, sl, tl) {
     if (sl === tl) return Promise.resolve(tekst);
+    // Dugi tekst u dijelove do ~900 znakova / Langer Text in Stücke bis ~900 Zeichen
+    var dijelovi = [], w = tekst.split(/\s+/), tren = "";
+    w.forEach(function (x) { if ((tren + " " + x).length > 900 && tren) { dijelovi.push(tren); tren = x; } else tren = tren ? tren + " " + x : x; });
+    if (tren) dijelovi.push(tren);
+    var rez = [];
+    return dijelovi.reduce(function (p, dio) {
+      return p.then(function () { return googleJedan(dio, sl, tl, 1); }).then(function (x) { rez.push(x); });
+    }, Promise.resolve()).then(function () { return rez.join(" "); });
+  }
+  function googleJedan(tekst, sl, tl, pokusaji) {
     var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sl + "&tl=" + tl + "&dt=t&q=" + encodeURIComponent(tekst);
-    return fetch(url).then(function (o) { return o.json(); }).then(function (d) {
+    return fetch(url).then(function (o) {
+      if (!o.ok) throw new Error("Google " + o.status);
+      return o.json();
+    }).then(function (d) {
       return (d[0] || []).map(function (x) { return x[0]; }).join("");
+    }).catch(function (e) {
+      if (pokusaji > 0) return new Promise(function (ok) { setTimeout(ok, 900); }).then(function () { return googleJedan(tekst, sl, tl, pokusaji - 1); });
+      throw new Error("Google: " + ((e && e.message) || e));
     });
   }
 
