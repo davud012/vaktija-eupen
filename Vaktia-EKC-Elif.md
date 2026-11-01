@@ -139,7 +139,7 @@ Tipps von unterwegs:
 
 - **Fehler behoben:** Ging die Uhr der Android-Box mehr als 90 s anders als die Handy-Uhr, hat der Fernseher das Hutba-Signal ignoriert. Jetzt werden keine Uhrzeiten mehr verglichen. Gespeicherte (alte) Signale vom Server werden ignoriert, es zählt nur das Live-Signal des Handys (alle 5 s).
 - Hintergrund jetzt **dunkelblau wie der Hutba-Bildschirm**.
-- **Verbindungsanzeige** unten links auf dem Fernseher (die ersten 2 Minuten nach dem Laden): grün „Übersetzung bereit“ oder rot „keine Verbindung“.
+- **Verbindungsanzeige** unten links: auf Wunsch ausgeblendet (`.veza-tv { display: none }` in index.html; zum Wiedereinschalten `display: none;` entfernen).
 - **Leichte Version an** (`lagano: true`) und versteckte Bildschirme ohne Animation, damit die Box nicht überlastet wird.
 - Fernseher-Fehler „ERR_CONNECTION_RESET“ = die Box hatte in dem Moment kein Internet zu GitHub. In Fully Kiosk automatisches Neuladen einstellen (siehe Chat).
 
