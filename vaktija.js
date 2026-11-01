@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-01.16 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-01.17 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -25,7 +25,7 @@ var POSTAVKE = {
 
   /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
-  lagano: false,
+  lagano: true,
 
   /* Pozadina: true = živo nebo (sunce, mjesec, oblaci), false = mirna plava pozadina (brže na slabijem uređaju).
      Hintergrund: true = lebendiger Himmel, false = ruhiger blauer Hintergrund (schneller auf schwachen Geräten). */

@@ -286,7 +286,12 @@
   /* ---------- Dizajn 5: Nebo – pravo nebo iznad Eupena / Der echte Himmel über Eupen ---------- */
   body.dizajn-5 { background: #061223; }
   /* Mirna plava pozadina umjesto živog neba / Ruhiger blauer Hintergrund statt lebendigem Himmel */
-  body.dizajn-5.plavo { background: linear-gradient(180deg, #24478f 0%, #1a3672 45%, #0f234d 100%) fixed; }
+  body.dizajn-5.plavo { background: linear-gradient(180deg, #1a3868 0%, #142b52 45%, #0f1a30 100%); min-height: 100vh; }
+  /* Stanje veze za prijevod (samo prve 2 minute) / Verbindungsstatus für die Übersetzung (nur die ersten 2 Minuten) */
+  .veza-tv { position: fixed; left: 1.5vw; bottom: 1.2vh; z-index: 40; font-size: 1vw; color: rgba(251, 248, 241, 0.6); transition: opacity 2s ease; }
+  .veza-tv i { display: inline-block; width: 0.7vw; height: 0.7vw; border-radius: 50%; background: #e5484d; margin-right: 0.5vw; vertical-align: middle; }
+  .veza-tv.ok i { background: #3dd68c; }
+  .veza-tv.skriven { opacity: 0; }
   body.dizajn-5.plavo .nebo { display: none; }
   body.dizajn-5 .uzorak, body.dizajn-5 .svjetla { display: none; }
   body.dizajn-5 .nebo { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
@@ -529,6 +534,8 @@
     position: absolute; bottom: 4vh; left: 0; right: 0; text-align: center; font-size: 1.25vw; color: rgba(251, 248, 241, 0.5);
   }
   body.lagano .he-uzivo i { animation: none; }
+  /* Skriveni ekrani ne troše snagu / Versteckte Bildschirme verbrauchen keine Leistung */
+  .vakat-ekran:not(.vidljiv) *, .hutba-ekran:not(.vidljiv) * { animation: none !important; }
   body.lagano .he-linije { -webkit-mask-image: none; mask-image: none; }
   body.lagano .he-rijec { animation: none; }
 </style>
@@ -596,6 +603,7 @@
   <div class="ve-sat" id="ve-sat"></div>
 </div>
 
+<div class="veza-tv" id="veza-tv"><i></i><span>Prijevod · Übersetzung …</span></div>
 <div class="hutba-ekran" id="hutba-ekran">
   <div class="he-vrh">
     <div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div>
@@ -1194,12 +1202,14 @@
       if (s === sesija) return;
       sesija = s; ocisti();
     }
-    function naPoruku(tema, m) {
+    function naPoruku(tema, m, zadrzano) {
       if (tema === "stanje") {
         if (!m.aktivno) { sakrij(); return; }
-        // Stara zadržana poruka (mobitel se ugasio) – ne prikazivati
-        // Alte gespeicherte Nachricht (Handy war weg) – nicht anzeigen
-        if (m.t && Math.abs(Date.now() - m.t) > 90000 && !vidljiv) return;
+        // Sačuvana poruka sa servera se ne prikazuje – čeka se živi signal mobitela (svakih 5 s).
+        // Ne poredimo satove, jer sat TV-a i mobitela mogu biti različiti.
+        // Gespeicherte Nachricht vom Server wird nicht angezeigt – es wird auf das Live-Signal des Handys gewartet (alle 5 s).
+        // Keine Uhrzeiten vergleichen, weil Fernseher- und Handy-Uhr unterschiedlich gehen können.
+        if (zadrzano && !vidljiv) return;
         var nova = m.s !== sesija;
         novaSesija(m.s); postaviJezik(m.c);
         if (nova) (m.zadnje || []).forEach(function (r) {
@@ -1239,14 +1249,15 @@
     if (!window.PrijevodVeza || !window.mqtt) return;
     // TV čuva šifrovane postavke (ne može ih pročitati) i ponovo ih objavi ako ih server izgubi
     // Der Fernseher hebt die verschlüsselten Einstellungen auf (kann sie nicht lesen) und veröffentlicht sie neu, falls der Server sie verliert
-    var tvVeza = null, videnPaketT = 0;
+    var tvVeza = null, videnPaketT = 0, startVeze = Date.now();
+    setTimeout(function () { var el = $("veza-tv"); if (el.className.indexOf(" ok") >= 0) el.className += " skriven"; }, 120000);
     function sacuvaniPaket() { try { return JSON.parse(localStorage.getItem("hutba-postavke-paket") || "null"); } catch (e) { return null; } }
     function obnoviPaket() {
       var pk = sacuvaniPaket();
       if (tvVeza && pk && pk.t > videnPaketT) tvVeza.posalji("postavke", pk, true);
     }
     var staroNaPoruku = naPoruku;
-    naPoruku = function (tema, m) {
+    naPoruku = function (tema, m, zadrzano) {
       if (tema === "postavke") {
         if (!m || !m.ct || !m.t) return;
         videnPaketT = Math.max(videnPaketT, m.t);
@@ -1254,11 +1265,16 @@
         if (!pk || m.t > pk.t) { try { localStorage.setItem("hutba-postavke-paket", JSON.stringify(m)); } catch (e) {} }
         return;
       }
-      staroNaPoruku(tema, m);
+      staroNaPoruku(tema, m, zadrzano);
     };
     try {
       tvVeza = PrijevodVeza.povezi(HP.kanal, {
         teme: ["stanje", "tekst", "postavke"], naPoruku: naPoruku,
+        naStanjeVeze: function (n, ukupno) {
+          var el = $("veza-tv");
+          el.className = "veza-tv" + (n > 0 ? " ok" : "") + (Date.now() - startVeze > 120000 && n > 0 ? " skriven" : "");
+          el.querySelector("span").textContent = n > 0 ? "Prijevod spreman · Übersetzung bereit (" + n + "/" + ukupno + ")" : "Prijevod: nema veze · Übersetzung: keine Verbindung";
+        },
         naPovezivanje: function () { videnPaketT = 0; setTimeout(obnoviPaket, 6000); }
       });
       setInterval(obnoviPaket, 30 * 60000);

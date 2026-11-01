@@ -47,7 +47,7 @@ var PrijevodVeza = (function () {
       k.on("close", function () { stanjeVeze[i] = false; javiStanje(); });
       k.on("offline", function () { stanjeVeze[i] = false; javiStanje(); });
       k.on("error", function () { /* ponovo se povezuje samo / verbindet sich selbst neu */ });
-      k.on("message", function (tema, sadrzaj) {
+      k.on("message", function (tema, sadrzaj, paket) {
         if (!opcije.naPoruku) return;
         var tekst = String(sadrzaj), poruka;
         try { poruka = JSON.parse(tekst); } catch (e) { return; }
@@ -57,7 +57,8 @@ var PrijevodVeza = (function () {
         if (vidjeno[kljuc]) return;
         vidjeno[kljuc] = 1; redVidjenih.push(kljuc);
         if (redVidjenih.length > 300) delete vidjeno[redVidjenih.shift()];
-        opcije.naPoruku(tema.slice(kanal.length + 1), poruka);
+        // zadrzano = stara sačuvana poruka sa servera (ne uživo) / gespeicherte Nachricht vom Server (nicht live)
+        opcije.naPoruku(tema.slice(kanal.length + 1), poruka, !!(paket && paket.retain));
       });
       klijenti.push(k);
     });

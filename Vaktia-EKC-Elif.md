@@ -135,6 +135,14 @@ Tipps von unterwegs:
 - **Gebets-Bildschirm** je Gebet: Sabah 15 Min., Podne 20, Ikindija 20, Akšam 20, Jacija 20 (ab Ezan, `trajanjeEkranaVakta`). Džuma unverändert.
 - **Ruhiger blauer Hintergrund** statt lebendigem Himmel (`nebo: false`), weil die Box beim Himmel ruckelte. Damit gibt es auch keine Wetter-Animationen mehr. Zurück zum Himmel: `nebo: true`.
 
+## Änderungen 1.11.2026 (Moschee-Test)
+
+- **Fehler behoben:** Ging die Uhr der Android-Box mehr als 90 s anders als die Handy-Uhr, hat der Fernseher das Hutba-Signal ignoriert. Jetzt werden keine Uhrzeiten mehr verglichen. Gespeicherte (alte) Signale vom Server werden ignoriert, es zählt nur das Live-Signal des Handys (alle 5 s).
+- Hintergrund jetzt **dunkelblau wie der Hutba-Bildschirm**.
+- **Verbindungsanzeige** unten links auf dem Fernseher (die ersten 2 Minuten nach dem Laden): grün „Übersetzung bereit“ oder rot „keine Verbindung“.
+- **Leichte Version an** (`lagano: true`) und versteckte Bildschirme ohne Animation, damit die Box nicht überlastet wird.
+- Fernseher-Fehler „ERR_CONNECTION_RESET“ = die Box hatte in dem Moment kein Internet zu GitHub. In Fully Kiosk automatisches Neuladen einstellen (siehe Chat).
+
 ## Später geplant
 
 - **Neuer Takvim:** Jedes Jahr im **Dezember** die Takvim-Seiten fürs nächste Jahr fotografieren und Claude schicken. Claude trägt sie in `vaktija.js` ein und lädt sie hoch. Der Fernseher übernimmt das automatisch.
