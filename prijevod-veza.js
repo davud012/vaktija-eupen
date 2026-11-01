@@ -41,7 +41,7 @@ var PrijevodVeza = (function () {
       try { k = mqtt.connect(url, o); } catch (e) { return; }
       k.on("connect", function () {
         stanjeVeze[i] = true; javiStanje();
-        if (opcije.naPoruku) k.subscribe([kanal + "/stanje", kanal + "/tekst"], { qos: 0 });
+        if (opcije.naPoruku) k.subscribe(opcije.teme ? opcije.teme.map(function (x) { return kanal + "/" + x; }) : [kanal + "/stanje", kanal + "/tekst"], { qos: 0 });
         if (opcije.naPovezivanje) opcije.naPovezivanje();
       });
       k.on("close", function () { stanjeVeze[i] = false; javiStanje(); });

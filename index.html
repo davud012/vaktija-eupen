@@ -1172,7 +1172,32 @@
       return;
     }
     if (!window.PrijevodVeza || !window.mqtt) return;
-    try { PrijevodVeza.povezi(HP.kanal, { naPoruku: naPoruku }); } catch (e) { /* bez prijevoda / ohne Übersetzung */ }
+    // TV čuva šifrovane postavke (ne može ih pročitati) i ponovo ih objavi ako ih server izgubi
+    // Der Fernseher hebt die verschlüsselten Einstellungen auf (kann sie nicht lesen) und veröffentlicht sie neu, falls der Server sie verliert
+    var tvVeza = null, videnPaketT = 0;
+    function sacuvaniPaket() { try { return JSON.parse(localStorage.getItem("hutba-postavke-paket") || "null"); } catch (e) { return null; } }
+    function obnoviPaket() {
+      var pk = sacuvaniPaket();
+      if (tvVeza && pk && pk.t > videnPaketT) tvVeza.posalji("postavke", pk, true);
+    }
+    var staroNaPoruku = naPoruku;
+    naPoruku = function (tema, m) {
+      if (tema === "postavke") {
+        if (!m || !m.ct || !m.t) return;
+        videnPaketT = Math.max(videnPaketT, m.t);
+        var pk = sacuvaniPaket();
+        if (!pk || m.t > pk.t) { try { localStorage.setItem("hutba-postavke-paket", JSON.stringify(m)); } catch (e) {} }
+        return;
+      }
+      staroNaPoruku(tema, m);
+    };
+    try {
+      tvVeza = PrijevodVeza.povezi(HP.kanal, {
+        teme: ["stanje", "tekst", "postavke"], naPoruku: naPoruku,
+        naPovezivanje: function () { videnPaketT = 0; setTimeout(obnoviPaket, 6000); }
+      });
+      setInterval(obnoviPaket, 30 * 60000);
+    } catch (e) { /* bez prijevoda / ohne Übersetzung */ }
   })();
   osvjezi();
   setInterval(osvjezi, BRZINA > 1 ? 100 : 1000);
