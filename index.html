@@ -15,9 +15,13 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; }
+  html { background: #0f1a30; }
   body {
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--text);
+    background: linear-gradient(180deg, #1a3868 0%, #142b52 45%, #0f1a30 100%);
+  }
+  body.dizajn-1 {
     background-color: #0b3b2e;
     background-image:
       radial-gradient(circle at 20% 15%, rgba(227, 194, 122, 0.10), transparent 45%),
@@ -331,6 +335,15 @@
   body.dizajn-5.raspored-1 .vakat.prosao { background: rgba(6, 16, 34, 0.28); }
   body.dizajn-5.raspored-1 .vakat.sljedeci-vakat { background: rgba(227, 194, 122, 0.25); }
   body.dizajn-5.raspored-1 .dzuma { background: rgba(6, 16, 34, 0.45); }
+
+  /* Nakon jacije: sutrašnja zora i izlazak / Nach Ischa: Fadschr und Sonnenaufgang von morgen */
+  .vakti.sa-sutra { position: relative; }
+  .sutra-okvir { position: absolute; top: -1vw; bottom: -1vw; pointer-events: none;
+    left: calc((100% - 6vw) / 6 * 4 + 4.8vw - 1vw); width: calc((100% - 6vw) / 6 * 2 + 1.2vw + 2vw);
+    border: 0.18vw dashed rgba(227, 194, 122, 0.6); border-radius: 2.8vw; }
+  .sutra-naslov { position: absolute; left: 0; right: 0; bottom: 100%; margin-bottom: 1vw; text-align: center;
+    color: var(--gold); font-size: 1.6vw; font-weight: 600; line-height: 1.25; white-space: nowrap; }
+  .sutra-naslov span { display: block; color: var(--muted); font-weight: 400; font-size: 1.25vw; }
 
   /* Raspored 2: traka na horizontu / Layout 2: Leiste am Horizont */
   body.dizajn-5.raspored-2 .sljedeci { height: 11vh; margin: 0; }
@@ -745,9 +758,26 @@
     return (h > 0 ? h + ":" + dvije(m) : m) + ":" + dvije(s);
   }
 
-  function crtajVakte(r) {
+  // sutraR + sutraD: nakon jacije kartice se pomjere 2 mjesta lijevo, desno sutrašnja zora i izlazak sunca
+  // Nach Ischa rücken die Karten 2 Plätze nach links, rechts Fadschr und Sonnenaufgang von morgen
+  function crtajVakte(r, sutraR, sutraD) {
+    if (sutraR) {
+      var lijevo = "";
+      for (var a = 2; a < VAKTI.length; a++) lijevo += kartica(r, a, "", a - 2);
+      var god = sutraD.getFullYear();
+      $("vakti").className = "vakti sa-sutra";
+      $("vakti").innerHTML = lijevo + kartica(sutraR, 0, "sutra-", 4) + kartica(sutraR, 1, "sutra-", 5) +
+        '<div class="sutra-okvir"><div class="sutra-naslov">' +
+          sutraD.getDate() + ". " + MJESECI_BS[sutraD.getMonth()] + " " + god +
+          '<span>' + sutraD.getDate() + ". " + MJESECI_DE[sutraD.getMonth()] + " " + god + '</span></div></div>';
+      return;
+    }
+    $("vakti").className = "vakti";
     var html = "";
-    for (var i = 0; i < VAKTI.length; i++) {
+    for (var i = 0; i < VAKTI.length; i++) html += kartica(r, i, "", i);
+    $("vakti").innerHTML = html;
+  }
+  function kartica(r, i, prefiks, mjesto) {
       var v = VAKTI[i], ime = v.bs, imeDe = v.de, dole = "";
       for (var j = 0; j < r.namazi.length; j++) {
         var n = r.namazi[j];
@@ -761,15 +791,15 @@
           dole = "Namaz / Gebet<br><b>" + uVrijeme(n.ikamet) + "</b>";
         }
       }
-      html += '<div class="vakat" id="vakat-' + v.kljuc + '" style="animation-delay:' + (0.3 + i * 0.1) + 's">' +
+      return '<div class="vakat" id="vakat-' + prefiks + v.kljuc + '" style="animation-delay:' + (0.3 + mjesto * 0.1) + 's">' +
         '<div class="ime">' + ime + '</div>' +
         '<div class="ime-de">' + imeDe + '</div>' +
         '<div class="ezan">' + r.vremena[i] + '</div>' +
         '<div class="namaz">' + dole + '</div>' +
         '</div>';
-    }
-    $("vakti").innerHTML = html;
   }
+  var prikazSutra = false, sutraZaPrikaz = null, sutraDatum = null;
+  function nacrtajSve() { if (danas) crtajVakte(danas, prikazSutra ? sutraZaPrikaz : null, sutraDatum); }
 
   // Ekran vakta / Gebetsbildschirm
   var veAktivan = false, veFaza = "";
@@ -778,7 +808,7 @@
     veAktivan = false; veFaza = "";
     $("vakat-ekran").className = "vakat-ekran";
     document.body.classList.remove("vakat-aktivan");
-    if (danas) crtajVakte(danas);          // kartice ponovo uleću / Karten fliegen wieder herein
+    nacrtajSve();                          // kartice ponovo uleću / Karten fliegen wieder herein
   }
   function prikaziVakatEkran(cilj, s, ezan, ikamet, kraj, sljedeci, sljedeciSutra) {
     if (BRZINA > 1) return;
@@ -844,6 +874,7 @@
     if (kljuc !== zadnjiDatum) {
       zadnjiDatum = kljuc;
       danas = rasporedZa(sad);
+      prikazSutra = false;
       $("datum-bs").textContent = DANI_BS[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_BS[sad.getMonth()] + " " + sad.getFullYear();
       $("datum-de").textContent = DANI_DE[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_DE[sad.getMonth()] + " " + sad.getFullYear();
       $("hidzra").textContent = hidzriDatum(sad);
@@ -881,12 +912,20 @@
       prethodniKraj = danas.namazi[i].kraj * 60;
     }
     var pomakDana = 0;
-    var sutra = rasporedZa(new Date(sad.getFullYear(), sad.getMonth(), sad.getDate() + 1));
+    var sutraD = new Date(sad.getFullYear(), sad.getMonth(), sad.getDate() + 1);
+    var sutra = rasporedZa(sutraD);
     if (!cilj && sutra) { cilj = sutra.namazi[0]; pomakDana = 86400; }
+    // Nakon jacije prikaži sutrašnju zoru i izlazak / Nach Ischa Fadschr und Sonnenaufgang von morgen zeigen
+    var trebaSutra = !!(pomakDana && sutra && P.sutraNakonJacije !== false);
+    if (trebaSutra !== prikazSutra) {
+      prikazSutra = trebaSutra; sutraZaPrikaz = sutra; sutraDatum = sutraD;
+      if (!veAktivan) nacrtajSve();
+    }
 
     // Kartice / Karten
     for (var k = 0; k < VAKTI.length; k++) {
       var kartica = $("vakat-" + VAKTI[k].kljuc), prosao;
+      if (!kartica) continue;
       if (VAKTI[k].kljuc === "izlazak") prosao = uMinute(danas.vremena[1]) * 60 <= s;
       else {
         prosao = false;
@@ -895,6 +934,11 @@
       var klasa = "vakat" + (prosao ? " prosao" : "");
       if (cilj && !pomakDana && cilj.i === k) klasa = "vakat sljedeci-vakat";
       kartica.setAttribute("data-klasa", klasa);
+    }
+    if (prikazSutra) {
+      var sz = $("vakat-sutra-zora"), si = $("vakat-sutra-izlazak");
+      if (sz) sz.setAttribute("data-klasa", "vakat sljedeci-vakat");
+      if (si) si.setAttribute("data-klasa", "vakat");
     }
 
     if (!cilj) {
@@ -907,7 +951,7 @@
     var ezan = cilj.ezan * 60 + pomakDana, ikamet = cilj.ikamet * 60 + pomakDana;
     var info = cilj.info;
     var faza = s < ezan ? "prije" : "vakat";
-    var karticaCilja = $("vakat-" + VAKTI[cilj.i].kljuc);
+    var karticaCilja = $((pomakDana && prikazSutra ? "vakat-sutra-" : "vakat-") + VAKTI[cilj.i].kljuc) || document.createElement("div");
 
     if (faza === "prije") {
       var ostalo = ezan - s;
@@ -978,7 +1022,7 @@
   // Klasu mijenjamo samo kad se promijeni, da animacije ne počinju ispočetka.
   // Klasse nur bei Änderung setzen, damit Animationen nicht neu starten.
   function primijeniKlase() {
-    var kartice = $("vakti").children;
+    var kartice = $("vakti").querySelectorAll("[data-klasa]");
     for (var i = 0; i < kartice.length; i++) {
       var nova = kartice[i].getAttribute("data-klasa");
       if (nova && kartice[i].className !== nova) kartice[i].className = nova;

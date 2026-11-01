@@ -153,3 +153,9 @@ Tipps von unterwegs:
 
 - Logo-Entwurf (Halbmond mit „Elif“): auf Wunsch verworfen
 - Umgehen des IZ-App-Abos: abgelehnt, stattdessen diese eigene Anzeige
+
+## Nach Jacija: Zeiten für morgen (2026-11-01.19)
+- Wenn der Jacija-Bildschirm vorbei ist, rücken die Karten 2 Plätze nach links (Podne … Jacija). Rechts stehen **Zora und Izlazak sunca von morgen**, gestrichelt umrandet, darüber das Datum (Bosnisch + Deutsch, z. B. „2. Novembar 2026 / 2. November 2026“).
+- Um 00:00 wird wieder normal angezeigt (Zora … Jacija).
+- Abschalten: in vaktija.js `sutraNakonJacije: false`.
+- Kein grüner Blitz mehr beim Laden: Grundhintergrund ist jetzt dunkelblau (Grün nur noch bei Design 1).
