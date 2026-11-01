@@ -1,0 +1,98 @@
+# Vaktia EKC-Elif: Projektstand
+
+Stand: 1. November 2026
+
+Wenn wir weitermachen wollen, sag Claude einfach:
+**„Lies die Datei `Vaktia-EKC-Elif.md` im Repository `davud012/vaktija-eupen` und mach dort weiter.“**
+
+---
+
+## Worum es geht
+
+Eine Gebetszeiten-Anzeige (Vaktija) für den **Džemat EKC Elif Eupen** (Edukativno kulturni centar „Elif“, Eupen, Belgien).
+Sie läuft im Vollbild auf dem Samsung-Fernseher der Moschee (UE65RU7179, Eingang **HDMI 1**) über eine Android-Box (**H20**).
+
+- **Adresse der Anzeige:** https://davud012.github.io/vaktija-eupen/
+- **GitHub-Repository:** https://github.com/davud012/vaktija-eupen (öffentlich, kostenlos über GitHub Pages)
+- Sprachen: Bosnisch und Deutsch
+- Zeiten: minutengenau aus dem Takvim der Islamska Zajednica (Papier-Takvim, abfotografiert)
+
+## Regeln für die Zeiten
+
+| Was | Regel |
+|---|---|
+| Ikamet / Gebet | immer **Ezan + 10 Minuten** (alle Gebete) |
+| Sabah-Ezan | **Izlazak (Sonnenaufgang) − 60 Minuten**, Sabah-Namaz 10 Minuten später |
+| Džuma (Freitag) | Hutba **14:00 im Sommer**, **13:00 im Winter** |
+| Fußzeile | nur „Džuma namaz · Freitagsgebet 13:00“ (bzw. 14:00) |
+
+## Was fertig ist
+
+**Design:** Design 5 „Nebo“ (Himmel), Layout 1 (Karten unten), Standard-Schrift.
+- Echter Himmel über Eupen: Sonne, Mond mit echter Mondphase, Planeten (ohne Beschriftung), Sterne, Milchstraße
+- Kein Boden, keine Moschee-Silhouette, kein Laufband
+- Einzige Info: nächstes Gebet und verbleibende Zeit
+- Echtes Wetter aus Eupen (Open-Meteo): Wolken, Regen mit Tropfen auf der Scheibe, Schnee, Gewitter mit Blitzen, Nebel
+- Himmelsereignisse bis 2028 vorberechnet (Finsternisse, Supermond, Konjunktionen, Sternschnuppen)
+
+**Gebets-Bildschirm:** Ab dem Ezan 30 Minuten lang ein eigener Bildschirm (arabischer Name, Countdown bis Ikamet, „Namaz je počeo · molimo utišajte mobitele“, danach „Allah neka primi namaz“, dazu das nächste Gebet). Danach zurück zur Hauptanzeige. Eigener Džuma-Bildschirm am Freitag. Der Freitag ist so, wie er ist, **perfekt** und bleibt so.
+
+**Takvim eingetragen:** 31.10.2026 (vom Nutzer bestätigt: 05:34 · 07:18 · 12:25 · 14:50 · 17:21 · 18:52) sowie der ganze **November und Dezember 2026** (von den Fotos).
+Außerhalb dieses Zeitraums stehen nur **Beispielzeiten** drin. Dann erscheint oben ein Hinweis-Banner.
+
+**Technik:**
+- Automatische Updates: Der Fernseher prüft alle 5 Minuten, ob es auf GitHub eine neue Version gibt, und lädt dann neu. Zusätzlich jede Nacht um 03:00.
+- Datum stimmt immer, auch wenn der Fernseher tagelang aus war (Uhr der Box, Korrektur über den Server nur bei mehr als 1 Stunde Abweichung).
+- Uhrzeit-Fehler (Seite ging 2 bis 8 Minuten vor) ist behoben.
+- Offline-Speicher: Fällt das Internet aus, läuft die Anzeige weiter.
+- Leichte Version für schwache Boxen: in `vaktija.js` `lagano: true` setzen, oder an die Adresse `?lagano=1` anhängen.
+
+## Wichtige Dateien
+
+| Datei | Inhalt |
+|---|---|
+| `vaktija.js` | **Die Gebetszeiten** und Einstellungen (Name, Regeln, Design). Hier wird der neue Takvim eingetragen. Oben die Versionsnummer hochzählen. |
+| `index.html` | Die Anzeige selbst |
+| `nebo.js` | Himmel (Sonne, Mond, Planeten, Sterne) |
+| `prilike.js` | Wetter-Animationen |
+| `nebeski-kalendar.js` | Himmelsereignisse bis 2028 |
+| `sw.js` | Offline-Speicher |
+| `ANLEITUNG.md` | Anleitung GitHub, Box, Fully Kiosk, AnyDesk |
+| `fuer-app-entwickler/` | Paket für den App-Entwickler: gleiche Zeiten und Regeln (JSON, Regeln als JavaScript, Testfälle) |
+
+**Zum Ausprobieren** (an die Adresse anhängen):
+`?vrijeme=2026-12-10T12:34:50` (bestimmte Uhrzeit) · `?brzina=600` (Zeitraffer) · `?prilike=kisa` (Wetter: `vedro`, `oblacno`, `magla`, `kisa`, `snijeg`, `oluja`) · `?lagano=1` (leichte Version)
+
+## Wo wir gerade stehen: Einrichtung der Box in der Moschee
+
+Erledigt:
+- H20-Box (Menü auf Französisch) am Samsung an HDMI 1 angeschlossen
+- WLAN verbunden, Webseite auf der Box geöffnet (ohne Konto)
+
+Noch zu tun:
+1. **Fully Kiosk Browser** installieren (von fully-kiosk.com die APK laden, Installation erlauben)
+2. In Fully einstellen:
+   - Start URL: `https://davud012.github.io/vaktija-eupen/`
+   - Launch on Boot: an
+   - Keep Screen On: an
+   - Fullscreen, Statusleiste und Navigationsleiste ausblenden: an
+3. Fully als **Startbildschirm** festlegen (Home-Taste → Fully Kiosk → „Toujours“), damit die Anzeige immer zurückkommt
+4. Am Samsung „Auto-Standby“ / „Automatisch ausschalten“ / Eco ausschalten
+5. Testen: Strom der Box ziehen und wieder einstecken, die Anzeige muss von selbst kommen. Am Fernseher auf einen anderen Eingang und zurück auf HDMI 1, die Anzeige muss sofort da sein.
+6. Optional: **AnyDesk** oder **RustDesk** (kostenlos, auch für Vereine) für Fernzugriff
+
+Tipps von unterwegs:
+- Kein OK-Knopf bzw. keine Bildschirmtastatur: Mausmodus der Fernbedienung ausschalten, Tastatur in den Einstellungen aktivieren (Paramètres → Préférences de l'appareil → Clavier), oder eine USB-Tastatur bzw. ein LAN-Kabel nehmen.
+- Das kleine Fenster mit „+“ unten links auf dem Box-Startbildschirm ist nur die Favoriten-Leiste und wird nicht gebraucht.
+
+## Später geplant
+
+- **Live-Übersetzung (Dolmetscher)** der Hutba von Bosnisch auf Deutsch auf dem Fernseher (vom Nutzer auf später verschoben)
+- **Neuer Takvim:** Jedes Jahr im **Dezember** die Takvim-Seiten fürs nächste Jahr fotografieren und Claude schicken. Claude trägt sie in `vaktija.js` ein und lädt sie hoch. Der Fernseher übernimmt das automatisch.
+  Wichtig: Aktuell ist nur bis **31.12.2026** echt eingetragen. Der Takvim für 2027 muss also **vor Januar** kommen.
+- Gespräch mit dem **App-Entwickler** (Paket in `fuer-app-entwickler/` liegt bereit)
+
+## Erledigt / verworfen
+
+- Logo-Entwurf (Halbmond mit „Elif“): auf Wunsch verworfen
+- Umgehen des IZ-App-Abos: abgelehnt, stattdessen diese eigene Anzeige
