@@ -832,15 +832,23 @@
       s1.bs = tekst; s1.konacno = true; zadnjiKraj = Date.now();
       prevedi(s1);
     }
+    // Šalje se po mogućnosti cijela rečenica (do tačke), ne pojedinačne riječi
+    // Möglichst ganze Sätze (bis zum Punkt) weitergeben, keine einzelnen Wörter
     var mirnoTimer = setInterval(function () {
       if (prepoznavanje !== r || !zadnjiInterim) return;
-      var w = rijeciOd(zadnjiInterim), nepredato = w.length - predato;
-      var mirno = Date.now() - zadnjaPromjena > 1100;
-      if (nepredato > 0 && (mirno || nepredato >= 22)) {
-        var uzmi = mirno ? nepredato : nepredato - 4;   // zadnje riječi se još mijenjaju / letzte Wörter ändern sich noch
-        predaj(w.slice(predato, predato + uzmi).join(" "));
-        predato += uzmi;
+      var w = rijeciOd(zadnjiInterim), novo = w.slice(predato), n = novo.length;
+      if (!n) return;
+      var tiho = Date.now() - zadnjaPromjena, uzmi = 0, j;
+      var kraj = -1;
+      for (j = n - 1; j >= 0; j--) if (/[.!?…]["“”»]?$/.test(novo[j])) { kraj = j; break; }
+      if (kraj >= 0 && (tiho > 800 || kraj <= n - 3)) uzmi = kraj + 1;          // cijela rečenica / ganzer Satz
+      else if (tiho > 1800 && n >= 3) uzmi = n;                                // pauza / Pause
+      else if (tiho > 3000) uzmi = n;                                          // duga pauza / lange Pause
+      else if (n >= 28) {                                                      // dugo bez tačke / lange ohne Punkt
+        for (j = n - 5; j >= 10; j--) if (/[,;:]$/.test(novo[j])) { uzmi = j + 1; break; }
+        if (!uzmi) uzmi = n - 4;
       }
+      if (uzmi > 0) { predaj(novo.slice(0, uzmi).join(" ")); predato += uzmi; }
     }, 300);
 
     r.onresult = function (e) {
@@ -1025,6 +1033,7 @@
       "- Proverbs and idioms: use the matching saying in " + cilj + " or a natural paraphrase. Example into German: \"S kim si, takav si.\" -> \"Sag mir, mit wem du umgehst, und ich sage dir, wer du bist.\" (not \"Mit wem du bist, so bist du.\")",
       "- The text comes from speech recognition: punctuation may be missing, words may be misheard, a segment may stop mid-sentence. Infer the intended words from context and translate the fragment so it reads naturally. Do not add content that was not said and do not finish sentences the imam has not finished.",
       "- The blessing on the Prophet (sallallahu alejhi ve sellem, salallahu alejhi vesellem, s.a.v.s., a.s. after Muhammed, صلى الله عليه وسلم) is ALWAYS written only as the single sign ﷺ, never spelled out and never translated. Example: \"Poslanik, sallallahu alejhi ve sellem, je rekao\" -> \"Der Prophet ﷺ sagte\".",
+      "- Bosnian words that are easily mistranslated: \"recite\" / \"recite ljudima\" is the imperative of reći = \"sagt\" (\"I recite ljudima lijepe riječi\" -> \"Und sagt zu den Menschen schöne Worte\"), NOT \"rezitieren\"; \"učiti\" (Kur'an) = rezitieren; \"Hvala Allahu, Gospodaru svjetova\" -> \"Alles Lob gebührt Allah, dem Herrn der Welten\"; \"salavat i selam na našeg Poslanika\" -> \"Segen und Frieden auf unseren Propheten ﷺ\"; \"draga braćo i sestre\" -> \"liebe Brüder und Schwestern\".",
       "- Religious terms (German shown as the model; for other languages use the usual term Muslims use in that language): Allah stays \"Allah\". Poslanik / Muhammed -> \"der Prophet Muhammad ﷺ\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
       "- Whenever the imam says something in ARABIC (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, or anything else in Arabic), write exactly that in ARABIC SCRIPT with vowel marks in round brackets, e.g. (بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) or (ٱلْحَمْدُ لِلَّٰهِ). Do not transliterate Arabic into Latin letters and do not translate it - the imam explains it himself.",
       "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
@@ -1037,7 +1046,7 @@
       "- Sentences: every sentence ends with proper punctuation (. ? !). When the imam speaks fast and runs several sentences together without a pause, still split them into separate, complete sentences - never glue different statements into one long sentence. If the segment stops in the middle of a sentence, end it without a full stop.",
       "- Paragraphs for the reader: if the new segment clearly begins a new thought or a new part of the sermon (a new topic, a new story, a new hadith or verse, a new address like \"Draga braćo i sestre\", the closing dua), start your output with the character ¶ followed by a space. Otherwise do not use ¶.",
       "",
-      "Output only the " + cilj + " translation of the NEW segment - no quotes, no notes, no explanations. If the new segment contains nothing meaningful (noise, a single filler word), output just: -"
+      "OUTPUT FORMAT: a JSON object with two fields. \"translation\": only the words that appear on the TV - the " + cilj + " translation of the NEW segment, nothing else, never English. \"comment\": put any note, doubt, explanation or remark here (it is never shown). If the new segment contains nothing meaningful (noise, a single filler word), set \"translation\" to \"-\"."
     ].join("\n");
   }
 
@@ -1101,28 +1110,55 @@
     x = x.replace(/\s*,?\s*\(?\s*(s\.?\s*a\.?\s*[wv]\.?\s*s\.?|s\.\s*a\.\s*w\.|sallallahu\s+['’]?alaihi\s+wa\s*sallam|sallallahu\s+alejhi\s+ve\s*sellem)\s*\)?\s*,?(?=\s|$)/gi, " ﷺ");
     return x;
   }
-  function prevediClaude(c, r, iz, ck) {
-    var poziv = $("prevodilac").value === "claude-haiku"
-      // Haiku: vrlo jeftino / sehr günstig
-      ? c.messages.create({
-          model: "claude-haiku-5-5",
-          max_tokens: 2000,
-          output_config: { effort: "low" },
-          system: uputa(iz, ck),
-          messages: [{ role: "user", content: kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs }]
-        })
-      : c.beta.messages.create({
-      model: MODEL,
+  var FORMAT_PRIJEVODA = {
+    type: "json_schema",
+    schema: {
+      type: "object",
+      properties: {
+        translation: { type: "string", description: "Only the translated words for the TV screen" },
+        comment: { type: "string", description: "Any note or explanation - never shown" }
+      },
+      required: ["translation", "comment"],
+      additionalProperties: false
+    }
+  };
+  var bezFormata = false;   // ako API ne prihvati format / falls die API das Format nicht annimmt
+  function zahtjevClaude(c, iz, ck, sadrzaj) {
+    var haiku = $("prevodilac").value === "claude-haiku";
+    var p = {
+      model: haiku ? "claude-haiku-5-5" : MODEL,
       max_tokens: 2000,
-      output_config: { effort: "low" },
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
+      output_config: bezFormata ? { effort: "low" } : { effort: "low", format: FORMAT_PRIJEVODA },
       system: uputa(iz, ck),
-      messages: [{ role: "user", content: kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs }]
-    });
-    return poziv.then(function (odg) {
+      messages: [{ role: "user", content: sadrzaj }]
+    };
+    if (haiku) return c.messages.create(p);
+    p.betas = ["server-side-fallback-2026-07-01"]; p.fallbacks = "default";
+    return c.beta.messages.create(p);
+  }
+  // Engleski u prijevodu? / Englisch in der Übersetzung?
+  var ENGLESKI = /\b(the|means|meaning|vocative|literally|translation|translated|refers|which|this|that|is|are|of|word|phrase|sentence|segment|as in|i\.e)\b/gi;
+  function imaEngleskog(x, ck) {
+    if (ck === "en") return false;
+    var bez = x.replace(/\([^)]*[؀-ۿ][^)]*\)/g, "");
+    var nadjeno = (bez.match(ENGLESKI) || []).map(function (w) { return w.toLowerCase(); });
+    var razlicito = nadjeno.filter(function (w, i) { return nadjeno.indexOf(w) === i; });
+    return razlicito.length >= 2 || /\b(means|vocative|literally)\b/i.test(bez);
+  }
+  function prevediClaude(c, r, iz, ck) {
+    var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs;
+    return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
+      if (!bezFormata && e && e.status === 400) { bezFormata = true; return zahtjevClaude(c, iz, ck, sadrzaj); }
+      throw e;
+    }).then(function (odg) {
       if (odg.stop_reason === "refusal") throw new Error("refusal");
-      return odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
+      var tekst = odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
+      var prijevod = tekst;
+      try { var j = JSON.parse(tekst); if (j && typeof j.translation === "string") prijevod = j.translation; } catch (e2) {}
+      prijevod = ocistiIzlaz(prijevod);
+      // Engleski ili objašnjenje -> umjesto toga Google / Englisch oder Erklärung -> stattdessen Google
+      if (prijevod !== "-" && imaEngleskog(prijevod, ck)) throw new Error("engleski");
+      return prijevod;
     }).catch(function (e) {
       if (e && (e.status === 401 || e.status === 403)) upozori(function () { return t("kljucNe"); });
       throw e;
@@ -1140,6 +1176,7 @@
       return p.then(function () { return googleJedan(dio, sl, tl); }).then(function (x) { rez.push(x); });
     }, Promise.resolve()).then(function () { return rez.join(" "); });
   }
+
   // Više besplatnih puteva: ako jedan ne radi (npr. Google blokira), probati sljedeći
   // Mehrere kostenlose Wege: geht einer nicht (z. B. Google sperrt), den nächsten versuchen
   var PUTEVI = [
