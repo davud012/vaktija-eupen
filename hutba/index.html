@@ -482,7 +482,8 @@
   var veza = null, brojVeza = -1, aktivno = false, snima = false, sesija = "", brojac = 0, pocetak = 0, mikrofonUgasen = 0, tvOd = 0;
   var recenice = [];              // {id, bs (original), de (prijevod), gotovo}
   var pulsTimer = null, satTimer = null, budnost = null;
-  var prepoznavanje = null, slusa = false, zadnjiPrivremeni = 0, zadnjaKonacna = "";
+  var prepoznavanje = null, slusa = false, zadnjiPrivremeni = 0, zadnjaKonacna = "", zadnjiKraj = 0;
+  var PAUZA_ODLOMAK = 2500;   // duža pauza imama = novi odlomak / längere Pause des Imams = neuer Absatz
 
   function pokreni() {
     if (veza) return;
@@ -574,7 +575,7 @@
     }, true);
   }
   function posaljiRecenicu(r) {
-    if (veza && aktivno && r.id > tvOd) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo });
+    if (veza && aktivno && r.id > tvOd) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo, p: r.p ? 1 : 0 });
   }
   function prikaziTVDugme() {
     $("tv-dugme").classList.toggle("ukljucen", aktivno);
@@ -719,7 +720,7 @@
           if (!tx) continue;
           zadnjaKonacna = e.results[i][0].transcript.trim();
           if (!trenutna) trenutna = novaRecenica();
-          trenutna.bs = tx; trenutna.konacno = true;
+          trenutna.bs = tx; trenutna.konacno = true; zadnjiKraj = Date.now();
           prevedi(trenutna);
           trenutna = null;
         } else {
@@ -757,6 +758,7 @@
 
   function novaRecenica() {
     var r = { id: ++brojac, bs: "", de: "", gotovo: false };
+    if (zadnjiKraj && Date.now() - zadnjiKraj > PAUZA_ODLOMAK) r.p = true;
     recenice.push(r);
     if (recenice.length > 200) recenice.shift();
     return r;
@@ -766,7 +768,7 @@
   /* =================== Gemini: snimanje zvuka / Tonaufnahme =================== */
   // Snima zvuk, reže na pauzama (5–14 s) i šalje Geminiju: on prepiše i prevede.
   // Nimmt den Ton auf, schneidet an Sprechpausen (5–14 s) und schickt ihn an Gemini: es schreibt mit und übersetzt.
-  var aCtx = null, aTok = null, aIzvor = null, aProc = null, aDijelovi = [], aDuzina = 0, aTisina = 0, aGlas = false, aSum = 0.003;
+  var aCtx = null, aTok = null, aIzvor = null, aProc = null, aDijelovi = [], aDuzina = 0, aTisina = 0, aGlas = false, aSum = 0.003, aPauza = true;
   var CILJNI_HZ = 16000;
   function audioStart() {
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -796,7 +798,7 @@
         if (govor) { aGlas = true; aTisina = 0; } else aTisina += n;
         var sek = aDuzina / CILJNI_HZ, tisinaSek = aTisina / CILJNI_HZ;
         if ((sek >= 5 && tisinaSek >= 0.6) || sek >= 14) audioPosalji();
-        else if (!aGlas && sek >= 3) { aDijelovi = []; aDuzina = 0; aTisina = 0; }   // samo tišina / nur Stille
+        else if (!aGlas && sek >= 3) { aDijelovi = []; aDuzina = 0; aTisina = 0; aPauza = true; }   // samo tišina = pauza / nur Stille = Pause
       };
       aIzvor.connect(aProc); aProc.connect(aCtx.destination);
       postaviVrijeme(null);
@@ -815,7 +817,7 @@
     var dijelovi = aDijelovi, duzina = aDuzina, glas = aGlas;
     aDijelovi = []; aDuzina = 0; aTisina = 0; aGlas = false;
     if (!glas) return;
-    var r = novaRecenica(); r.bs = t("slusam"); prikaziTok(); posaljiRecenicu(r);
+    var r = novaRecenica(); r.p = aPauza; aPauza = false; r.bs = t("slusam"); prikaziTok(); posaljiRecenicu(r);
     gemini(wavBase64(dijelovi, duzina), r);
   }
   function wavBase64(dijelovi, duzina) {
@@ -858,6 +860,7 @@
       var j = JSON.parse(tekst);
       var orig = String(j.original || "").trim(), pr = String(j.translation || "").trim();
       if (!orig || orig === "-" || !pr || pr === "-") { ukloni(r); return; }
+      if (/^¶/.test(pr)) { r.p = true; pr = pr.replace(/^¶\s*/, ""); }
       r.bs = orig; r.de = pr; r.gotovo = true;
       if (upozorenjeFn && upozorenjeFn.gemini) upozori(null);
       prikaziTok(); posaljiRecenicu(r);
@@ -886,6 +889,7 @@
       "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
       "- The same for a well-known hadith or dua quoted in Arabic: keep it in Arabic in round brackets only if you are sure of the exact wording, otherwise " + ci.ar + ".",
       "- Keep the respectful tone of a sermon. Prefer short, readable sentences.",
+      "- Paragraphs for the reader: if the new segment clearly begins a new thought or a new part of the sermon (a new topic, a new story, a new hadith or verse, a new address like \"Draga braćo i sestre\", the closing dua), start your output with the character ¶ followed by a space. Otherwise do not use ¶.",
       "",
       "Output only the " + cilj + " translation of the NEW segment - no quotes, no notes, no explanations. If the new segment contains nothing meaningful (noise, a single filler word), output just: -"
     ].join("\n");
@@ -914,6 +918,7 @@
     posao.catch(function () { return c ? prevediGoogle(r.bs, iz.g, ck) : ""; }).then(function (de) {
       de = (de || "").trim();
       if (de === "-" || de === "–") { ukloni(r); return; }
+      if (/^¶/.test(de)) { r.p = true; de = de.replace(/^¶\s*/, ""); }
       r.de = de || t("neuspjelo");
       r.gotovo = true;
       prikaziTok(); posaljiRecenicu(r);
@@ -956,7 +961,7 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   // Arapski tekst desno-nalijevo / Arabischer Text von rechts nach links
   function sArapskim(s) {
-    return esc(s).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s]*/g,
+    return esc(s).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*/g,
       function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
   }
   function prikaziTok() {

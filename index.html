@@ -505,6 +505,10 @@
     font-size: 3.3vw; line-height: 1.5; font-weight: 400; text-shadow: 0 0.3vh 1.4vh rgba(0, 0, 0, 0.55);
   }
   .he-traka.bez-animacije { transition: none; }
+  /* Odlomci: novi dio počinje u novom redu, stari su malo tamniji / Absätze: neuer Teil in neuer Zeile, alte etwas dunkler */
+  .he-odlomak { margin-top: 0.75em; transition: opacity 1.4s ease; }
+  .he-odlomak:first-child { margin-top: 0; }
+  .he-odlomak.prosli { opacity: 0.5; }
   .he-rijec { animation: he-rijec 0.5s ease-out both; }
   @keyframes he-rijec { from { opacity: 0; } to { opacity: 1; } }
   .he-traka .ar { font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; color: #e3c27a; font-size: 1.15em; }
@@ -1019,8 +1023,9 @@
     }
 
     var traka = $("he-traka"), cekanje = $("he-cekanje");
-    var stanjeId = {}, pustenoDo = {}, red = [], tajmer = null;
-    var AR = /([؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s]*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]|[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿])/;
+    var stanjeId = {}, pustenoDo = {}, red = [], tajmer = null, odlomak = null, rijeciUOdlomku = 0, zadnjaRijec = "";
+    var MAX_RIJECI_ODLOMKA = 55;   // duži odlomak se lomi na kraju rečenice / längerer Absatz wird am Satzende umgebrochen
+    var AR = /([؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]|[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿])/;
 
     // Tekst u riječi (arapski ostaje u komadu) / Text in Wörter (Arabisch bleibt am Stück)
     function rijeci(tekst) {
@@ -1032,24 +1037,33 @@
       });
       return out;
     }
+    function noviOdlomak() {
+      if (odlomak && !odlomak.childNodes.length) return;
+      if (odlomak) odlomak.classList.add("prosli");
+      odlomak = document.createElement("div");
+      odlomak.className = "he-odlomak";
+      traka.appendChild(odlomak);
+    }
     function dodajRijec(r, bezAnimacije) {
-      var zadnji = traka.lastChild;
+      if (r.novi) { noviOdlomak(); return; }
+      if (!odlomak) noviOdlomak();
+      var zadnji = odlomak.lastChild;
       var bezRazmaka = !zadnji || /^[)\].,;:!?»“]/.test(r.t) || (zadnji.textContent && /[(\[„«]$/.test(zadnji.textContent));
-      if (!bezRazmaka) traka.appendChild(document.createTextNode(" "));
+      if (!bezRazmaka) odlomak.appendChild(document.createTextNode(" "));
       var el = document.createElement(r.ar ? "bdi" : "span");
       if (r.ar) { el.className = "ar" + (bezAnimacije ? "" : " he-rijec"); el.dir = "rtl"; }
       else if (!bezAnimacije) el.className = "he-rijec";
       el.textContent = r.t;
-      traka.appendChild(el);
+      odlomak.appendChild(el);
     }
     // Pomjeranje: zadnji red uvijek dole, staro polako gore / Letzte Zeile immer unten, Altes gleitet nach oben
     function pomjeri() {
       var visina = linije.clientHeight, sadrzaj = traka.offsetHeight;
       traka.style.transform = "translateY(" + Math.round(visina - sadrzaj) + "px)";
       // Previše teksta: obrisati staro (nevidljivo) / Zu viel Text: Altes (unsichtbar) entfernen
-      if (sadrzaj > visina * 3 && traka.childNodes.length > 300) {
+      if (sadrzaj > visina * 3 && traka.childNodes.length > 3) {
         traka.classList.add("bez-animacije");
-        for (var i = 0; i < 120 && traka.firstChild; i++) traka.removeChild(traka.firstChild);
+        while (traka.childNodes.length > 2 && traka.offsetHeight > visina * 1.6) traka.removeChild(traka.firstChild);
         traka.style.transform = "translateY(" + Math.round(visina - traka.offsetHeight) + "px)";
         void traka.offsetHeight; traka.classList.remove("bez-animacije");
       }
@@ -1058,15 +1072,29 @@
     function sljedecaRijec() {
       tajmer = null;
       if (!red.length) return;
-      dodajRijec(red.shift()); pomjeri();
+      var sljedeca = red.shift();
+      dodajRijec(sljedeca); pomjeri();
+      if (sljedeca.novi) { tajmer = setTimeout(sljedecaRijec, 350); return; }
       var pauza = red.length > 30 ? 70 : red.length > 14 ? 130 : red.length > 6 ? 190 : 260;
       tajmer = setTimeout(sljedecaRijec, pauza);
     }
-    function dodajTekst(tekst, odmah) {
+    function dodajTekst(tekst, odmah, novi) {
       if (!tekst || tekst === "-") return;
       cekanje.style.display = "none";
-      if (odmah) { rijeci(tekst).forEach(function (r) { dodajRijec(r, true); }); pomjeri(); return; }
-      red = red.concat(rijeci(tekst));
+      tekst = String(tekst);
+      if (/^\s*¶/.test(tekst)) { novi = true; tekst = tekst.replace(/^\s*¶\s*/, ""); }
+      // Novi odlomak: kad imam napravi pauzu / novu misao, ili je odlomak predug na kraju rečenice
+      // Neuer Absatz: bei Pause / neuem Gedanken des Imams, oder wenn der Absatz am Satzende zu lang ist
+      if (rijeciUOdlomku && (novi || (rijeciUOdlomku >= MAX_RIJECI_ODLOMKA && /[.!?…)]$/.test(zadnjaRijec)))) {
+        var oznaka = { novi: true };
+        if (odmah) dodajRijec(oznaka, true); else red.push(oznaka);
+        rijeciUOdlomku = 0;
+      }
+      var lista = rijeci(tekst);
+      rijeciUOdlomku += lista.length;
+      if (lista.length) zadnjaRijec = lista[lista.length - 1].t;
+      if (odmah) { lista.forEach(function (r) { dodajRijec(r, true); }); pomjeri(); return; }
+      red = red.concat(lista);
       if (!tajmer) sljedecaRijec();
     }
     // Rečenice idu redom (ako jedna kasni, čeka se do 5 s) / Sätze in Reihenfolge (verspätete bis 5 s abwarten)
@@ -1074,7 +1102,7 @@
       var ids = Object.keys(stanjeId).map(Number).filter(function (id) { return !pustenoDo[id]; }).sort(function (a, b) { return a - b; });
       for (var i = 0; i < ids.length; i++) {
         var z = stanjeId[ids[i]];
-        if (z.gotovo) { pustenoDo[ids[i]] = 1; dodajTekst(z.de); continue; }
+        if (z.gotovo) { pustenoDo[ids[i]] = 1; dodajTekst(z.de, false, z.p); continue; }
         var kasnije = ids.slice(i + 1).some(function (id) { return stanjeId[id].gotovo; });
         if (kasnije && Date.now() - z.od > 5000) { pustenoDo[ids[i]] = 1; continue; }
         break;
@@ -1083,6 +1111,7 @@
     function ocisti() {
       stanjeId = {}; pustenoDo = {}; red = []; clearTimeout(tajmer); tajmer = null;
       traka.innerHTML = ""; traka.style.transform = ""; cekanje.style.display = "";
+      odlomak = null; rijeciUOdlomku = 0; zadnjaRijec = "";
     }
     function pokazi() {
       zadnjiPuls = Date.now();
@@ -1111,13 +1140,13 @@
         if (nova) (m.zadnje || []).forEach(function (r) {
           if (stanjeId[r.id]) return;
           stanjeId[r.id] = { gotovo: true, de: r.de, od: Date.now() }; pustenoDo[r.id] = 1;
-          dodajTekst(r.de, true);
+          dodajTekst(r.de, true, r.p);
         });
         pokazi();
       } else if (tema === "tekst") {
         novaSesija(m.s); postaviJezik(m.c);
         var z = stanjeId[m.id] || (stanjeId[m.id] = { od: Date.now() });
-        if (!pustenoDo[m.id] && m.gotovo) { z.gotovo = true; z.de = m.de; }
+        if (!pustenoDo[m.id] && m.gotovo) { z.gotovo = true; z.de = m.de; z.p = !!m.p; }
         pokazi(); pustiRedom();
       }
     }
@@ -1139,7 +1168,7 @@
         "Allah, erhaben ist Er, sagt: (الٓمٓ – ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ · Sure Al-Baqara 2:1-2)",
         "Möge Allah es uns leicht machen, gut zueinander zu sein.",
         "Ein guter Freund erinnert dich an Allah, wenn du ihn vergisst, und hilft dir, wenn du dich an Ihn erinnerst."];
-      probe.forEach(function (x, i) { setTimeout(function () { dodajTekst(x); }, i * 4500); });
+      probe.forEach(function (x, i) { setTimeout(function () { dodajTekst(x, false, i === 2 || i === 4); }, i * 4500); });
       return;
     }
     if (!window.PrijevodVeza || !window.mqtt) return;

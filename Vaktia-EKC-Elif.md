@@ -93,6 +93,7 @@ Tipps von unterwegs:
 - Roter Knopf **„Hutba beenden“** (erscheint, sobald Fernseher oder Mikrofon läuft) beendet Mikrofon und Fernseher zusammen
 - iPhone: Die Spracherkennung des Browsers geht nur in **Safari** (mit eingeschalteter Diktierfunktion/Siri). In Chrome, Brave oder der Google-App auf dem iPhone blockiert Apple sie. Die Seite zeigt dann einen Knopf „In Safari öffnen“. Für eine Lösung in jedem Browser müsste der Ton selbst aufgenommen und an einen Cloud-Dienst geschickt werden (z. B. Gemini oder Whisper, braucht einen Schlüssel).
 - Fernseher zeigt die Übersetzung wie ein **Teleprompter**: Wörter kommen nacheinander, alter Text gleitet langsam nach oben, nichts springt
+- **Absätze** auf dem Fernseher: neuer Absatz bei einer Sprechpause des Imams (über 2,5 s), wenn Claude/Gemini einen neuen Gedanken erkennt (Zeichen ¶), oder nach ca. 55 Wörtern am Satzende. Der aktuelle Absatz ist hell, ältere sind abgedunkelt.
 - **Gemini als Spracherkennung** (Einstellungen → Spracherkennung → Gemini): geht in jedem Browser, auch Chrome/Google-App auf dem iPhone. Ton wird an Sprechpausen in Stücke von 5–14 s geschnitten, Gemini schreibt mit und übersetzt nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com), Modell standardmäßig `gemini-flash-latest` (änderbar)
 - Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
 - Mikrofon-Erlaubnis speichert der Browser selbst: bei der Frage „Bei Besuch der Website zulassen“ wählen, nicht „Nur dieses Mal“
