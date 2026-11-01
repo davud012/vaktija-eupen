@@ -203,6 +203,23 @@
           <option value="bs">Bosanski</option>
         </select>
 
+        <label for="prepoznavanje" data-t="prepoznavanje"></label>
+        <select id="prepoznavanje">
+          <option value="auto" data-t="optAuto"></option>
+          <option value="gemini" data-t="optGemini"></option>
+        </select>
+        <div class="mali" id="prepoznavanje-info"></div>
+        <div id="gemini-dio">
+          <label for="gkljuc" data-t="gKljuc"></label>
+          <input id="gkljuc" type="password" placeholder="AIza…" autocomplete="off">
+          <div class="mali" data-t="gKljucInfo"></div>
+          <label for="gmodel" data-t="gModel"></label>
+          <input id="gmodel" type="text" autocomplete="off" spellcheck="false">
+          <button class="dugme sporedno" id="spremi-gkljuc" type="button" data-t="spremi"></button>
+          <span class="mali" id="gkljuc-stanje"></span>
+        </div>
+
+        <div id="prevodilac-dio">
         <label for="prevodilac" data-t="prevodilac"></label>
         <select id="prevodilac">
           <option value="google" data-t="optGoogle"></option>
@@ -216,6 +233,7 @@
           <div class="mali" data-t="kljucInfo"></div>
           <button class="dugme sporedno" id="spremi-kljuc" type="button" data-t="spremi"></button>
           <span class="mali" id="kljuc-stanje"></span>
+        </div>
         </div>
 
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
@@ -282,6 +300,10 @@
       ios2: "Postavke → Safari → <b>Mikrofon</b> → Pitaj ili Dozvoli.", ios3: "Za test: u Postavkama izabrati jezik govora <b>Deutsch</b> – ako to radi, problem je samo u jeziku.",
       nemaNeta: "Nema interneta za prepoznavanje govora … pokušava ponovo.",
       kljucNe: "Claude ključ ne radi – koristi se Google.",
+      prepoznavanje: "Prepoznavanje govora", optAuto: "Preglednik – besplatno (Chrome, Safari)", optGemini: "Gemini – radi u svakom pregledniku",
+      infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Radi u svakom pregledniku (i Chrome/Google na iPhoneu). Gemini odmah i prevodi po smislu. Treba Gemini ključ (aistudio.google.com).",
+      gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
+      gNe: "Gemini greška", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
     },
     de: {
@@ -324,6 +346,10 @@
       ios2: "Einstellungen → Safari → <b>Mikrofon</b> → Fragen oder Erlauben.", ios3: "Zum Test: in den Einstellungen als gesprochene Sprache <b>Deutsch</b> wählen – geht das, liegt es nur an der Sprache.",
       nemaNeta: "Kein Internet für die Spracherkennung … neuer Versuch.",
       kljucNe: "Claude-Schlüssel ungültig – es wird Google verwendet.",
+      prepoznavanje: "Spracherkennung", optAuto: "Browser – kostenlos (Chrome, Safari)", optGemini: "Gemini – geht in jedem Browser",
+      infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Geht in jedem Browser (auch Chrome/Google auf dem iPhone). Gemini übersetzt gleich mit, nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com).",
+      gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
+      gNe: "Gemini-Fehler", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
     },
     fr: {
@@ -366,6 +392,10 @@
       ios2: "Réglages → Safari → <b>Micro</b> → Demander ou Autoriser.", ios3: "Pour tester : choisir <b>Deutsch</b> comme langue parlée dans les paramètres – si cela marche, le problème vient seulement de la langue.",
       nemaNeta: "Pas d'Internet pour la reconnaissance vocale … nouvel essai.",
       kljucNe: "Clé Claude invalide – Google est utilisé.",
+      prepoznavanje: "Reconnaissance vocale", optAuto: "Navigateur – gratuit (Chrome, Safari)", optGemini: "Gemini – fonctionne dans tout navigateur",
+      infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Fonctionne dans tout navigateur (aussi Chrome/Google sur iPhone). Gemini traduit en même temps, selon le sens. Nécessite une clé Gemini (aistudio.google.com).",
+      gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
+      gNe: "Erreur Gemini", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
     }
   };
@@ -422,7 +452,8 @@
       }
       return "<b>" + t("iosNaslov") + "</b><br>" +
         '<a class="dugme" href="' + safariLink() + '">' + t("iosOtvori") + "</a>" +
-        '<div style="margin-top:10px">' + t("iosDiktat") + "</div>" + kodHtml(kod);
+        '<div style="margin-top:10px">' + t("iosDiktat") + "</div>" +
+        '<div style="margin-top:10px">' + t("iliGemini") + "</div>" + kodHtml(kod);
     };
   }
 
@@ -460,7 +491,7 @@
       naStanjeVeze: function (n) { brojVeza = n; prikaziVezu(); },
       naPovezivanje: function () { if (aktivno) posaljiStanje(); }
     });
-    if (IOS_DRUGI) upozori(iosPoruka(""), true);
+    if (IOS_DRUGI && nacin() !== "gemini") upozori(iosPoruka(""), true);
   }
   function prikaziVezu() {
     var el = $("veza");
@@ -474,6 +505,23 @@
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
   $("prevodilac").value = citaj("hutba-prevodilac") === "claude" ? "claude" : "google";
   $("kljuc").value = citaj("hutba-kljuc") || "";
+  $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
+  $("gkljuc").value = citaj("hutba-gkljuc") || "";
+  var G_MODEL = "gemini-flash-latest";
+  $("gmodel").value = citaj("hutba-gmodel") || G_MODEL;
+  $("prepoznavanje").addEventListener("change", function () { pisi("hutba-prepoznavanje", this.value); prikaziPrevodioca(); });
+  $("spremi-gkljuc").addEventListener("click", function () {
+    pisi("hutba-gkljuc", $("gkljuc").value.trim() || null);
+    var m = $("gmodel").value.trim(); pisi("hutba-gmodel", m && m !== G_MODEL ? m : null);
+    prikaziPrevodioca();
+  });
+  // Koji način prepoznavanja: "browser", "gemini" ili null / Welche Spracherkennung
+  function nacin() {
+    var imaG = !!citaj("hutba-gkljuc");
+    if ($("prepoznavanje").value === "gemini") return imaG ? "gemini" : null;
+    if (podrzavaGovor() && !IOS_DRUGI) return "browser";
+    return imaG ? "gemini" : null;
+  }
 
   $("jezik").addEventListener("change", function () {
     pisi("hutba-jezik", this.value);
@@ -482,6 +530,11 @@
   $("cilj").addEventListener("change", function () { pisi("hutba-cilj", this.value); posaljiStanje(); });
   $("prevodilac").addEventListener("change", function () { pisi("hutba-prevodilac", this.value); prikaziPrevodioca(); });
   function prikaziPrevodioca() {
+    var gem = $("prepoznavanje").value === "gemini";
+    $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI);
+    $("prevodilac-dio").classList.toggle("skriveno", gem);
+    $("prepoznavanje-info").textContent = gem ? t("infoGemini") : t("infoAuto");
+    $("gkljuc-stanje").textContent = citaj("hutba-gkljuc") ? "  " + t("spremljeno") : "";
     var cl = $("prevodilac").value === "claude";
     $("claude-dio").classList.toggle("skriveno", !cl);
     $("prevodilac-info").textContent = cl ? t("infoClaude") : t("infoGoogle");
@@ -553,13 +606,14 @@
   $("kraj-dugme").addEventListener("click", function () { ugasiMikrofon(); ugasiTV(); upozori(null); });
 
   /* =================== Mikrofon =================== */
-  function upaliMikrofon() {
+  function upaliMikrofon(kako) {
     snima = true; mikrofonUgasen = 0; pocetak = Date.now();
     $("mikrofon").classList.add("ukljucen");
     postaviStatus("snima", true);
     clearInterval(satTimer); satTimer = setInterval(prikaziVrijeme, 1000); prikaziVrijeme();
     zatraziBudnost();
-    slusaj();   // odmah, dok traje dodir – preglednik sam pita za dozvolu / sofort beim Tippen – der Browser fragt selbst
+    if (kako === "gemini") audioStart();
+    else slusaj();   // odmah, dok traje dodir – preglednik sam pita za dozvolu / sofort beim Tippen – der Browser fragt selbst
     if (!aktivno) {
       var fn = function () { return t("samoMobitel"); }; fn.samoMobitel = true;
       upozori(fn, true);
@@ -571,6 +625,7 @@
     snima = false; slusa = false; mikrofonUgasen = Date.now();
     clearInterval(satTimer); satTimer = null;
     if (prepoznavanje) { try { prepoznavanje.abort(); } catch (e) {} }
+    audioStop();
     if (budnost) { try { budnost.release(); } catch (e) {} budnost = null; }
     $("mikrofon").classList.remove("ukljucen");
     postaviStatus(kljucStatusa || "micOff");
@@ -585,12 +640,14 @@
 
   $("mikrofon").addEventListener("click", function () {
     if (snima) { ugasiMikrofon(); return; }
-    if (!podrzavaGovor()) {
-      upozori(IOS ? iosPoruka("") : function () { return "<b>" + t("nemaGovora") + "</b><br>" + t("servis1"); });
+    var kako = nacin();
+    if (!kako) {
+      upozori(IOS ? iosPoruka("") : function () { return "<b>" + t("nemaGovora") + "</b><br>" + t("servis1") + "<br><br>" + t("iliGemini"); });
+      $("detalji").open = true;
       return;
     }
     upozori(null);
-    upaliMikrofon();
+    upaliMikrofon(kako);
   });
 
   // Prepoznavanje govora odbijeno: zašto? / Spracherkennung abgelehnt: warum?
@@ -703,6 +760,113 @@
     recenice.push(r);
     if (recenice.length > 200) recenice.shift();
     return r;
+  }
+
+
+  /* =================== Gemini: snimanje zvuka / Tonaufnahme =================== */
+  // Snima zvuk, reže na pauzama (5–14 s) i šalje Geminiju: on prepiše i prevede.
+  // Nimmt den Ton auf, schneidet an Sprechpausen (5–14 s) und schickt ihn an Gemini: es schreibt mit und übersetzt.
+  var aCtx = null, aTok = null, aIzvor = null, aProc = null, aDijelovi = [], aDuzina = 0, aTisina = 0, aGlas = false, aSum = 0.003;
+  var CILJNI_HZ = 16000;
+  function audioStart() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!aCtx) aCtx = new AC();
+    if (aCtx.resume) aCtx.resume();          // mora biti u dodiru (iPhone) / muss beim Tippen passieren (iPhone)
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 } }).then(function (tok) {
+      if (!snima) { tok.getTracks().forEach(function (x) { x.stop(); }); return; }
+      aTok = tok;
+      aIzvor = aCtx.createMediaStreamSource(tok);
+      aProc = aCtx.createScriptProcessor(4096, 1, 1);
+      aDijelovi = []; aDuzina = 0; aTisina = 0; aGlas = false;
+      aProc.onaudioprocess = function (e) {
+        var ulaz = e.inputBuffer.getChannelData(0), izlaz = e.outputBuffer.getChannelData(0);
+        for (var z = 0; z < izlaz.length; z++) izlaz[z] = 0;
+        if (!snima) return;
+        // Smanjiti na 16 kHz / Auf 16 kHz verkleinern
+        var omjer = aCtx.sampleRate / CILJNI_HZ, n = Math.floor(ulaz.length / omjer), mali = new Float32Array(n), zbir = 0;
+        for (var i = 0; i < n; i++) {
+          var a = Math.floor(i * omjer), b = Math.min(ulaz.length, Math.floor((i + 1) * omjer)), s2 = 0;
+          for (var j = a; j < b; j++) s2 += ulaz[j];
+          mali[i] = s2 / Math.max(1, b - a); zbir += mali[i] * mali[i];
+        }
+        var jacina = Math.sqrt(zbir / Math.max(1, n));
+        aSum = Math.min(aSum * 1.002 + 0.00001, Math.max(0.0015, jacina < aSum ? jacina : aSum)); // nivo šuma / Grundrauschen
+        var govor = jacina > Math.max(0.008, aSum * 3);
+        aDijelovi.push(mali); aDuzina += n;
+        if (govor) { aGlas = true; aTisina = 0; } else aTisina += n;
+        var sek = aDuzina / CILJNI_HZ, tisinaSek = aTisina / CILJNI_HZ;
+        if ((sek >= 5 && tisinaSek >= 0.6) || sek >= 14) audioPosalji();
+        else if (!aGlas && sek >= 3) { aDijelovi = []; aDuzina = 0; aTisina = 0; }   // samo tišina / nur Stille
+      };
+      aIzvor.connect(aProc); aProc.connect(aCtx.destination);
+      postaviVrijeme(null);
+    }).catch(function (e) {
+      ugasiMikrofon("micNe");
+      upozori(blokiranPoruka(e && e.name));
+    });
+  }
+  function audioStop() {
+    if (aGlas && aDuzina / CILJNI_HZ > 1) audioPosalji();
+    if (aProc) { try { aProc.disconnect(); aIzvor.disconnect(); } catch (e) {} aProc.onaudioprocess = null; }
+    if (aTok) aTok.getTracks().forEach(function (x) { x.stop(); });
+    aProc = aIzvor = aTok = null; aDijelovi = []; aDuzina = 0; aGlas = false;
+  }
+  function audioPosalji() {
+    var dijelovi = aDijelovi, duzina = aDuzina, glas = aGlas;
+    aDijelovi = []; aDuzina = 0; aTisina = 0; aGlas = false;
+    if (!glas) return;
+    var r = novaRecenica(); r.bs = t("slusam"); prikaziTok(); posaljiRecenicu(r);
+    gemini(wavBase64(dijelovi, duzina), r);
+  }
+  function wavBase64(dijelovi, duzina) {
+    var buf = new ArrayBuffer(44 + duzina * 2), v = new DataView(buf), o = 0;
+    function str(x) { for (var i = 0; i < x.length; i++) v.setUint8(o++, x.charCodeAt(i)); }
+    function u32(x) { v.setUint32(o, x, true); o += 4; }
+    function u16(x) { v.setUint16(o, x, true); o += 2; }
+    str("RIFF"); u32(36 + duzina * 2); str("WAVE"); str("fmt "); u32(16); u16(1); u16(1); u32(CILJNI_HZ); u32(CILJNI_HZ * 2); u16(2); u16(16);
+    str("data"); u32(duzina * 2);
+    dijelovi.forEach(function (d) { for (var i = 0; i < d.length; i++) { var x = Math.max(-1, Math.min(1, d[i])); v.setInt16(o, x < 0 ? x * 0x8000 : x * 0x7fff, true); o += 2; } });
+    var bajtovi = new Uint8Array(buf), bin = "";
+    for (var i = 0; i < bajtovi.length; i += 0x8000) bin += String.fromCharCode.apply(null, bajtovi.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function gemini(b64, r) {
+    var iz = izvor(), ck = ciljKod(), model = citaj("hutba-gmodel") || G_MODEL;
+    var upute = uputa(iz, ck) + "\n\nIMPORTANT: Here the input is an AUDIO recording of the next part of the sermon, not text. " +
+      "First write down exactly what was said, in the spoken language (field \"original\"; recited Qur'an in Arabic script if you recognize it). " +
+      "Then translate it into " + CILJ[ck].ime + " following all rules above (field \"translation\"). " +
+      "If the audio contains no speech, return \"-\" in both fields.";
+    var tijelo = {
+      systemInstruction: { parts: [{ text: upute }] },
+      contents: [{ role: "user", parts: [
+        { inlineData: { mimeType: "audio/wav", data: b64 } },
+        { text: kontekst(r) + "Write down and translate this audio segment." }
+      ] }],
+      generationConfig: {
+        temperature: 0.2,
+        responseMimeType: "application/json",
+        responseSchema: { type: "OBJECT", properties: { original: { type: "STRING" }, translation: { type: "STRING" } }, required: ["original", "translation"] }
+      }
+    };
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(citaj("hutba-gkljuc") || ""), {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(tijelo)
+    }).then(function (o) {
+      return o.json().then(function (d) { if (!o.ok) throw new Error(o.status + " " + ((d.error && d.error.message) || "")); return d; });
+    }).then(function (d) {
+      var tekst = (((d.candidates || [])[0] || {}).content || {}).parts;
+      tekst = (tekst || []).map(function (p) { return p.text || ""; }).join("");
+      var j = JSON.parse(tekst);
+      var orig = String(j.original || "").trim(), pr = String(j.translation || "").trim();
+      if (!orig || orig === "-" || !pr || pr === "-") { ukloni(r); return; }
+      r.bs = orig; r.de = pr; r.gotovo = true;
+      if (upozorenjeFn && upozorenjeFn.gemini) upozori(null);
+      prikaziTok(); posaljiRecenicu(r);
+    }).catch(function (e) {
+      var poruka = String((e && e.message) || e).slice(0, 160);
+      var fn = function () { return "<b>" + t("gNe") + "</b>" + kodHtml(esc(poruka)); }; fn.gemini = true;
+      upozori(fn);
+      ukloni(r);
+    });
   }
 
   /* =================== Prijevod / Übersetzung =================== */

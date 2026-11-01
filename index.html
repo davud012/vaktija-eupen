@@ -66,7 +66,7 @@
   .hidzra { font-size: 1.5vw; margin-top: 0.6vh; }
   .sat { font-size: 8vw; font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .sat .dvotacka { animation: treptaj 2s ease-in-out infinite; }
-  .sat .sek { display: inline-block; font-size: 3.5vw; color: var(--muted); min-width: 2.2ch; text-align: left; }
+  .sat .sek { display: inline-block; font-size: 3.5vw; color: var(--muted); min-width: 2.2ch; text-align: left; font-variant-numeric: tabular-nums; }
   .sat .sek.tik { animation: tik 0.45s ease-out; }
   .sat .hhmm.nova { animation: nova-minuta 0.7s ease-out; }
   @keyframes treptaj { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
@@ -495,24 +495,27 @@
   @keyframes he-puls { 50% { opacity: 0.25; } }
   .he-sat { font-size: 3vw; font-weight: 300; font-variant-numeric: tabular-nums; text-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.5); }
   .he-linije {
-    position: absolute; left: 7vw; right: 7vw; top: 16vh; bottom: 12vh;
-    display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%); mask-image: linear-gradient(180deg, transparent 0%, #000 22%);
+    position: absolute; left: 7vw; right: 7vw; top: 15vh; bottom: 12vh; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 30%); mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
   }
-  .he-linija { margin-top: 3.2vh; animation: he-ulaz 0.7s cubic-bezier(.2, .8, .2, 1) both; transition: opacity 0.8s ease; }
-  .he-linija .njem { font-size: 3.5vw; line-height: 1.28; font-weight: 400; text-shadow: 0 0.3vh 1.4vh rgba(0, 0, 0, 0.55); }
-  .he-linija .ar { font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; color: #e3c27a; font-size: 1.2em; }
-  .he-linija.ceka .njem { color: rgba(251, 248, 241, 0.45); }
-  .he-linija.stara { opacity: 0.42; }
-  .he-linija.stara .njem { font-size: 2.6vw; }
-  @keyframes he-ulaz { from { opacity: 0; transform: translateY(3vh); } to { opacity: 1; transform: none; } }
-  .he-cekanje { font-size: 2.4vw; color: rgba(251, 248, 241, 0.6); text-align: center; margin-bottom: 20vh; }
+  /* Kao teleprompter: tekst teče, staro ide polako gore / Wie ein Teleprompter: Text fließt, Altes gleitet langsam nach oben */
+  .he-traka {
+    position: absolute; left: 0; right: 0; top: 0; will-change: transform;
+    transition: transform 1.1s cubic-bezier(.3, .1, .3, 1);
+    font-size: 3.3vw; line-height: 1.5; font-weight: 400; text-shadow: 0 0.3vh 1.4vh rgba(0, 0, 0, 0.55);
+  }
+  .he-traka.bez-animacije { transition: none; }
+  .he-rijec { animation: he-rijec 0.5s ease-out both; }
+  @keyframes he-rijec { from { opacity: 0; } to { opacity: 1; } }
+  .he-traka .ar { font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; color: #e3c27a; font-size: 1.15em; }
+  .he-cekanje { position: absolute; left: 0; right: 0; bottom: 30%; font-size: 2.4vw; color: rgba(251, 248, 241, 0.6); text-align: center; }
   .he-cekanje .de { font-size: 0.75em; }
   .he-dno {
     position: absolute; bottom: 4vh; left: 0; right: 0; text-align: center; font-size: 1.25vw; color: rgba(251, 248, 241, 0.5);
   }
   body.lagano .he-uzivo i { animation: none; }
   body.lagano .he-linije { -webkit-mask-image: none; mask-image: none; }
+  body.lagano .he-rijec { animation: none; }
 </style>
 </head>
 <body>
@@ -583,7 +586,9 @@
     <div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div>
     <div class="he-sat" id="he-sat"></div>
   </div>
-  <div class="he-linije" id="he-linije"></div>
+  <div class="he-linije" id="he-linije"><div class="he-traka" id="he-traka"></div>
+    <div class="he-cekanje" id="he-cekanje">Prijevod počinje kad imam progovori …<br><span class="de">Die Übersetzung beginnt, sobald der Imam spricht …</span></div>
+  </div>
   <div class="he-dno" id="he-dno">Automatski prijevod · Automatische Übersetzung – kann Fehler enthalten</div>
 </div>
 
@@ -604,9 +609,9 @@
     { kljuc: "jacija",   bs: "Jacija",        de: "Ischa",         namazBs: "jacija-namaz",   namazDe: "Ischa-Gebet", ar: "صَلَاةُ الْعِشَاءِ" }
   ];
   var DZUMA = { kljuc: "podne", bs: "Džuma", de: "Freitagsgebet", namazBs: "džuma-namaz", namazDe: "Freitagsgebet", ar: "صَلَاةُ الْجُمُعَةِ" };
-  var DANI_BS = ["nedjelja", "ponedjeljak", "utorak", "srijeda", "četvrtak", "petak", "subota"];
+  var DANI_BS = ["Nedjelja", "Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota"];
   var DANI_DE = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-  var MJESECI_BS = ["januar", "februar", "mart", "april", "maj", "juni", "juli", "august", "septembar", "oktobar", "novembar", "decembar"];
+  var MJESECI_BS = ["Januar", "Februar", "Mart", "April", "Maj", "Juni", "Juli", "August", "Septembar", "Oktobar", "Novembar", "Decembar"];
   var MJESECI_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   var HIDZRI_MJESECI = ["muharrem", "safer", "rebiu-l-evvel", "rebiu-l-ahir", "džumade-l-ula", "džumade-l-uhra",
                         "redžeb", "šaban", "ramazan", "ševval", "zu-l-kade", "zu-l-hidždže"];
@@ -804,14 +809,14 @@
     }
     var sek = $("sek");
     sek.textContent = ":" + dvije(sad.getSeconds());
-    if (BRZINA === 1) { sek.className = "sek"; void sek.offsetWidth; sek.className = "sek tik"; }
+    // Sekunde mirne, bez animacije / Sekunden ruhig, ohne Animation
     $("ve-sat").textContent = dvije(sad.getHours()) + ":" + dvije(sad.getMinutes());
 
     // Novi dan / Neuer Tag
     if (kljuc !== zadnjiDatum) {
       zadnjiDatum = kljuc;
       danas = rasporedZa(sad);
-      $("datum-bs").textContent = DANI_BS[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_BS[sad.getMonth()] + " " + sad.getFullYear() + ".";
+      $("datum-bs").textContent = DANI_BS[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_BS[sad.getMonth()] + " " + sad.getFullYear();
       $("datum-de").textContent = DANI_DE[sad.getDay()] + ", " + sad.getDate() + ". " + MJESECI_DE[sad.getMonth()] + " " + sad.getFullYear();
       $("hidzra").textContent = hidzriDatum(sad);
       $("vakti").style.display = danas ? "" : "none";
@@ -995,7 +1000,7 @@
     var HP = P.hutbaPrijevod, ekran = $("hutba-ekran"), linije = $("he-linije");
     var TEST = /[?&]test=hutba/.test(location.search);
     if (!HP || !HP.ukljuceno) return;
-    var sesija = null, recenice = {}, zadnjiPuls = 0, vidljiv = false, jezik = "de";
+    var sesija = null, zadnjiPuls = 0, vidljiv = false, jezik = "de";
     var JEZICI = {
       de: ["Predigt – Übersetzung", "Automatische Übersetzung – kann Fehler enthalten"],
       fr: ["Sermon – traduction", "Traduction automatique – peut contenir des erreurs"],
@@ -1010,50 +1015,90 @@
       jezik = c;
       $("he-naslov-cilj").textContent = JEZICI[c][0] ? "· " + JEZICI[c][0] : "";
       $("he-dno").textContent = "Automatski prijevod · " + JEZICI[c][1];
-      linije.dir = c === "ar" ? "rtl" : "ltr";
+      $("he-traka").dir = c === "ar" ? "rtl" : "ltr";
     }
 
-    function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-    function sArapskim(t) {
-      return esc(t).replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF][\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s]*/g,
-        function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
-    }
-    function prikazi() {
-      var lista = Object.keys(recenice).map(function (k) { return recenice[k]; })
-        .filter(function (r, i, a) { return r.bs && r.de !== "-" && (r.gotovo || r === a[a.length - 1]); })
-        .sort(function (a, b) { return a.id - b.id; }).slice(-4);
-      if (!lista.length) {
-        linije.innerHTML = '<div class="he-cekanje">Prijevod počinje kad imam progovori …<br><span class="de">Die Übersetzung beginnt, sobald der Imam spricht …</span></div>';
-        return;
-      }
-      var postojece = {};
-      Array.prototype.forEach.call(linije.children, function (el) { if (el.dataset.id) postojece[el.dataset.id] = el; });
-      var novo = document.createDocumentFragment();
-      lista.forEach(function (r, i) {
-        var el = postojece[r.id] || document.createElement("div");
-        el.dataset.id = r.id;
-        el.className = "he-linija" + (r.gotovo ? "" : " ceka") + (i < lista.length - 2 ? " stara" : "");
-        el.innerHTML = '<div class="njem">' + (r.gotovo ? sArapskim(r.de) : "…") + '</div>';
-        novo.appendChild(el);
+    var traka = $("he-traka"), cekanje = $("he-cekanje");
+    var stanjeId = {}, pustenoDo = {}, red = [], tajmer = null;
+    var AR = /([؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s]*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]|[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿])/;
+
+    // Tekst u riječi (arapski ostaje u komadu) / Text in Wörter (Arabisch bleibt am Stück)
+    function rijeci(tekst) {
+      var out = [];
+      String(tekst).split(AR).forEach(function (dio, i) {
+        if (!dio) return;
+        if (i % 2 === 1) out.push({ t: dio.trim(), ar: true });
+        else dio.split(/\s+/).forEach(function (w) { if (w) out.push({ t: w }); });
       });
-      linije.innerHTML = ""; linije.appendChild(novo);
+      return out;
+    }
+    function dodajRijec(r, bezAnimacije) {
+      var zadnji = traka.lastChild;
+      var bezRazmaka = !zadnji || /^[)\].,;:!?»“]/.test(r.t) || (zadnji.textContent && /[(\[„«]$/.test(zadnji.textContent));
+      if (!bezRazmaka) traka.appendChild(document.createTextNode(" "));
+      var el = document.createElement(r.ar ? "bdi" : "span");
+      if (r.ar) { el.className = "ar" + (bezAnimacije ? "" : " he-rijec"); el.dir = "rtl"; }
+      else if (!bezAnimacije) el.className = "he-rijec";
+      el.textContent = r.t;
+      traka.appendChild(el);
+    }
+    // Pomjeranje: zadnji red uvijek dole, staro polako gore / Letzte Zeile immer unten, Altes gleitet nach oben
+    function pomjeri() {
+      var visina = linije.clientHeight, sadrzaj = traka.offsetHeight;
+      traka.style.transform = "translateY(" + Math.round(visina - sadrzaj) + "px)";
+      // Previše teksta: obrisati staro (nevidljivo) / Zu viel Text: Altes (unsichtbar) entfernen
+      if (sadrzaj > visina * 3 && traka.childNodes.length > 300) {
+        traka.classList.add("bez-animacije");
+        for (var i = 0; i < 120 && traka.firstChild; i++) traka.removeChild(traka.firstChild);
+        traka.style.transform = "translateY(" + Math.round(visina - traka.offsetHeight) + "px)";
+        void traka.offsetHeight; traka.classList.remove("bez-animacije");
+      }
+    }
+    // Riječi dolaze jedna po jedna, kao da se govori / Wörter kommen eine nach der anderen, wie gesprochen
+    function sljedecaRijec() {
+      tajmer = null;
+      if (!red.length) return;
+      dodajRijec(red.shift()); pomjeri();
+      var pauza = red.length > 30 ? 70 : red.length > 14 ? 130 : red.length > 6 ? 190 : 260;
+      tajmer = setTimeout(sljedecaRijec, pauza);
+    }
+    function dodajTekst(tekst, odmah) {
+      if (!tekst || tekst === "-") return;
+      cekanje.style.display = "none";
+      if (odmah) { rijeci(tekst).forEach(function (r) { dodajRijec(r, true); }); pomjeri(); return; }
+      red = red.concat(rijeci(tekst));
+      if (!tajmer) sljedecaRijec();
+    }
+    // Rečenice idu redom (ako jedna kasni, čeka se do 5 s) / Sätze in Reihenfolge (verspätete bis 5 s abwarten)
+    function pustiRedom() {
+      var ids = Object.keys(stanjeId).map(Number).filter(function (id) { return !pustenoDo[id]; }).sort(function (a, b) { return a - b; });
+      for (var i = 0; i < ids.length; i++) {
+        var z = stanjeId[ids[i]];
+        if (z.gotovo) { pustenoDo[ids[i]] = 1; dodajTekst(z.de); continue; }
+        var kasnije = ids.slice(i + 1).some(function (id) { return stanjeId[id].gotovo; });
+        if (kasnije && Date.now() - z.od > 5000) { pustenoDo[ids[i]] = 1; continue; }
+        break;
+      }
+    }
+    function ocisti() {
+      stanjeId = {}; pustenoDo = {}; red = []; clearTimeout(tajmer); tajmer = null;
+      traka.innerHTML = ""; traka.style.transform = ""; cekanje.style.display = "";
     }
     function pokazi() {
       zadnjiPuls = Date.now();
       if (vidljiv) return;
       vidljiv = true; ekran.classList.add("vidljiv"); document.body.classList.add("hutba-aktivna");
-      prikazi();
     }
     function sakrij() {
       if (!vidljiv) return;
       vidljiv = false; ekran.classList.remove("vidljiv"); document.body.classList.remove("hutba-aktivna");
       // Ništa ne ostaje na ekranu / Nichts bleibt gespeichert
-      recenice = {}; sesija = null;
-      setTimeout(function () { if (!vidljiv) linije.innerHTML = ""; }, 1300);
+      sesija = null;
+      setTimeout(function () { if (!vidljiv) ocisti(); }, 1300);
     }
     function novaSesija(s) {
       if (s === sesija) return;
-      sesija = s; recenice = {}; linije.innerHTML = "";
+      sesija = s; ocisti();
     }
     function naPoruku(tema, m) {
       if (tema === "stanje") {
@@ -1061,15 +1106,23 @@
         // Stara zadržana poruka (mobitel se ugasio) – ne prikazivati
         // Alte gespeicherte Nachricht (Handy war weg) – nicht anzeigen
         if (m.t && Math.abs(Date.now() - m.t) > 90000 && !vidljiv) return;
+        var nova = m.s !== sesija;
         novaSesija(m.s); postaviJezik(m.c);
-        (m.zadnje || []).forEach(function (r) { if (!recenice[r.id]) recenice[r.id] = r; });
-        pokazi(); prikazi();
+        if (nova) (m.zadnje || []).forEach(function (r) {
+          if (stanjeId[r.id]) return;
+          stanjeId[r.id] = { gotovo: true, de: r.de, od: Date.now() }; pustenoDo[r.id] = 1;
+          dodajTekst(r.de, true);
+        });
+        pokazi();
       } else if (tema === "tekst") {
         novaSesija(m.s); postaviJezik(m.c);
-        recenice[m.id] = m;
-        pokazi(); prikazi();
+        var z = stanjeId[m.id] || (stanjeId[m.id] = { od: Date.now() });
+        if (!pustenoDo[m.id] && m.gotovo) { z.gotovo = true; z.de = m.de; }
+        pokazi(); pustiRedom();
       }
     }
+    setInterval(function () { if (vidljiv) pustiRedom(); }, 1000);
+    window.addEventListener("resize", function () { if (vidljiv) pomjeri(); });
     setInterval(function () {
       if (vidljiv) {
         var d = sada();
@@ -1080,14 +1133,13 @@
     }, 1000);
 
     if (TEST) {
-      novaSesija("test");
-      [["S kim si, takav si. Zato pazite s kim se družite, braćo i sestre.", "Sag mir, mit wem du umgehst, und ich sage dir, wer du bist. Achtet deshalb darauf, mit wem ihr eure Zeit verbringt, liebe Brüder und Schwestern."],
-       ["Poslanik, sallallahu alejhi ve sellem, je rekao da je čovjek na vjeri svog prijatelja.", "Der Prophet Muhammad (s.a.w.) sagte, dass der Mensch die Religion seines Freundes annimmt."],
-       ["Allah dželle šanuhu kaže: elif lam mim, zalikel kitabu la rejbe fih", "Allah, erhaben ist Er, sagt: (الٓمٓ – ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ · Sure Al-Baqara 2:1-2)"],
-       ["Neka nam Allah olakša da budemo dobri jedni prema drugima", ""]].forEach(function (x, i) {
-        recenice[i + 1] = { id: i + 1, bs: x[0], de: x[1], gotovo: !!x[1] };
-      });
-      pokazi(); prikazi();
+      novaSesija("test"); pokazi();
+      var probe = ["Sag mir, mit wem du umgehst, und ich sage dir, wer du bist. Achtet deshalb darauf, mit wem ihr eure Zeit verbringt, liebe Brüder und Schwestern.",
+        "Der Prophet Muhammad (s.a.w.) sagte, dass der Mensch die Religion seines Freundes annimmt.",
+        "Allah, erhaben ist Er, sagt: (الٓمٓ – ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ · Sure Al-Baqara 2:1-2)",
+        "Möge Allah es uns leicht machen, gut zueinander zu sein.",
+        "Ein guter Freund erinnert dich an Allah, wenn du ihn vergisst, und hilft dir, wenn du dich an Ihn erinnerst."];
+      probe.forEach(function (x, i) { setTimeout(function () { dodajTekst(x); }, i * 4500); });
       return;
     }
     if (!window.PrijevodVeza || !window.mqtt) return;

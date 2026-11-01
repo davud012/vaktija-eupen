@@ -92,6 +92,8 @@ Tipps von unterwegs:
 - Handy-Seite einsprachig: oben rechts **DE / BS / FR** umschalten (wird gemerkt)
 - Roter Knopf **„Hutba beenden“** (erscheint, sobald Fernseher oder Mikrofon läuft) beendet Mikrofon und Fernseher zusammen
 - iPhone: Die Spracherkennung des Browsers geht nur in **Safari** (mit eingeschalteter Diktierfunktion/Siri). In Chrome, Brave oder der Google-App auf dem iPhone blockiert Apple sie. Die Seite zeigt dann einen Knopf „In Safari öffnen“. Für eine Lösung in jedem Browser müsste der Ton selbst aufgenommen und an einen Cloud-Dienst geschickt werden (z. B. Gemini oder Whisper, braucht einen Schlüssel).
+- Fernseher zeigt die Übersetzung wie ein **Teleprompter**: Wörter kommen nacheinander, alter Text gleitet langsam nach oben, nichts springt
+- **Gemini als Spracherkennung** (Einstellungen → Spracherkennung → Gemini): geht in jedem Browser, auch Chrome/Google-App auf dem iPhone. Ton wird an Sprechpausen in Stücke von 5–14 s geschnitten, Gemini schreibt mit und übersetzt nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com), Modell standardmäßig `gemini-flash-latest` (änderbar)
 - Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
 - Mikrofon-Erlaubnis speichert der Browser selbst: bei der Frage „Bei Besuch der Website zulassen“ wählen, nicht „Nur dieses Mal“
 - Übersetzer wählbar unter „Einstellungen“: **Google** (Standard, kostenlos, eher Wort für Wort, erkennt keine Koran-Verse) oder **Claude** (Modell claude-opus-5-5, nach Sinn, ca. 0,50 € pro Hutba, braucht einen API-Schlüssel, der nur auf dem Handy gespeichert wird)
@@ -103,6 +105,11 @@ Tipps von unterwegs:
 - Dateien: `hutba/index.html` (Handy), `prijevod-veza.js` (Verbindung), `lib/` (Bibliotheken), Anzeige in `index.html`
 - Fernseher-Vorschau ohne Handy: Adresse + `?test=hutba`
 - Offen: echter Test in der Moschee (Mikrofon, Hall), eventuell ein Ansteckmikrofon, später ein richtiges Passwort und eine geschützte Verbindung
+
+## Hauptanzeige (Änderungen 1.11.2026)
+
+- Datum groß geschrieben und ohne Punkt nach dem Jahr: „Nedjelja, 1. Novembar 2026“
+- Sekunden oben rechts klein und ruhig, ohne Animation
 
 ## Später geplant
 
