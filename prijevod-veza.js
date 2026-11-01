@@ -9,7 +9,9 @@
      <kanal>/tekst   – rečenice (bosanski + njemački) / Sätze (Bosnisch + Deutsch)
    ===================================================================== */
 var PrijevodVeza = (function () {
-  var SERVERI = ["wss://broker.hivemq.com:8884/mqtt", "wss://broker.emqx.io:8084/mqtt"];
+  // Treći server ide preko porta 443 (radi i na mobilnim mrežama koje blokiraju druge portove)
+  // Der dritte Server läuft über Port 443 (geht auch in Mobilfunknetzen, die andere Ports sperren)
+  var SERVERI = ["wss://broker.hivemq.com:8884/mqtt", "wss://broker.emqx.io:8084/mqtt", "wss://public:public@public.cloud.shiftr.io"];
   var m = /[?&]broker=([^&]+)/.exec(location.search);
   if (m) SERVERI = decodeURIComponent(m[1]).split(",");
 
@@ -34,6 +36,8 @@ var PrijevodVeza = (function () {
         o.will = { topic: kanal + "/stanje", payload: JSON.stringify(opcije.volja), qos: 1, retain: true };
       }
       var k;
+      var pristup = /^(wss?:\/\/)([^:@\/]+):([^@\/]+)@(.*)$/.exec(url);
+      if (pristup) { url = pristup[1] + pristup[4]; o.username = pristup[2]; o.password = pristup[3]; }
       try { k = mqtt.connect(url, o); } catch (e) { return; }
       k.on("connect", function () {
         stanjeVeze[i] = true; javiStanje();

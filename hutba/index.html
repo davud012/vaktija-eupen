@@ -277,6 +277,9 @@
       blok1: "Lijevo od adrese dodirnuti ikonu (🔒, ⚙ ili „aA“) → <b>Mikrofon</b> → <b>Dozvoli</b>, zatim stranicu ponovo učitati.",
       blok2: "Postavke telefona → aplikacija preglednika → <b>Mikrofon</b> uključiti.",
       bsNe: "Bosanski nije dostupan na ovom mobitelu – koristi se hrvatski.",
+      iosHr: "iPhone ne podržava bosanski – prebačeno na <b>hrvatski</b> (razumije i bosanski). Pritisnite mikrofon još jednom.",
+      iosKoraci: "Na iPhoneu provjerite:", ios1: "Postavke → Općenito → Tastatura → Tastature → <b>Dodaj tastaturu → Hrvatski</b> (tako hrvatski dođe u jezike diktiranja).",
+      ios2: "Postavke → Safari → <b>Mikrofon</b> → Pitaj ili Dozvoli.", ios3: "Za test: u Postavkama izabrati jezik govora <b>Deutsch</b> – ako to radi, problem je samo u jeziku.",
       nemaNeta: "Nema interneta za prepoznavanje govora … pokušava ponovo.",
       kljucNe: "Claude ključ ne radi – koristi se Google.",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
@@ -316,6 +319,9 @@
       blok1: "Links neben der Adresse auf das Symbol tippen (🔒, ⚙ oder „aA“) → <b>Mikrofon</b> → <b>Zulassen</b>, dann Seite neu laden.",
       blok2: "Handy-Einstellungen → App des Browsers → <b>Mikrofon</b> einschalten.",
       bsNe: "Bosnisch ist auf diesem Handy nicht verfügbar – es wird Kroatisch verwendet.",
+      iosHr: "Das iPhone unterstützt kein Bosnisch – auf <b>Kroatisch</b> umgestellt (versteht auch Bosnisch). Bitte das Mikrofon noch einmal drücken.",
+      iosKoraci: "Auf dem iPhone prüfen:", ios1: "Einstellungen → Allgemein → Tastatur → Tastaturen → <b>Tastatur hinzufügen → Kroatisch</b> (damit Kroatisch bei den Diktiersprachen erscheint).",
+      ios2: "Einstellungen → Safari → <b>Mikrofon</b> → Fragen oder Erlauben.", ios3: "Zum Test: in den Einstellungen als gesprochene Sprache <b>Deutsch</b> wählen – geht das, liegt es nur an der Sprache.",
       nemaNeta: "Kein Internet für die Spracherkennung … neuer Versuch.",
       kljucNe: "Claude-Schlüssel ungültig – es wird Google verwendet.",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
@@ -355,6 +361,9 @@
       blok1: "Touchez l'icône à gauche de l'adresse (🔒, ⚙ ou « aA ») → <b>Micro</b> → <b>Autoriser</b>, puis rechargez la page.",
       blok2: "Paramètres du téléphone → application du navigateur → activer le <b>micro</b>.",
       bsNe: "Le bosnien n'est pas disponible sur ce téléphone – le croate est utilisé.",
+      iosHr: "L'iPhone ne prend pas en charge le bosnien – passage au <b>croate</b> (il comprend aussi le bosnien). Appuyez encore une fois sur le micro.",
+      iosKoraci: "Sur l'iPhone, vérifiez :", ios1: "Réglages → Général → Clavier → Claviers → <b>Ajouter un clavier → Croate</b> (le croate apparaît alors dans les langues de dictée).",
+      ios2: "Réglages → Safari → <b>Micro</b> → Demander ou Autoriser.", ios3: "Pour tester : choisir <b>Deutsch</b> comme langue parlée dans les paramètres – si cela marche, le problème vient seulement de la langue.",
       nemaNeta: "Pas d'Internet pour la reconnaissance vocale … nouvel essai.",
       kljucNe: "Clé Claude invalide – Google est utilisé.",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
@@ -407,6 +416,10 @@
   function safariLink() { return "x-safari-" + location.href.split("#")[0]; }
   function iosPoruka(kod) {
     return function () {
+      if (!IOS_DRUGI && kod) {
+        // Već u Safariju / Schon in Safari
+        return "<b>" + t("iosKoraci") + "</b><ol><li>" + t("iosDiktat") + "</li><li>" + t("ios1") + "</li><li>" + t("ios2") + "</li><li>" + t("ios3") + "</li></ol>" + kodHtml(kod + " · " + $("jezik").value);
+      }
       return "<b>" + t("iosNaslov") + "</b><br>" +
         '<a class="dugme" href="' + safariLink() + '">' + t("iosOtvori") + "</a>" +
         '<div style="margin-top:10px">' + t("iosDiktat") + "</div>" + kodHtml(kod);
@@ -457,6 +470,7 @@
 
   /* =================== Postavke / Einstellungen =================== */
   var j0 = citaj("hutba-jezik"); if (j0) $("jezik").value = j0;
+  else if (IOS) $("jezik").value = "hr-HR";   // iPhone ne zna bosanski / iPhone kann kein Bosnisch
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
   $("prevodilac").value = citaj("hutba-prevodilac") === "claude" ? "claude" : "google";
   $("kljuc").value = citaj("hutba-kljuc") || "";
@@ -590,6 +604,12 @@
           tk.getTracks().forEach(function (x) { x.stop(); });
           upozori(function () { return t("dozvoljenoPonovo"); }, true);
         }).catch(function () { upozori(blokiranPoruka(kod)); });
+        return;
+      }
+      if (IOS && !IOS_DRUGI && /^bs/.test($("jezik").value)) {
+        // Apple ne zna bosanski: hrvatski i ponovo pritisnuti / Apple kann kein Bosnisch: Kroatisch und nochmal drücken
+        $("jezik").value = "hr-HR"; pisi("hutba-jezik", "hr-HR");
+        upozori(function () { return t("iosHr"); }, true);
         return;
       }
       if (IOS) { upozori(iosPoruka(kod)); return; }
