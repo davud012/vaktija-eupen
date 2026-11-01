@@ -241,6 +241,7 @@
 
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
         <div class="mali" data-t="odjavaInfo"></div>
+        <div class="mali" id="verzija" style="margin-top:14px;opacity:.6"></div>
       </div>
     </details>
   </section>
@@ -842,8 +843,8 @@
       var kraj = -1;
       for (j = n - 1; j >= 0; j--) if (/[.!?…]["“”»]?$/.test(novo[j])) { kraj = j; break; }
       if (kraj >= 0 && (tiho > 800 || kraj <= n - 3)) uzmi = kraj + 1;          // cijela rečenica / ganzer Satz
-      else if (tiho > 1800 && n >= 3) uzmi = n;                                // pauza / Pause
-      else if (tiho > 3000) uzmi = n;                                          // duga pauza / lange Pause
+      else if (tiho > 1800 && n >= 7) uzmi = n;                                // pauza / Pause
+      else if (tiho > 3500) uzmi = n;                                          // duga pauza / lange Pause
       else if (n >= 28) {                                                      // dugo bez tačke / lange ohne Punkt
         for (j = n - 5; j >= 10; j--) if (/[,;:]$/.test(novo[j])) { uzmi = j + 1; break; }
         if (!uzmi) uzmi = n - 4;
@@ -1019,6 +1020,35 @@
     });
   }
 
+  /* =================== Arapske formule / Arabische Formeln =================== */
+  // Česte arapske rečenice (kako ih prepoznavanje napiše) odmah u arapsko pismo – tačno, bez pogađanja.
+  // Häufige arabische Formeln (so wie die Spracherkennung sie schreibt) sofort in arabische Schrift – genau, ohne Raten.
+  var FORMULE = [
+    [/\b(e?u[zs]u\s*bil+ahi\s*mine?[\s-]*[sš]+[\s-]*[sš]?ej[tț]an[ie]?r?[\s-]*r?ra?d[zž]?im)\b/gi, "أَعُوذُ بِٱللَّٰهِ مِنَ ٱلشَّيْطَٰنِ ٱلرَّجِيمِ"],
+    [/\b(bi?smi?l+ah?i?r?[\s-]*(r?rahmani?r?[\s-]*)?r?rahim|bismil+ah)\b/gi, "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"],
+    [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
+    [/\b(el|al)[\s-]*hamdu?\s*li?l+ah[ie]?\s*(rab+il[\s-]*['’]?alemin)?\b/gi, null],
+    [/\bsubhan[ae]?l+ah\b/gi, "سُبْحَانَ ٱللَّٰهِ"],
+    [/\ballahu\s*e?a?kb[ea]r\b/gi, "ٱللَّٰهُ أَكْبَرُ"],
+    [/\bin\s*[sš]a\s*al+ah\b|\bin[sš]al+ah\b/gi, "إِن شَاءَ ٱللَّٰهُ"],
+    [/\bma\s*[sš]a\s*al+ah\b|\bma[sš]al+ah\b/gi, "مَا شَاءَ ٱللَّٰهُ"],
+    [/\bes+[\s-]*sel+amu\s*['’]?a?lej?kum(\s*ve\s*rahmetul+ahi(\s*ve\s*berekatuhu)?)?\b/gi, null],
+    [/\bestag?f[iy]rul+ah\b/gi, "أَسْتَغْفِرُ ٱللَّٰهَ"],
+    [/\bd[zž]ezakal+ahu?\s*hajr[ae]n?\b/gi, "جَزَاكَ ٱللَّٰهُ خَيْرًا"]
+  ];
+  function arapskeFormule(tekst) {
+    return FORMULE.reduce(function (t2, f) {
+      return t2.replace(f[0], function (cijelo) {
+        var ar = f[1];
+        if (!ar && /hamd/i.test(cijelo)) ar = /rab+il/i.test(cijelo) ? "ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ" : "ٱلْحَمْدُ لِلَّٰهِ";
+        if (!ar) ar = /berekat/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ وَبَرَكَاتُهُ" : /rahmet/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ" : "ٱلسَّلَامُ عَلَيْكُمْ";
+        return ar === "ﷺ" ? "ﷺ" : "(" + ar + ")";
+      });
+    }, tekst);
+  }
+  var AR_BLOK = /(\([^()]*[\u0600-\u06FF][^()]*\)|ﷺ)/;
+  function samoArapski(t2) { return !t2.split(AR_BLOK).some(function (d, i) { return i % 2 === 0 && /[A-Za-zÀ-žА-я]/.test(d); }); }
+
   /* =================== Prijevod / Übersetzung =================== */
   function uputa(iz, ck) {
     var ci = CILJ[ck], cilj = ci.ime;
@@ -1069,7 +1099,10 @@
     r.de = ""; r.gotovo = false;
     prikaziTok(); posaljiRecenicu(r);
     var c = claude(), iz = izvor(), ck = ciljKod();
-    var posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
+    if (iz.g !== "ar") r.bs = arapskeFormule(r.bs);
+    var posao;
+    if (samoArapski(r.bs)) posao = Promise.resolve(r.bs);                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
+    else posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
     var greska = "";
     posao.catch(function (e) {
       greska = String((e && e.message) || e);
@@ -1100,7 +1133,7 @@
     x = x.split(/\n+\s*(note|n\.b\.|explanation|translator'?s? note)\s*:/i)[0];
     x = x.replace(/^["„“”]+|["„“”]+$/g, "").trim();
     // Sätze mit Bemerkungen über den Text entfernen / Sätze mit Bemerkungen über den Text entfernen
-    var META = /\b(segment|fragment|der satz setzt|setzt (den|die|das) vorherigen|vorherige[nrs]? (satz|segment|teil)|bezieht sich auf|im kontext|this sentence|the segment|continues the previous|ce segment|la phrase continue|ovaj segment|rečenica nastavlja)\b/i;
+    var META = /\b(segment|fragment|der satz setzt|setzt (den|die|das) vorherigen|vorherige[nrs]? (satz|segment|teil)|bezieht sich auf|im kontext|this sentence|the segment|continues the previous|das wort|bedeutet hier|genitiv|dativ|akkusativ|vokativ|i should|wait,|ce segment|la phrase continue|ovaj segment|rečenica nastavlja)\b/i;
     if (META.test(x)) {
       var dijelovi = x.match(/[^.!?…]+[.!?…]*\s*/g) || [x];
       x = dijelovi.filter(function (d) { return !META.test(d); }).join("").trim();
@@ -1145,6 +1178,14 @@
     var razlicito = nadjeno.filter(function (w, i) { return nadjeno.indexOf(w) === i; });
     return razlicito.length >= 2 || /\b(means|vocative|literally)\b/i.test(bez);
   }
+  // Ako se u prijevodu pojave bosanske riječi iz originala (npr. "poslanika", "svjetova"), model objašnjava umjesto da prevodi
+  // Tauchen bosnische Wörter aus dem Original in der Übersetzung auf, erklärt das Modell statt zu übersetzen
+  var DOZVOLJENE = /^(allah|allahu|muhammed|muhammad|muhammeda|kur'an|kuran|bismillah|amin|amen|ramazan|bajram|d[zž]uma|hutba|ibrahim|isa|musa|nuh|adem|merjem|mekka|medina|mekke|medine|ka'ba)$/i;
+  function imaIzvornihRijeci(prijevod, izvorniTekst, iz, ck) {
+    if (iz.g === "ar" || (iz.g === "bs" && ck === "bs") || iz.g === ck) return false;
+    var rijeci = {}; (izvorniTekst.toLowerCase().match(/[a-zčćžšđ']{5,}/g) || []).forEach(function (w) { if (!DOZVOLJENE.test(w)) rijeci[w] = 1; });
+    return (prijevod.toLowerCase().match(/[a-zčćžšđäöüß']{5,}/g) || []).some(function (w) { return rijeci[w]; });
+  }
   function prevediClaude(c, r, iz, ck) {
     var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs;
     return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
@@ -1158,6 +1199,7 @@
       prijevod = ocistiIzlaz(prijevod);
       // Engleski ili objašnjenje -> umjesto toga Google / Englisch oder Erklärung -> stattdessen Google
       if (prijevod !== "-" && imaEngleskog(prijevod, ck)) throw new Error("engleski");
+      if (prijevod !== "-" && imaIzvornihRijeci(prijevod, r.bs, iz, ck)) throw new Error("objasnjenje");
       return prijevod;
     }).catch(function (e) {
       if (e && (e.status === 401 || e.status === 403)) upozori(function () { return t("kljucNe"); });
@@ -1167,6 +1209,15 @@
 
   function prevediGoogle(tekst, sl, tl) {
     if (sl === tl) return Promise.resolve(tekst);
+    if (AR_BLOK.test(tekst)) {
+      var dijeloviAr = tekst.split(AR_BLOK);
+      return Promise.all(dijeloviAr.map(function (d, i) {
+        return i % 2 === 1 || !/[A-Za-zÀ-ž]/.test(d) ? Promise.resolve(d) : prevediGoogleCisto(d.trim(), sl, tl);
+      })).then(function (x) { return x.join(" ").replace(/\s+/g, " ").replace(/\s+([.,!?;:])/g, "$1").trim(); });
+    }
+    return prevediGoogleCisto(tekst, sl, tl);
+  }
+  function prevediGoogleCisto(tekst, sl, tl) {
     // Dugi tekst u dijelove do ~900 znakova / Langer Text in Stücke bis ~900 Zeichen
     var dijelovi = [], w = tekst.split(/\s+/), tren = "";
     w.forEach(function (x) { if ((tren + " " + x).length > 900 && tren) { dijelovi.push(tren); tren = x; } else tren = tren ? tren + " " + x : x; });
@@ -1236,6 +1287,22 @@
         (r.gotovo ? sArapskim(r.de) : "…") + '</div></div>';
     }).join("") : '<div class="prazno">' + t("prazno") + '</div>';
   }
+
+  /* =================== Automatsko ažuriranje / Automatische Aktualisierung =================== */
+  // Nova verzija na GitHubu -> stranica se sama učita ponovo (ne dok mikrofon ili TV radi)
+  // Neue Version auf GitHub -> Seite lädt sich selbst neu (nicht während Mikrofon oder Fernseher laufen)
+  var mojaVerzija = null, cekaAzuriranje = false;
+  function provjeriVerziju() {
+    fetch("../vaktija.js?v=" + Date.now(), { cache: "no-store" }).then(function (o) { return o.text(); }).then(function (tx) {
+      var m = /verzija:\s*([0-9.\-]+)/.exec(tx), v = m ? m[1] : "";
+      if (!v) return;
+      if (mojaVerzija === null) { mojaVerzija = v; $("verzija").textContent = "Verzija " + v; return; }
+      if (v !== mojaVerzija) cekaAzuriranje = true;
+      if (cekaAzuriranje && !snima && !aktivno) location.reload();
+    }).catch(function () {});
+  }
+  provjeriVerziju();
+  setInterval(provjeriVerziju, 3 * 60000);
 
   /* =================== Start =================== */
   ucitajPostavkeUFormu();
