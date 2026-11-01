@@ -90,11 +90,14 @@ Tipps von unterwegs:
 - Handy-Seite: **https://davud012.github.io/vaktija-eupen/hutba/**, Passwort **123** (in `vaktija.js` unter `hutbaPrijevod.lozinka` änderbar)
 - Imam drückt das Mikrofon → Fernseher wechselt automatisch zur Übersetzung. Auf dem Fernseher steht **nur Deutsch**, ohne den bosnischen Text (Wunsch des Nutzers).
 - Mikrofon wieder drücken oder Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
-- Übersetzung nach Sinn mit **Claude** (Modell claude-opus-5-5): Dafür einmal einen Claude-API-Schlüssel im Handy unter „Einstellungen & Test“ eintragen. Der Schlüssel bleibt nur auf dem Handy. Ohne Schlüssel wird einfach mit Google übersetzt (eher Wort für Wort).
+- Übersetzer wählbar unter „Einstellungen“: **Google** (Standard, kostenlos, eher Wort für Wort, erkennt keine Koran-Verse) oder **Claude** (Modell claude-opus-5-5, nach Sinn, ca. 1 € pro Hutba, braucht einen API-Schlüssel, der nur auf dem Handy gespeichert wird)
+- Gesprochene Sprache wählbar (Bosnisch, Kroatisch, Serbisch, Deutsch, Englisch, Türkisch, Arabisch) und Zielsprache (Deutsch, Französisch, Niederländisch, Englisch, Türkisch, Arabisch, Bosnisch)
+- Beim Druck aufs Mikrofon kommt das Fenster „Mikrofon erlauben“. War es früher blockiert, zeigt die Seite eine Anleitung zum Freigeben.
+- „Abmelden & alles löschen“ löscht alles Gesagte und Übersetzte, am Handy, am Fernseher und auf dem Server. Nach dem Stoppen bleibt auch sonst nichts auf dem Server oder dem Fernseher.
 - Koran-Rezitation wird nicht übersetzt. Stattdessen erscheint der Vers auf Arabisch in Klammern mit der Quelle, z. B. (الٓمٓ · Sure Al-Baqara 2:1). Das passiert nur, wenn der Vers sicher erkannt wird, sonst erscheint [Rezitation auf Arabisch].
 - Verbindung Handy → Fernseher: zwei kostenlose öffentliche MQTT-Server (HiveMQ, EMQX). Kanalname steht in `vaktija.js` unter `hutbaPrijevod.kanal`.
 - Dateien: `hutba/index.html` (Handy), `prijevod-veza.js` (Verbindung), `lib/` (Bibliotheken), Anzeige in `index.html`
-- Testen ohne Imam: Handy-Seite → „Einstellungen & Test“ → Satz an den Fernseher senden. Fernseher-Vorschau: Adresse + `?test=hutba`
+- Fernseher-Vorschau ohne Handy: Adresse + `?test=hutba`
 - Offen: echter Test in der Moschee (Mikrofon, Hall), eventuell ein Ansteckmikrofon, später ein richtiges Passwort und eine geschützte Verbindung
 
 ## Später geplant

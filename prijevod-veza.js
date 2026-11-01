@@ -65,6 +65,12 @@ var PrijevodVeza = (function () {
           if (k.connected) k.publish(kanal + "/" + tema, tekst, { qos: zadrzi ? 1 : 0, retain: !!zadrzi });
         });
       },
+      // Briše zadržanu poruku sa servera / Löscht die gespeicherte Nachricht vom Server
+      obrisiZadrzano: function (tema) {
+        klijenti.forEach(function (k) {
+          if (k.connected) k.publish(kanal + "/" + tema, "", { qos: 1, retain: true });
+        });
+      },
       povezano: function () { return stanjeVeze.some(Boolean); },
       zatvori: function () { klijenti.forEach(function (k) { try { k.end(true); } catch (e) {} }); }
     };

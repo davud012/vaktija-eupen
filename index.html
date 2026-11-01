@@ -580,11 +580,11 @@
 
 <div class="hutba-ekran" id="hutba-ekran">
   <div class="he-vrh">
-    <div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de">· Predigt – Übersetzung</span></div>
+    <div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div>
     <div class="he-sat" id="he-sat"></div>
   </div>
   <div class="he-linije" id="he-linije"></div>
-  <div class="he-dno">Automatski prijevod · Automatische Übersetzung – kann Fehler enthalten</div>
+  <div class="he-dno" id="he-dno">Automatski prijevod · Automatische Übersetzung – kann Fehler enthalten</div>
 </div>
 
 <script src="vaktija.js"></script>
@@ -995,7 +995,23 @@
     var HP = P.hutbaPrijevod, ekran = $("hutba-ekran"), linije = $("he-linije");
     var TEST = /[?&]test=hutba/.test(location.search);
     if (!HP || !HP.ukljuceno) return;
-    var sesija = null, recenice = {}, zadnjiPuls = 0, vidljiv = false;
+    var sesija = null, recenice = {}, zadnjiPuls = 0, vidljiv = false, jezik = "de";
+    var JEZICI = {
+      de: ["Predigt – Übersetzung", "Automatische Übersetzung – kann Fehler enthalten"],
+      fr: ["Sermon – traduction", "Traduction automatique – peut contenir des erreurs"],
+      nl: ["Preek – vertaling", "Automatische vertaling – kan fouten bevatten"],
+      en: ["Sermon – translation", "Automatic translation – may contain errors"],
+      tr: ["Hutbe – tercüme", "Otomatik çeviri – hata içerebilir"],
+      ar: ["الخطبة – ترجمة", "ترجمة آلية – قد تحتوي على أخطاء"],
+      bs: ["", "Može sadržavati greške"]
+    };
+    function postaviJezik(c) {
+      if (!c || !JEZICI[c] || c === jezik) return;
+      jezik = c;
+      $("he-naslov-cilj").textContent = JEZICI[c][0] ? "· " + JEZICI[c][0] : "";
+      $("he-dno").textContent = "Automatski prijevod · " + JEZICI[c][1];
+      linije.dir = c === "ar" ? "rtl" : "ltr";
+    }
 
     function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
     function sArapskim(t) {
@@ -1031,6 +1047,9 @@
     function sakrij() {
       if (!vidljiv) return;
       vidljiv = false; ekran.classList.remove("vidljiv"); document.body.classList.remove("hutba-aktivna");
+      // Ništa ne ostaje na ekranu / Nichts bleibt gespeichert
+      recenice = {}; sesija = null;
+      setTimeout(function () { if (!vidljiv) linije.innerHTML = ""; }, 1300);
     }
     function novaSesija(s) {
       if (s === sesija) return;
@@ -1042,11 +1061,11 @@
         // Stara zadržana poruka (mobitel se ugasio) – ne prikazivati
         // Alte gespeicherte Nachricht (Handy war weg) – nicht anzeigen
         if (m.t && Math.abs(Date.now() - m.t) > 90000 && !vidljiv) return;
-        novaSesija(m.s);
+        novaSesija(m.s); postaviJezik(m.c);
         (m.zadnje || []).forEach(function (r) { if (!recenice[r.id]) recenice[r.id] = r; });
         pokazi(); prikazi();
       } else if (tema === "tekst") {
-        novaSesija(m.s);
+        novaSesija(m.s); postaviJezik(m.c);
         recenice[m.id] = m;
         pokazi(); prikazi();
       }

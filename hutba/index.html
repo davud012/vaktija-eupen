@@ -114,7 +114,7 @@
     <div class="zaglavlje">
       <div>
         <h1>Hutba – prijevod uživo</h1>
-        <div class="podnaslov">Predigt – Live-Übersetzung · TEST</div>
+        <div class="podnaslov">Predigt – Live-Übersetzung</div>
       </div>
       <div class="veza" id="veza"><i></i><span>TV …</span></div>
     </div>
@@ -148,31 +148,47 @@
     </div>
 
     <details id="detalji">
-      <summary>Postavke i test · Einstellungen & Test</summary>
+      <summary>Postavke · Einstellungen</summary>
       <div class="postavke">
         <label for="jezik">Jezik govora · Gesprochene Sprache</label>
         <select id="jezik">
-          <option value="bs-BA">Bosanski (bs-BA)</option>
-          <option value="hr-HR">Hrvatski (hr-HR) – ako bosanski ne radi / falls Bosnisch nicht geht</option>
-          <option value="sr-RS">Srpski (sr-RS)</option>
+          <option value="bs-BA">Bosanski</option>
+          <option value="hr-HR">Hrvatski – ako bosanski ne radi / falls Bosnisch nicht geht</option>
+          <option value="sr-RS">Srpski</option>
+          <option value="de-DE">Deutsch</option>
+          <option value="en-GB">English</option>
+          <option value="tr-TR">Türkçe</option>
+          <option value="ar-SA">العربية</option>
         </select>
 
-        <label for="kljuc">Claude API ključ · Claude-API-Schlüssel</label>
-        <input id="kljuc" type="password" placeholder="sk-ant-…" autocomplete="off">
-        <div class="mali">
-          Za prijevod po smislu (ne riječ po riječ). Ostaje samo na ovom mobitelu.<br>
-          Für die Übersetzung nach Sinn (nicht Wort für Wort). Bleibt nur auf diesem Handy gespeichert.
-          Ohne Schlüssel: einfache Google-Übersetzung.
+        <label for="cilj">Prijevod na · Übersetzen in</label>
+        <select id="cilj">
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="nl">Nederlands</option>
+          <option value="en">English</option>
+          <option value="tr">Türkçe</option>
+          <option value="ar">العربية</option>
+          <option value="bs">Bosanski</option>
+        </select>
+
+        <label for="prevodilac">Prevodilac · Übersetzer</label>
+        <select id="prevodilac">
+          <option value="google">Google – besplatno · kostenlos</option>
+          <option value="claude">Claude – po smislu, uz plaćanje · nach Sinn, kostenpflichtig</option>
+        </select>
+        <div class="mali" id="prevodilac-info"></div>
+
+        <div id="claude-dio" class="skriveno">
+          <label for="kljuc">Claude API ključ · Claude-API-Schlüssel</label>
+          <input id="kljuc" type="password" placeholder="sk-ant-…" autocomplete="off">
+          <div class="mali">Ostaje samo na ovom mobitelu. · Bleibt nur auf diesem Handy gespeichert.</div>
+          <button class="dugme sporedno" id="spremi-kljuc" type="button">Spremi · Speichern</button>
+          <span class="mali" id="kljuc-stanje"></span>
         </div>
-        <button class="dugme sporedno" id="spremi-kljuc" type="button">Spremi · Speichern</button>
-        <span class="mali" id="kljuc-stanje"></span>
 
-        <label for="probni-tekst">Test bez mikrofona · Test ohne Mikrofon</label>
-        <textarea id="probni-tekst" rows="2">S kim si, takav si. Zato pazite s kim se družite, braćo i sestre.</textarea>
-        <button class="dugme sporedno" id="posalji-probu" type="button">Pošalji na TV · An den Fernseher senden</button>
-        <div class="mali">Pošalje ovu rečenicu kao da je izgovorena (TV se uključi na 1 minutu).<br>Schickt den Satz, als wäre er gesprochen (Fernseher zeigt es 1 Minute).</div>
-
-        <button class="dugme sporedno" id="odjava" type="button" style="margin-top:18px">Odjava · Abmelden</button>
+        <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px">Odjava i brisanje · Abmelden &amp; alles löschen</button>
+        <div class="mali">Briše sve izgovoreno i prevedeno, na mobitelu i na TV-u.<br>Löscht alles Gesagte und Übersetzte, am Handy und am Fernseher.</div>
       </div>
     </details>
   </section>
@@ -206,12 +222,20 @@
     if ($("lozinka").value.trim() === LOZINKA) { pisi("hutba-prijava", LOZINKA); otvori(); }
     else { $("greska-lozinke").textContent = "Pogrešna lozinka · Falsches Passwort"; $("lozinka").select(); }
   });
-  $("odjava").addEventListener("click", function () { zaustavi(); pisi("hutba-prijava", null); location.reload(); });
+  $("odjava").addEventListener("click", function () {
+    if (!confirm("Odjaviti se i obrisati sve izgovoreno?\nAbmelden und alles Gesagte löschen?")) return;
+    zaustavi();
+    recenice = []; prikaziTok();
+    // I na serveru ništa ne ostaje / Auch auf dem Server bleibt nichts
+    if (veza) veza.obrisiZadrzano("stanje");
+    pisi("hutba-prijava", null);
+    setTimeout(function () { location.reload(); }, 700);
+  });
 
   /* ---------- Stanje ---------- */
   var veza = null, aktivno = false, sesija = "", brojac = 0, pocetak = 0;
   var recenice = [];              // {id, bs, de, gotovo}
-  var pulsTimer = null, satTimer = null, probaTimer = null, budnost = null;
+  var pulsTimer = null, satTimer = null, budnost = null;
   var prepoznavanje = null, slusa = false, zadnjiPrivremeni = 0, zadnjaKonacna = "";
 
   function pokreni() {
@@ -225,9 +249,11 @@
       },
       naPovezivanje: function () { if (aktivno) posaljiStanje(); }
     });
-    var j = citaj("hutba-jezik"); if (j) $("jezik").value = j;
+    var j = citaj("hutba-jezik"); if (j && IZVOR[j]) $("jezik").value = j;
+    var c = citaj("hutba-cilj"); if (c && CILJ[c]) $("cilj").value = c;
+    $("prevodilac").value = citaj("hutba-prevodilac") === "claude" ? "claude" : "google";
     $("kljuc").value = citaj("hutba-kljuc") || "";
-    prikaziStanjeKljuca();
+    prikaziPrevodioca();
   }
 
   /* ---------- Postavke ---------- */
@@ -235,24 +261,49 @@
     pisi("hutba-jezik", this.value);
     if (slusa && prepoznavanje) { try { prepoznavanje.stop(); } catch (e) {} }
   });
-  function prikaziStanjeKljuca() {
-    $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  ✓ Claude" : "  Google (einfach)";
+  $("cilj").addEventListener("change", function () { pisi("hutba-cilj", this.value); posaljiStanje(); });
+  $("prevodilac").addEventListener("change", function () { pisi("hutba-prevodilac", this.value); prikaziPrevodioca(); });
+  function prikaziPrevodioca() {
+    var cl = $("prevodilac").value === "claude";
+    $("claude-dio").classList.toggle("skriveno", !cl);
+    $("prevodilac-info").innerHTML = cl
+      ? "Prevodi po smislu i prepoznaje ajete iz Kur'ana. Treba ključ (oko 1 € po hutbi).<br>Übersetzt nach Sinn und erkennt Koran-Verse. Braucht einen Schlüssel (ca. 1 € pro Hutba)."
+      : "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.<br>Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.";
+    $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  ✓ spremljeno · gespeichert" : "";
   }
   $("spremi-kljuc").addEventListener("click", function () {
     var v = $("kljuc").value.trim();
-    pisi("hutba-kljuc", v || null); klijent = null; prikaziStanjeKljuca();
+    pisi("hutba-kljuc", v || null); klijent = null; prikaziPrevodioca();
   });
+
+  /* ---------- Jezici / Sprachen ---------- */
+  var IZVOR = {
+    "bs-BA": { g: "bs", ime: "Bosnian" }, "hr-HR": { g: "hr", ime: "Bosnian/Croatian" }, "sr-RS": { g: "sr", ime: "Bosnian/Serbian" },
+    "de-DE": { g: "de", ime: "German" }, "en-GB": { g: "en", ime: "English" }, "tr-TR": { g: "tr", ime: "Turkish" }, "ar-SA": { g: "ar", ime: "Arabic" }
+  };
+  var CILJ = {
+    de: { ime: "German", sura: "Sure", rec: "[Rezitation auf Arabisch]", ar: "[Arabisch]" },
+    fr: { ime: "French", sura: "Sourate", rec: "[Récitation en arabe]", ar: "[Arabe]" },
+    nl: { ime: "Dutch", sura: "Soera", rec: "[Recitatie in het Arabisch]", ar: "[Arabisch]" },
+    en: { ime: "English", sura: "Surah", rec: "[Recitation in Arabic]", ar: "[Arabic]" },
+    tr: { ime: "Turkish", sura: "Sure", rec: "[Arapça tilavet]", ar: "[Arapça]" },
+    ar: { ime: "Arabic", sura: "سورة", rec: "[تلاوة]", ar: "[بالعربية]" },
+    bs: { ime: "Bosnian", sura: "sura", rec: "[Učenje na arapskom]", ar: "[Na arapskom]" }
+  };
+  function izvor() { return IZVOR[$("jezik").value] || IZVOR["bs-BA"]; }
+  function ciljKod() { return CILJ[$("cilj").value] ? $("cilj").value : "de"; }
 
   /* ---------- Slanje na TV / Senden an den Fernseher ---------- */
   function posaljiStanje() {
     if (!veza) return;
     veza.posalji("stanje", {
-      aktivno: aktivno, s: sesija, t: Date.now(),
-      zadnje: recenice.filter(function (r) { return r.gotovo; }).slice(-3)
+      aktivno: aktivno, s: sesija, t: Date.now(), c: ciljKod(),
+      // Nakon zaustavljanja ništa ne ostaje na serveru / Nach dem Stoppen bleibt nichts auf dem Server
+      zadnje: aktivno ? recenice.filter(function (r) { return r.gotovo; }).slice(-3) : []
     }, true);
   }
   function posaljiRecenicu(r) {
-    if (veza && aktivno) veza.posalji("tekst", { s: sesija, id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo });
+    if (veza && aktivno) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo });
   }
 
   function ukljuci(trajnoSlusanje) {
@@ -273,7 +324,7 @@
   function zaustavi() {
     if (!aktivno) return;
     aktivno = false; slusa = false;
-    clearInterval(pulsTimer); clearInterval(satTimer); clearTimeout(probaTimer); satTimer = null;
+    clearInterval(pulsTimer); clearInterval(satTimer); satTimer = null;
     if (prepoznavanje) { try { prepoznavanje.abort(); } catch (e) {} }
     posaljiStanje();
     if (budnost) { try { budnost.release(); } catch (e) {} budnost = null; }
@@ -295,8 +346,38 @@
       return;
     }
     upozori("");
-    ukljuci(true);
+    traziMikrofon(function () { ukljuci(true); });
   });
+
+  // Prvo pitati za mikrofon (pojavi se prozor "Dozvoli") / Zuerst Mikrofon-Erlaubnis anfragen (Fenster "Zulassen" erscheint)
+  function traziMikrofon(dalje) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { dalje(); return; }
+    $("status").textContent = "Dozvolite mikrofon · Mikrofon erlauben";
+    $("vrijeme").textContent = "Pritisnite „Dozvoli“ · Auf „Zulassen“ tippen";
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (tok) {
+      tok.getTracks().forEach(function (t) { t.stop(); });
+      dalje();
+    }).catch(function (e) {
+      $("status").textContent = "Mikrofon nije dozvoljen · Mikrofon nicht erlaubt";
+      $("vrijeme").textContent = "";
+      if (e && (e.name === "NotFoundError" || e.name === "DevicesNotFoundError")) {
+        upozori("Mikrofon nije pronađen. · Kein Mikrofon gefunden.");
+      } else {
+        mikrofonZabranjen();
+      }
+    });
+  }
+  function mikrofonZabranjen() {
+    upozori("<b>Mikrofon je blokiran.</b> Prozor se više ne pojavljuje jer je ranije odbijen.<br>" +
+      "<span class=de><b>Mikrofon ist blockiert.</b> Das Fenster kommt nicht mehr, weil es früher abgelehnt wurde.</span>" +
+      "<ol style='margin:8px 0 0;padding-left:20px'>" +
+      "<li><b>Android/Chrome:</b> lijevo od adrese dodirnuti ikonu (🔒 ili ⚙) → <b>Dozvole</b> → <b>Mikrofon</b> → <b>Dozvoli</b>, zatim stranicu ponovo učitati.<br>" +
+      "<span class=de>Links neben der Adresse auf das Symbol (🔒 oder ⚙) tippen → <b>Berechtigungen</b> → <b>Mikrofon</b> → <b>Zulassen</b>, dann Seite neu laden.</span></li>" +
+      "<li>Ako i dalje ne radi: Postavke telefona → Aplikacije → Chrome → Dozvole → Mikrofon → Dozvoli.<br>" +
+      "<span class=de>Geht es immer noch nicht: Handy-Einstellungen → Apps → Chrome → Berechtigungen → Mikrofon → Zulassen.</span></li>" +
+      "<li><b>iPhone:</b> Postavke → Safari → Mikrofon → Dozvoli. · <span class=de>Einstellungen → Safari → Mikrofon → Erlauben.</span></li>" +
+      "<li>Stranicu otvoriti u Chrome-u ili Safari-ju, ne iz WhatsApp-a. · <span class=de>Seite in Chrome oder Safari öffnen, nicht direkt aus WhatsApp.</span></li></ol>");
+  }
 
   // Kad se stranica zatvori: TV nazad na vaktiju / Seite geschlossen: Fernseher zurück zu den Gebetszeiten
   window.addEventListener("pagehide", function () { if (aktivno) zaustavi(); });
@@ -354,9 +435,8 @@
     };
     r.onerror = function (e) {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        upozori("Mikrofon nije dozvoljen. Dozvolite mikrofon za ovu stranicu u postavkama preglednika.<br>" +
-          "<span class=de>Mikrofon nicht erlaubt. Bitte in den Browser-Einstellungen für diese Seite erlauben.</span>");
         zaustavi();
+        mikrofonZabranjen();
       } else if (e.error === "language-not-supported" && r.lang !== "hr-HR") {
         $("jezik").value = "hr-HR"; pisi("hutba-jezik", "hr-HR");
         upozori("Bosanski nije dostupan na ovom mobitelu – koristi se hrvatski.<br><span class=de>Bosnisch nicht verfügbar – es wird Kroatisch verwendet.</span>");
@@ -384,28 +464,31 @@
   }
 
   /* ---------- Prijevod / Übersetzung ---------- */
-  var UPUTA = [
-    "You are the live interpreter for the Friday sermon (hutba) in the Bosnian mosque \"Džemat EKC Elif\" in Eupen, Belgium.",
-    "The imam speaks Bosnian. Speech recognition turns his words into text, segment by segment. You translate each new segment into German; it is shown as a subtitle on the TV in the mosque for German-speaking listeners.",
-    "",
-    "How to translate:",
-    "- Translate the meaning, not word for word. Write natural, clear German that a German speaker would actually say.",
-    "- Proverbs and idioms: use the matching German saying or a natural paraphrase. Example: \"S kim si, takav si.\" -> \"Sag mir, mit wem du umgehst, und ich sage dir, wer du bist.\" (not \"Mit wem du bist, so bist du.\")",
-    "- The text comes from speech recognition: punctuation may be missing, words may be misheard, a segment may stop mid-sentence. Infer the intended words from context and translate the fragment so it reads naturally. Do not add content that was not said and do not finish sentences the imam has not finished.",
-    "- Religious terms: Allah stays \"Allah\". Poslanik / Muhammed a.s. / s.a.v.s. -> \"der Prophet Muhammad (s.a.w.)\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
-    "- Arabic formulas stay in the usual German transliteration: Alhamdulillah, Subhanallah, Allahu akbar, Inschallah, Maschallah, Bismillah, As-salamu alaikum.",
-    "- Qur'an recitation in Arabic: the Bosnian speech recognizer writes Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · Sure <German/transliterated name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · Sure Al-Baqara 2:1). Several verses: (Arabic text · Sure Al-Ichlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. Bosnian text around the recitation is translated normally.",
-    "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: [Rezitation auf Arabisch] - never guess a verse.",
-    "- The same for a well-known hadith or dua quoted in Arabic: keep it in Arabic in round brackets only if you are sure of the exact wording, otherwise [Arabisch].",
-    "- Keep the respectful tone of a sermon. Prefer short, readable sentences.",
-    "",
-    "Output only the German translation of the NEW segment - no quotes, no notes, no explanations. If the new segment contains nothing meaningful (noise, a single filler word), output just: -"
-  ].join("\n");
+  function uputa(iz, ck) {
+    var ci = CILJ[ck], cilj = ci.ime;
+    return [
+      "You are the live interpreter for the Friday sermon (hutba) in the Bosnian mosque \"Džemat EKC Elif\" in Eupen, Belgium.",
+      "The imam speaks " + iz.ime + ". Speech recognition turns his words into text, segment by segment. You translate each new segment into " + cilj + "; it is shown as a subtitle on the TV in the mosque.",
+      "",
+      "How to translate:",
+      "- Translate the meaning, not word for word. Write natural, clear " + cilj + " that a native speaker would actually say.",
+      "- Proverbs and idioms: use the matching saying in " + cilj + " or a natural paraphrase. Example into German: \"S kim si, takav si.\" -> \"Sag mir, mit wem du umgehst, und ich sage dir, wer du bist.\" (not \"Mit wem du bist, so bist du.\")",
+      "- The text comes from speech recognition: punctuation may be missing, words may be misheard, a segment may stop mid-sentence. Infer the intended words from context and translate the fragment so it reads naturally. Do not add content that was not said and do not finish sentences the imam has not finished.",
+      "- Religious terms (German shown as the model; for other languages use the usual term Muslims use in that language): Allah stays \"Allah\". Poslanik / Muhammed a.s. / s.a.v.s. -> \"der Prophet Muhammad (s.a.w.)\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
+      "- Arabic formulas stay in the usual transliteration of " + cilj + " (German: Alhamdulillah, Subhanallah, Allahu akbar, Inschallah, Maschallah, Bismillah, As-salamu alaikum).",
+      "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
+      "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
+      "- The same for a well-known hadith or dua quoted in Arabic: keep it in Arabic in round brackets only if you are sure of the exact wording, otherwise " + ci.ar + ".",
+      "- Keep the respectful tone of a sermon. Prefer short, readable sentences.",
+      "",
+      "Output only the " + cilj + " translation of the NEW segment - no quotes, no notes, no explanations. If the new segment contains nothing meaningful (noise, a single filler word), output just: -"
+    ].join("\n");
+  }
 
   var klijent = null;
   function claude() {
     var k = citaj("hutba-kljuc");
-    if (!k || !window.Anthropic) return null;
+    if ($("prevodilac").value !== "claude" || !k || !window.Anthropic) return null;
     if (!klijent) klijent = new Anthropic({ apiKey: k, dangerouslyAllowBrowser: true, maxRetries: 1, timeout: 30000 });
     return klijent;
   }
@@ -414,15 +497,15 @@
     var prije = recenice.filter(function (x) { return x.id < r.id && x.gotovo && x.de; }).slice(-5);
     if (!prije.length) return "";
     return "Earlier in this sermon (context only, do not translate again):\n" +
-      prije.map(function (x) { return "BS: " + x.bs + "\nDE: " + x.de; }).join("\n") + "\n\n";
+      prije.map(function (x) { return "Original: " + x.bs + "\nTranslation: " + x.de; }).join("\n") + "\n\n";
   }
 
   function prevedi(r) {
     r.de = ""; r.gotovo = false;
     prikaziTok(); posaljiRecenicu(r);
-    var c = claude();
-    var posao = c ? prevediClaude(c, r) : prevediGoogle(r.bs);
-    posao.catch(function () { return c ? prevediGoogle(r.bs) : ""; }).then(function (de) {
+    var c = claude(), iz = izvor(), ck = ciljKod();
+    var posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
+    posao.catch(function () { return c ? prevediGoogle(r.bs, iz.g, ck) : ""; }).then(function (de) {
       de = (de || "").trim();
       if (de === "-" || de === "–") { ukloni(r); return; }
       r.de = de || "(prijevod nije uspio · Übersetzung fehlgeschlagen)";
@@ -431,15 +514,15 @@
     });
   }
 
-  function prevediClaude(c, r) {
+  function prevediClaude(c, r, iz, ck) {
     return c.beta.messages.create({
       model: MODEL,
       max_tokens: 2000,
       output_config: { effort: "low" },
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      system: UPUTA,
-      messages: [{ role: "user", content: kontekst(r) + "New segment (Bosnian):\n" + r.bs }]
+      system: uputa(iz, ck),
+      messages: [{ role: "user", content: kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs }]
     }).then(function (odg) {
       if (odg.stop_reason === "refusal") throw new Error("refusal");
       return odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
@@ -451,8 +534,9 @@
     });
   }
 
-  function prevediGoogle(tekst) {
-    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=bs&tl=de&dt=t&q=" + encodeURIComponent(tekst);
+  function prevediGoogle(tekst, sl, tl) {
+    if (sl === tl) return Promise.resolve(tekst);
+    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sl + "&tl=" + tl + "&dt=t&q=" + encodeURIComponent(tekst);
     return fetch(url).then(function (o) { return o.json(); }).then(function (d) {
       return (d[0] || []).map(function (x) { return x[0]; }).join("");
     });
@@ -475,24 +559,10 @@
     var zadnje = recenice.filter(function (r) { return r.bs; }).slice(-6).reverse();
     $("tok").innerHTML = zadnje.length ? zadnje.map(function (r) {
       return '<div class="recenica"><div class="bs">' + esc(r.bs) + '</div>' +
-        '<div class="njem' + (r.gotovo ? "" : " ceka") + '">' + (r.gotovo ? sArapskim(r.de) : "…") + '</div></div>';
+        '<div class="njem' + (r.gotovo ? "" : " ceka") + '"' + (ciljKod() === "ar" ? ' dir="rtl"' : "") + '>' + (r.gotovo ? sArapskim(r.de) : "…") + '</div></div>';
     }).join("") : '<div class="prazno">Još ništa · Noch nichts</div>';
   }
 
-  /* ---------- Test bez mikrofona / Test ohne Mikrofon ---------- */
-  $("posalji-probu").addEventListener("click", function () {
-    var t = $("probni-tekst").value.trim();
-    if (!t) return;
-    var bioAktivan = aktivno;
-    if (!aktivno) ukljuci(false);
-    var r = novaRecenica(); r.bs = t; prevedi(r);
-    if (!bioAktivan || !satTimer) {
-      clearTimeout(probaTimer);
-      probaTimer = setTimeout(function () { if (!satTimer) zaustavi(); }, 60000);
-      $("status").textContent = "Test na TV-u (1 min) · Test am Fernseher";
-      $("status").className = "status";
-    }
-  });
 })();
 </script>
 </body>
