@@ -511,6 +511,10 @@
   /* Svaka rečenica u svom redu, s malim razmakom / Jeder Satz in eigener Zeile, mit kleinem Abstand */
   .he-recenica { margin-top: 0.55em; }
   .he-recenica:first-child { margin-top: 0; }
+  .he-arapski { margin: 0.45em 0; text-align: right; }
+  .he-arapski:first-child { margin-top: 0; }
+  .he-arapski > div[dir] { font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; color: #e3c27a; font-size: 1.25em; line-height: 1.6; }
+  .he-izvor { font-size: 0.6em; color: rgba(251, 248, 241, 0.65); margin-top: 0.1em; }
   .he-odlomak:first-child { margin-top: 0; }
   .he-odlomak.prosli { opacity: 0.5; }
   .he-rijec { animation: he-rijec 0.5s ease-out both; }
@@ -1032,7 +1036,21 @@
     var AR = /([؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]|[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿])/;
 
     // Tekst u riječi (arapski ostaje u komadu) / Text in Wörter (Arabisch bleibt am Stück)
+    // Arapski u zagradi = svoj blok (red zdesna nalijevo) / Arabisch in Klammern = eigener Block (Zeile von rechts nach links)
+    var AR_ZAGRADA = /(\([^()]*[\u0600-\u06FF][^()]*\))/;
     function rijeci(tekst) {
+      var out = [];
+      String(tekst).split(AR_ZAGRADA).forEach(function (komad, k) {
+        if (k % 2 === 1) {
+          var d = komad.slice(1, -1).split(/\s+·\s+/);
+          out.push({ blok: true, t: d[0].trim(), izvor: (d[1] || "").trim() });
+          return;
+        }
+        rijeciObicno(komad).forEach(function (x) { out.push(x); });
+      });
+      return out;
+    }
+    function rijeciObicno(tekst) {
       var out = [];
       String(tekst).split(AR).forEach(function (dio, i) {
         if (!dio) return;
@@ -1067,6 +1085,15 @@
     function dodajRijec(r, bezAnimacije) {
       if (r.novi) { noviOdlomak(); return; }
       if (!odlomak) noviOdlomak();
+      if (r.blok) {
+        var b = document.createElement("div");
+        b.className = "he-arapski" + (bezAnimacije ? "" : " he-rijec");
+        var a = document.createElement("div"); a.dir = "rtl"; a.textContent = "(" + r.t + ")"; b.appendChild(a);
+        if (r.izvor) { var iz = document.createElement("div"); iz.className = "he-izvor"; iz.textContent = r.izvor; b.appendChild(iz); }
+        odlomak.appendChild(b);
+        recenica = null; krajRecenice = true;   // poslije bloka novi red / nach dem Block neue Zeile
+        return;
+      }
       if (!recenica || krajRecenice) novaRecenicaTV();
       var zadnji = recenica.lastChild;
       var bezRazmaka = !zadnji || /^[)\].,;:!?»“]/.test(r.t) || (zadnji.textContent && /[(\[„«]$/.test(zadnji.textContent));
@@ -1100,10 +1127,11 @@
       // Tempo prema broju rečenica koje čekaju: nikad sve odjednom, najviše ~2 rečenice kašnjenja
       // Tempo nach Anzahl wartender Sätze: nie alles auf einmal, höchstens ~2 Sätze Rückstand
       var cekaju = 0;
-      for (var i = 0; i < red.length; i++) if (!red[i].novi && !red[i].ar && jeKrajRecenice(red[i].t)) cekaju++;
-      if (red.length && !jeKrajRecenice(red[red.length - 1].t)) cekaju++;
+      for (var i = 0; i < red.length; i++) if (red[i].blok || (!red[i].novi && !red[i].ar && jeKrajRecenice(red[i].t))) cekaju++;
+      if (red.length && !red[red.length - 1].blok && !jeKrajRecenice(red[red.length - 1].t || "")) cekaju++;
       var pauza = cekaju <= 1 ? 330 : cekaju === 2 ? 250 : cekaju === 3 ? 180 : 130;
-      if (sljedeca.ar) pauza += 400;   // arapski tekst malo duže / arabischen Text etwas länger zeigen
+      if (sljedeca.ar) pauza += 400;
+      if (sljedeca.blok) pauza += 900 + sljedeca.t.length * 25;   // arapski blok duže ostaje sam / arabischer Block bleibt länger allein   // arapski tekst malo duže / arabischen Text etwas länger zeigen
       tajmer = setTimeout(sljedecaRijec, pauza);
     }
     function dodajTekst(tekst, odmah, novi) {
@@ -1192,7 +1220,7 @@
     if (TEST) {
       novaSesija("test"); pokazi();
       var probe = ["Sag mir, mit wem du umgehst, und ich sage dir, wer du bist. Achtet deshalb darauf, mit wem ihr eure Zeit verbringt, liebe Brüder und Schwestern.",
-        "Der Prophet ﷺ sagte, dass der Mensch die Religion seines Freundes annimmt. (ٱلْحَمْدُ لِلَّٰهِ)",
+        "(ٱلْحَمْدُ لِلَّٰهِ وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ) Der Prophet ﷺ sagte, dass der Mensch die Religion seines Freundes annimmt.",
         "Allah, erhaben ist Er, sagt: (الٓمٓ – ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ · Sure Al-Baqara 2:1-2)",
         "Möge Allah es uns leicht machen, gut zueinander zu sein.",
         "Ein guter Freund erinnert dich an Allah, wenn du ihn vergisst, und hilft dir, wenn du dich an Ihn erinnerst."];

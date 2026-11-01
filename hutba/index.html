@@ -104,6 +104,8 @@
   .recenica .njem { font-size: 17px; margin-top: 3px; line-height: 1.4; }
   .recenica .njem.ceka { color: var(--blijedo); }
   .ar { font-family: "Amiri", "Scheherazade New", "Noto Naskh Arabic", "Traditional Arabic", serif; font-size: 1.25em; color: var(--zlato); }
+  .ar-blok { display: block; text-align: right; font-family: "Amiri", "Scheherazade New", serif; font-size: 1.35em; color: var(--zlato); margin: 4px 0; line-height: 1.7; }
+  .ar-izvor { display: block; text-align: right; font-size: 0.8em; color: var(--blijedo); margin-bottom: 4px; }
   .prazno { color: var(--blijedo); font-size: 14px; }
 
   details { margin-top: 26px; border-radius: 14px; background: var(--kartica); border: 1px solid rgba(255, 255, 255, 0.08); }
@@ -1028,6 +1030,7 @@
     [/\b(bi?smi?l+ah?i?r?[\s-]*(r?rahmani?r?[\s-]*)?r?rahim|bismil+ah)\b/gi, "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"],
     [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
     [/\b(el|al)[\s-]*hamdu?\s*li?l+ah[ie]?\s*(rab+il[\s-]*['’]?alemin)?\b/gi, null],
+    [/\b[wv][ae]s*[\s-]*s?s[ae]l[ae]tu?\s*[wv][ae]s*[\s-]*s?s[ae]l[ae]mu?\s*['’]?al[ae]\s*(r[ae]sul[iu]?l+ah[ie]?|e?[sš]+e?r[ae]f[ie]l[\s-]*enbija(i)?\s*v?e?l?[\s-]*murselin)\b/gi, null],
     [/\bsubhan[ae]?l+ah\b/gi, "سُبْحَانَ ٱللَّٰهِ"],
     [/\ballahu\s*e?a?kb[ea]r\b/gi, "ٱللَّٰهُ أَكْبَرُ"],
     [/\bin\s*[sš]a\s*al+ah\b|\bin[sš]al+ah\b/gi, "إِن شَاءَ ٱللَّٰهُ"],
@@ -1037,14 +1040,26 @@
     [/\bd[zž]ezakal+ahu?\s*hajr[ae]n?\b/gi, "جَزَاكَ ٱللَّٰهُ خَيْرًا"]
   ];
   function arapskeFormule(tekst) {
-    return FORMULE.reduce(function (t2, f) {
+    var t3 = FORMULE.reduce(function (t2, f) {
       return t2.replace(f[0], function (cijelo) {
         var ar = f[1];
+        if (!ar && /s[ae]l[ae]tu?\s*[wv]/i.test(cijelo)) ar = /enbija/i.test(cijelo) ? "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ أَشْرَفِ ٱلْأَنْبِيَاءِ وَٱلْمُرْسَلِينَ" : "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ";
         if (!ar && /hamd/i.test(cijelo)) ar = /rab+il/i.test(cijelo) ? "ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ" : "ٱلْحَمْدُ لِلَّٰهِ";
         if (!ar) ar = /berekat/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ وَبَرَكَاتُهُ" : /rahmet/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ" : "ٱلسَّلَامُ عَلَيْكُمْ";
         return ar === "ﷺ" ? "ﷺ" : "(" + ar + ")";
       });
     }, tekst);
+    return spojiArapsko(t3);
+  }
+  // Više arapskih dijelova jedan za drugim -> jedna zagrada / Mehrere arabische Teile hintereinander -> eine Klammer
+  function spojiArapsko(x) {
+    var prije;
+    do {
+      prije = x;
+      x = x.replace(/\(\s*([^()]*[\u0600-\u06FF][^()·]*?)\s*\)[\s,;.]*\(\s*([^()]*[\u0600-\u06FF][^()]*?)\s*\)/, "($1 $2)");
+      x = x.replace(/\(([^()]*[\u0600-\u06FF][^()·]*)\)\s*ﷺ/, "($1 ﷺ)");
+    } while (x !== prije);
+    return x;
   }
   var AR_BLOK = /(\([^()]*[\u0600-\u06FF][^()]*\)|ﷺ)/;
   function samoArapski(t2) { return !t2.split(AR_BLOK).some(function (d, i) { return i % 2 === 0 && /[A-Za-zÀ-žА-я]/.test(d); }); }
@@ -1068,6 +1083,7 @@
       "- Whenever the imam says something in ARABIC (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, or anything else in Arabic), write exactly that in ARABIC SCRIPT with vowel marks in round brackets, e.g. (بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) or (ٱلْحَمْدُ لِلَّٰهِ). Do not transliterate Arabic into Latin letters and do not translate it - the imam explains it himself.",
       "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
       "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
+      "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, written right-to-left in Arabic script. Example: \"Elhamdulillah, ves-salatu ves-selamu ala resulillah\" -> (ٱلْحَمْدُ لِلَّٰهِ وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ). Never split it into separate brackets and never mix Latin words into it.",
       "- For a hadith or dua in Arabic: write the Arabic wording you heard; if you cannot make out the Arabic words at all, write " + ci.ar + ".",
       "- LANGUAGE: write ONLY in " + cilj + " (plus Arabic script in brackets as described). NEVER use English: no English words, no notes, no labels like \"Translation:\", no comments, no explanations, no apologies. If something is unclear, translate what you can and leave the rest out.",
       "- Keep the respectful tone of a sermon.",
@@ -1101,7 +1117,7 @@
     var c = claude(), iz = izvor(), ck = ciljKod();
     if (iz.g !== "ar") r.bs = arapskeFormule(r.bs);
     var posao;
-    if (samoArapski(r.bs)) posao = Promise.resolve(r.bs);                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
+    if (samoArapski(r.bs)) posao = Promise.resolve(r.bs.replace(/\s+\)/g, ")").replace(/\s*[.,;:!?]+\s*$/, ""));                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
     else posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
     var greska = "";
     posao.catch(function (e) {
@@ -1139,6 +1155,7 @@
       x = dijelovi.filter(function (d) { return !META.test(d); }).join("").trim();
       if (!x) x = "-";
     }
+    x = spojiArapsko(x);
     // Salavat kao znak ﷺ / Segensformel als Zeichen ﷺ
     x = x.replace(/\s*,?\s*\(?\s*(s\.?\s*a\.?\s*[wv]\.?\s*s\.?|s\.\s*a\.\s*w\.|sallallahu\s+['’]?alaihi\s+wa\s*sallam|sallallahu\s+alejhi\s+ve\s*sellem)\s*\)?\s*,?(?=\s|$)/gi, " ﷺ");
     return x;
@@ -1276,7 +1293,14 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   // Arapski tekst desno-nalijevo / Arabischer Text von rechts nach links
   function sArapskim(s) {
-    return esc(s).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*/g,
+    // Arapski u zagradi: svoj red, zdesna nalijevo / Arabisch in Klammern: eigene Zeile, von rechts nach links
+    s = String(s).replace(/\(([^()]*[\u0600-\u06FF][^()]*)\)/g, function (cijelo, unutra) {
+      var d = unutra.split(/\s+·\s+/);
+      return "\u0001" + d[0] + "\u0002" + (d[1] || "") + "\u0003";
+    });
+    return esc(s).replace(/\u0001([^\u0002]*)\u0002([^\u0003]*)\u0003/g, function (x, ar, izvor) {
+      return '<span class="ar-blok" dir="rtl">(' + ar + ')</span>' + (izvor ? '<span class="ar-izvor">' + izvor + '</span>' : "");
+    }).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*/g,
       function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
   }
   function prikaziTok() {
