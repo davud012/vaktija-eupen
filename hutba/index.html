@@ -71,6 +71,14 @@
   .uputa ol { margin: 6px 0 0; padding-left: 20px; }
   .uputa li { margin: 4px 0; }
   .uputa .de { font-size: 13.5px; }
+  .tv-dugme {
+    display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 22px;
+    padding: 15px 16px; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--zlato); background: rgba(227, 194, 122, 0.1); color: var(--zlato);
+  }
+  .tv-dugme svg { width: 24px; height: 24px; flex: none; }
+  .tv-dugme.ukljucen { border-color: var(--zeleno); background: rgba(61, 214, 140, 0.14); color: var(--zeleno); }
+  .tv-dugme small { display: block; font-weight: 400; font-size: 13px; opacity: 0.85; }
   .upozorenje { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: rgba(229, 72, 77, 0.14); border: 1px solid rgba(229, 72, 77, 0.45); font-size: 14.5px; line-height: 1.45; }
 
   .tok { margin-top: 22px; }
@@ -130,16 +138,22 @@
       <div class="vrijeme" id="vrijeme">Mikrofon drücken zum Starten</div>
     </div>
 
+    <button class="tv-dugme" id="tv-dugme" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+      <span id="tv-tekst"></span>
+    </button>
+
     <div class="upozorenje skriveno" id="upozorenje"></div>
 
     <div class="uputa" id="uputa">
       <b>Kako radi · So funktioniert es</b>
       <ol>
-        <li>Pritisnite <b>mikrofon</b> – TV prelazi na prijevod.<br><span class="de">Mikrofon drücken – der Fernseher wechselt zur Übersetzung.</span></li>
-        <li>Govorite normalno. Mikrofon ostaje <b>uključen</b> dok ga ponovo ne pritisnete.<br><span class="de">Normal sprechen. Das Mikrofon bleibt an, bis Sie es wieder drücken.</span></li>
-        <li>Na kraju ponovo pritisnite mikrofon – TV se vraća na vaktiju.<br><span class="de">Am Ende wieder drücken – der Fernseher zeigt wieder die Gebetszeiten.</span></li>
+        <li>Pritisnite <b>Prikaži na TV-u</b> – TV prelazi na prijevod.<br><span class="de"><b>Auf Fernseher übertragen</b> drücken – der Fernseher wechselt zur Übersetzung.</span></li>
+        <li>Pritisnite <b>mikrofon</b> i govorite normalno. Mikrofon ostaje uključen dok ga ponovo ne pritisnete.<br><span class="de"><b>Mikrofon</b> drücken und normal sprechen. Es bleibt an, bis Sie es wieder drücken.</span></li>
+        <li>Na kraju: mikrofon isključiti i pritisnuti <b>Završi na TV-u</b> – TV se vraća na vaktiju.<br><span class="de">Am Ende: Mikrofon aus und <b>Übertragung beenden</b> drücken – der Fernseher zeigt wieder die Gebetszeiten.</span></li>
       </ol>
       <div style="margin-top:8px">Ekran mobitela ostaviti upaljen, ne zaključavati.<br><span class="de">Handy-Bildschirm anlassen, nicht sperren.</span></div>
+      <div style="margin-top:8px">Kod pitanja za mikrofon izabrati <b>„Dozvoli pri posjeti stranici“</b> (ne „Samo ovaj put“) – onda se više ne pita.<br><span class="de">Bei der Mikrofon-Frage <b>„Bei Besuch der Website zulassen“</b> wählen (nicht „Nur dieses Mal“) – dann wird nicht mehr gefragt.</span></div>
     </div>
 
     <div class="tok">
@@ -215,8 +229,6 @@
     $("glavno").classList.remove("skriveno");
     pokreni();
   }
-  if (citaj("hutba-prijava") === LOZINKA) otvori();
-  else setTimeout(function () { $("lozinka").focus(); }, 300);
   $("forma-lozinke").addEventListener("submit", function (e) {
     e.preventDefault();
     if ($("lozinka").value.trim() === LOZINKA) { pisi("hutba-prijava", LOZINKA); otvori(); }
@@ -224,7 +236,7 @@
   });
   $("odjava").addEventListener("click", function () {
     if (!confirm("Odjaviti se i obrisati sve izgovoreno?\nAbmelden und alles Gesagte löschen?")) return;
-    zaustavi();
+    ugasiMikrofon(); ugasiTV();
     recenice = []; prikaziTok();
     // I na serveru ništa ne ostaje / Auch auf dem Server bleibt nichts
     if (veza) veza.obrisiZadrzano("stanje");
@@ -233,7 +245,7 @@
   });
 
   /* ---------- Stanje ---------- */
-  var veza = null, aktivno = false, sesija = "", brojac = 0, pocetak = 0;
+  var veza = null, aktivno = false, snima = false, sesija = "", brojac = 0, pocetak = 0, mikrofonUgasen = 0, tvOd = 0;
   var recenice = [];              // {id, bs, de, gotovo}
   var pulsTimer = null, satTimer = null, budnost = null;
   var prepoznavanje = null, slusa = false, zadnjiPrivremeni = 0, zadnjaKonacna = "";
@@ -254,6 +266,7 @@
     $("prevodilac").value = citaj("hutba-prevodilac") === "claude" ? "claude" : "google";
     $("kljuc").value = citaj("hutba-kljuc") || "";
     prikaziPrevodioca();
+    prikaziTVDugme();
   }
 
   /* ---------- Postavke ---------- */
@@ -267,7 +280,7 @@
     var cl = $("prevodilac").value === "claude";
     $("claude-dio").classList.toggle("skriveno", !cl);
     $("prevodilac-info").innerHTML = cl
-      ? "Prevodi po smislu i prepoznaje ajete iz Kur'ana. Treba ključ (oko 1 € po hutbi).<br>Übersetzt nach Sinn und erkennt Koran-Verse. Braucht einen Schlüssel (ca. 1 € pro Hutba)."
+      ? "Prevodi po smislu i prepoznaje ajete iz Kur'ana. Treba ključ (oko 0,50 € po hutbi).<br>Übersetzt nach Sinn und erkennt Koran-Verse. Braucht einen Schlüssel (ca. 0,50 € pro Hutba)."
       : "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.<br>Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.";
     $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  ✓ spremljeno · gespeichert" : "";
   }
@@ -299,37 +312,61 @@
     veza.posalji("stanje", {
       aktivno: aktivno, s: sesija, t: Date.now(), c: ciljKod(),
       // Nakon zaustavljanja ništa ne ostaje na serveru / Nach dem Stoppen bleibt nichts auf dem Server
-      zadnje: aktivno ? recenice.filter(function (r) { return r.gotovo; }).slice(-3) : []
+      zadnje: aktivno ? recenice.filter(function (r) { return r.gotovo && r.id > tvOd; }).slice(-3) : []
     }, true);
   }
   function posaljiRecenicu(r) {
-    if (veza && aktivno) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo });
+    if (veza && aktivno && r.id > tvOd) veza.posalji("tekst", { s: sesija, c: ciljKod(), id: r.id, bs: r.bs, de: r.de || "", gotovo: !!r.gotovo });
   }
 
-  function ukljuci(trajnoSlusanje) {
-    if (aktivno) return;
-    aktivno = true; sesija = Math.random().toString(36).slice(2, 8); brojac = 0; recenice = []; pocetak = Date.now();
-    prikaziTok();
-    posaljiStanje();
-    pulsTimer = setInterval(posaljiStanje, 5000);
-    if (trajnoSlusanje) {
-      $("mikrofon").classList.add("ukljucen");
-      $("status").textContent = "Snima… · Aufnahme läuft";
-      $("status").className = "status snima";
-      satTimer = setInterval(prikaziVrijeme, 1000); prikaziVrijeme();
-      zatraziBudnost();
-      slusaj();
-    }
+  /* ---------- Na TV / Auf den Fernseher ---------- */
+  function prikaziTVDugme() {
+    $("tv-dugme").classList.toggle("ukljucen", aktivno);
+    $("tv-tekst").innerHTML = aktivno
+      ? "Na TV-u ✓ · Läuft am Fernseher<small>Pritisnite za kraj · Drücken zum Beenden</small>"
+      : "Prikaži na TV-u · Auf Fernseher übertragen";
   }
-  function zaustavi() {
-    if (!aktivno) return;
-    aktivno = false; slusa = false;
-    clearInterval(pulsTimer); clearInterval(satTimer); satTimer = null;
-    if (prepoznavanje) { try { prepoznavanje.abort(); } catch (e) {} }
+  function upaliTV() {
+    if (aktivno) return;
+    aktivno = true; sesija = Math.random().toString(36).slice(2, 8); tvOd = brojac;
+    if ($("upozorenje").textContent.indexOf("nur am Handy") >= 0) upozori("");
     posaljiStanje();
+    pulsTimer = setInterval(function () {
+      // Mikrofon 15 min isključen -> TV sam nazad na vaktiju
+      // Mikrofon 15 Min. aus -> Fernseher geht von selbst zurück zu den Gebetszeiten
+      if (!snima && mikrofonUgasen && Date.now() - mikrofonUgasen > 15 * 60000) { ugasiTV(); return; }
+      posaljiStanje();
+    }, 5000);
+    if (!snima) mikrofonUgasen = Date.now();
+    prikaziTVDugme();
+  }
+  function ugasiTV() {
+    if (!aktivno) return;
+    aktivno = false; clearInterval(pulsTimer);
+    posaljiStanje();
+    prikaziTVDugme();
+  }
+  $("tv-dugme").addEventListener("click", function () { if (aktivno) ugasiTV(); else upaliTV(); });
+
+  /* ---------- Mikrofon ---------- */
+  function upaliMikrofon() {
+    snima = true; mikrofonUgasen = 0; pocetak = Date.now();
+    $("mikrofon").classList.add("ukljucen");
+    $("status").textContent = "Snima… · Aufnahme läuft";
+    $("status").className = "status snima";
+    clearInterval(satTimer); satTimer = setInterval(prikaziVrijeme, 1000); prikaziVrijeme();
+    zatraziBudnost();
+    slusaj();   // odmah, dok traje dodir – preglednik sam pita za dozvolu / sofort beim Tippen – der Browser fragt selbst
+    if (!aktivno) upozori("Prijevod je samo na mobitelu. Za TV pritisnite <b>Prikaži na TV-u</b>.<br><span class=de>Die Übersetzung ist nur am Handy. Für den Fernseher <b>Auf Fernseher übertragen</b> drücken.</span>");
+  }
+  function ugasiMikrofon(tekst) {
+    if (!snima) return;
+    snima = false; slusa = false; mikrofonUgasen = Date.now();
+    clearInterval(satTimer); satTimer = null;
+    if (prepoznavanje) { try { prepoznavanje.abort(); } catch (e) {} }
     if (budnost) { try { budnost.release(); } catch (e) {} budnost = null; }
     $("mikrofon").classList.remove("ukljucen");
-    $("status").textContent = "Zaustavljeno · Gestoppt";
+    $("status").textContent = tekst || "Mikrofon isključen · Mikrofon aus";
     $("status").className = "status";
     $("vrijeme").textContent = "Pritisnite za ponovni početak · Drücken zum Neustart";
   }
@@ -339,50 +376,60 @@
   }
 
   $("mikrofon").addEventListener("click", function () {
-    if (aktivno) { zaustavi(); return; }
+    if (snima) { ugasiMikrofon(); return; }
     if (!podrzavaGovor()) {
       upozori("Ovaj preglednik ne prepoznaje govor. Otvorite stranicu u <b>Chrome</b>-u (Android) ili <b>Safari</b>-ju (iPhone).<br>" +
         "<span class=de>Dieser Browser erkennt keine Sprache. Bitte in Chrome (Android) oder Safari (iPhone) öffnen.</span>");
       return;
     }
     upozori("");
-    traziMikrofon(function () { ukljuci(true); });
+    upaliMikrofon();
   });
 
-  // Prvo pitati za mikrofon (pojavi se prozor "Dozvoli") / Zuerst Mikrofon-Erlaubnis anfragen (Fenster "Zulassen" erscheint)
-  function traziMikrofon(dalje) {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { dalje(); return; }
-    $("status").textContent = "Dozvolite mikrofon · Mikrofon erlauben";
-    $("vrijeme").textContent = "Pritisnite „Dozvoli“ · Auf „Zulassen“ tippen";
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (tok) {
-      tok.getTracks().forEach(function (t) { t.stop(); });
-      dalje();
-    }).catch(function (e) {
-      $("status").textContent = "Mikrofon nije dozvoljen · Mikrofon nicht erlaubt";
-      $("vrijeme").textContent = "";
-      if (e && (e.name === "NotFoundError" || e.name === "DevicesNotFoundError")) {
-        upozori("Mikrofon nije pronađen. · Kein Mikrofon gefunden.");
-      } else {
-        mikrofonZabranjen();
+  // Prepoznavanje govora odbijeno: provjeriti zašto / Spracherkennung abgelehnt: prüfen warum
+  function govorOdbijen(kod) {
+    ugasiMikrofon("Mikrofon ne radi · Mikrofon geht nicht");
+    function prikazi(stanje) {
+      if (stanje === "denied") { mikrofonZabranjen(kod); return; }
+      if (stanje === "prompt" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Još nije pitano: pokazati prozor "Dozvoli" / Noch nicht gefragt: Fenster "Zulassen" zeigen
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (t) {
+          t.getTracks().forEach(function (x) { x.stop(); });
+          upozori("Mikrofon je dozvoljen ✓ Pritisnite mikrofon još jednom.<br><span class=de>Mikrofon erlaubt ✓ Bitte das Mikrofon noch einmal drücken.</span>");
+        }).catch(function () { mikrofonZabranjen(kod); });
+        return;
       }
-    });
+      servisZabranjen(kod);
+    }
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: "microphone" }).then(function (p) { prikazi(p.state); }, function () { prikazi(""); });
+    } else prikazi("");
   }
-  function mikrofonZabranjen() {
-    upozori("<b>Mikrofon je blokiran.</b> Prozor se više ne pojavljuje jer je ranije odbijen.<br>" +
-      "<span class=de><b>Mikrofon ist blockiert.</b> Das Fenster kommt nicht mehr, weil es früher abgelehnt wurde.</span>" +
+  function servisZabranjen(kod) {
+    upozori("<b>Mikrofon je dozvoljen, ali prepoznavanje govora ne radi.</b><br>" +
+      "<span class=de><b>Das Mikrofon ist erlaubt, aber die Spracherkennung startet nicht.</b></span>" +
+      "<ol style='margin:8px 0 0;padding-left:20px'>" +
+      "<li>Stranicu otvoriti u <b>Google Chrome</b>-u (ne Samsung Internet, ne Firefox, ne iz WhatsApp-a).<br><span class=de>Seite in <b>Google Chrome</b> öffnen (nicht Samsung Internet, nicht Firefox, nicht aus WhatsApp).</span></li>" +
+      "<li>Postavke telefona → Aplikacije → <b>Google</b> i <b>Usluge govora (Google)</b> moraju biti uključene.<br><span class=de>Handy-Einstellungen → Apps → <b>Google</b> und <b>Speech Services by Google</b> müssen aktiviert sein.</span></li>" +
+      "<li>Chrome zatvoriti potpuno i ponovo otvoriti.<br><span class=de>Chrome ganz schließen und neu öffnen.</span></li></ol>" +
+      "<div style='margin-top:6px;opacity:.6;font-size:12px'>Kod greške / Fehlercode: " + kod + "</div>");
+  }
+  function mikrofonZabranjen(kod) {
+    upozori("<b>Mikrofon je blokiran za ovu stranicu.</b><br>" +
+      "<span class=de><b>Das Mikrofon ist für diese Seite blockiert.</b></span>" +
       "<ol style='margin:8px 0 0;padding-left:20px'>" +
       "<li><b>Android/Chrome:</b> lijevo od adrese dodirnuti ikonu (🔒 ili ⚙) → <b>Dozvole</b> → <b>Mikrofon</b> → <b>Dozvoli</b>, zatim stranicu ponovo učitati.<br>" +
       "<span class=de>Links neben der Adresse auf das Symbol (🔒 oder ⚙) tippen → <b>Berechtigungen</b> → <b>Mikrofon</b> → <b>Zulassen</b>, dann Seite neu laden.</span></li>" +
       "<li>Ako i dalje ne radi: Postavke telefona → Aplikacije → Chrome → Dozvole → Mikrofon → Dozvoli.<br>" +
       "<span class=de>Geht es immer noch nicht: Handy-Einstellungen → Apps → Chrome → Berechtigungen → Mikrofon → Zulassen.</span></li>" +
-      "<li><b>iPhone:</b> Postavke → Safari → Mikrofon → Dozvoli. · <span class=de>Einstellungen → Safari → Mikrofon → Erlauben.</span></li>" +
-      "<li>Stranicu otvoriti u Chrome-u ili Safari-ju, ne iz WhatsApp-a. · <span class=de>Seite in Chrome oder Safari öffnen, nicht direkt aus WhatsApp.</span></li></ol>");
+      "<li><b>iPhone:</b> Postavke → Safari → Mikrofon → Dozvoli. · <span class=de>Einstellungen → Safari → Mikrofon → Erlauben.</span></li></ol>" +
+      "<div style='margin-top:6px;opacity:.6;font-size:12px'>Kod greške / Fehlercode: " + (kod || "-") + "</div>");
   }
 
   // Kad se stranica zatvori: TV nazad na vaktiju / Seite geschlossen: Fernseher zurück zu den Gebetszeiten
-  window.addEventListener("pagehide", function () { if (aktivno) zaustavi(); });
+  window.addEventListener("pagehide", function () { ugasiMikrofon(); ugasiTV(); });
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible" && aktivno) { zatraziBudnost(); if (!slusa && satTimer) slusaj(); }
+    if (document.visibilityState === "visible" && snima) { zatraziBudnost(); if (!slusa) slusaj(); }
   });
 
   function zatraziBudnost() {
@@ -435,8 +482,7 @@
     };
     r.onerror = function (e) {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        zaustavi();
-        mikrofonZabranjen();
+        if (prepoznavanje === r) { slusa = false; govorOdbijen(e.error); }
       } else if (e.error === "language-not-supported" && r.lang !== "hr-HR") {
         $("jezik").value = "hr-HR"; pisi("hutba-jezik", "hr-HR");
         upozori("Bosanski nije dostupan na ovom mobitelu – koristi se hrvatski.<br><span class=de>Bosnisch nicht verfügbar – es wird Kroatisch verwendet.</span>");
@@ -448,12 +494,12 @@
       // Mikrofon ostaje uključen: odmah ponovo slušati / Mikrofon bleibt an: sofort weiter zuhören
       zadnjaKonacna = "";
       if (trenutna && trenutna.bs && !trenutna.konacno) { trenutna.konacno = true; prevedi(trenutna); }
-      if (aktivno && slusa && prepoznavanje === r) {
-        setTimeout(function () { if (aktivno && slusa && prepoznavanje === r) { try { slusaj(); } catch (e) {} } }, 250);
+      if (snima && slusa && prepoznavanje === r) {
+        setTimeout(function () { if (snima && slusa && prepoznavanje === r) { try { slusaj(); } catch (e) {} } }, 250);
       }
     };
     r.onstart = function () { if ($("upozorenje").textContent.indexOf("interneta") >= 0) upozori(""); };
-    try { r.start(); } catch (e) { setTimeout(function () { if (aktivno) slusaj(); }, 1000); }
+    try { r.start(); } catch (e) { setTimeout(function () { if (snima) slusaj(); }, 1000); }
   }
 
   function novaRecenica() {
@@ -563,6 +609,9 @@
     }).join("") : '<div class="prazno">Još ništa · Noch nichts</div>';
   }
 
+  // Na kraju, kad je sve spremno / Am Ende, wenn alles bereit ist
+  if (citaj("hutba-prijava") === LOZINKA) otvori();
+  else setTimeout(function () { $("lozinka").focus(); }, 300);
 })();
 </script>
 </body>

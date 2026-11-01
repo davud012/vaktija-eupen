@@ -88,9 +88,10 @@ Tipps von unterwegs:
 ## Hutba-Übersetzung live (TEST-Version, seit 1.11.2026)
 
 - Handy-Seite: **https://davud012.github.io/vaktija-eupen/hutba/**, Passwort **123** (in `vaktija.js` unter `hutbaPrijevod.lozinka` änderbar)
-- Imam drückt das Mikrofon → Fernseher wechselt automatisch zur Übersetzung. Auf dem Fernseher steht **nur Deutsch**, ohne den bosnischen Text (Wunsch des Nutzers).
-- Mikrofon wieder drücken oder Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
-- Übersetzer wählbar unter „Einstellungen“: **Google** (Standard, kostenlos, eher Wort für Wort, erkennt keine Koran-Verse) oder **Claude** (Modell claude-opus-5-5, nach Sinn, ca. 1 € pro Hutba, braucht einen API-Schlüssel, der nur auf dem Handy gespeichert wird)
+- Ablauf: Knopf **„Auf Fernseher übertragen“** → Fernseher zeigt die Übersetzung. Dann **Mikrofon** drücken und sprechen. Am Ende Mikrofon aus und Knopf **„Beenden“**. Ist das Mikrofon 15 Minuten aus, geht der Fernseher von selbst zurück. Mikrofon ohne Fernseher geht auch (Übersetzung nur am Handy). Auf dem Fernseher steht **nur Deutsch**, ohne den bosnischen Text (Wunsch des Nutzers).
+- Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
+- Mikrofon-Erlaubnis speichert der Browser selbst: bei der Frage „Bei Besuch der Website zulassen“ wählen, nicht „Nur dieses Mal“
+- Übersetzer wählbar unter „Einstellungen“: **Google** (Standard, kostenlos, eher Wort für Wort, erkennt keine Koran-Verse) oder **Claude** (Modell claude-opus-5-5, nach Sinn, ca. 0,50 € pro Hutba, braucht einen API-Schlüssel, der nur auf dem Handy gespeichert wird)
 - Gesprochene Sprache wählbar (Bosnisch, Kroatisch, Serbisch, Deutsch, Englisch, Türkisch, Arabisch) und Zielsprache (Deutsch, Französisch, Niederländisch, Englisch, Türkisch, Arabisch, Bosnisch)
 - Beim Druck aufs Mikrofon kommt das Fenster „Mikrofon erlauben“. War es früher blockiert, zeigt die Seite eine Anleitung zum Freigeben.
 - „Abmelden & alles löschen“ löscht alles Gesagte und Übersetzte, am Handy, am Fernseher und auf dem Server. Nach dem Stoppen bleibt auch sonst nichts auf dem Server oder dem Fernseher.
