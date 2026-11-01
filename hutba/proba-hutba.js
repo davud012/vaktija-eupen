@@ -1,0 +1,31 @@
+/* Probna hutba za test prijevoda (oko 300 riječi) – onako kako je prepoznavanje govora otprilike napiše.
+   Probe-Hutba zum Testen der Übersetzung (ca. 300 Wörter) – ungefähr so, wie die Spracherkennung sie mitschreibt. */
+var PROBA_HUTBA = [
+  "Bismillahirrahmanirrahim.",
+  "Elhamdulillahi rabbil alemin, ves-salatu ves-selamu ala resulillah.",
+  "Draga braćo i sestre, cijenjeni džematlije, es-selamu alejkum ve rahmetullahi ve berekatuhu.",
+  "Danas želim govoriti o lijepoj riječi i o tome kako naš jezik može biti ili put u Džennet ili put u propast.",
+  "Uzvišeni Allah u Kur'anu kaže: I recite ljudima lijepe riječi.",
+  "Ovaj ajet nas podsjeća da je lijepa riječ ibadet, a ne samo lijepo ponašanje.",
+  "Naš Poslanik sallallahu alejhi ve sellem je rekao: Ko vjeruje u Allaha i Sudnji dan, neka govori dobro ili neka šuti.",
+  "Pogledajte kako je jednostavno.",
+  "Ili dobro, ili šutnja.",
+  "Nema treće mogućnosti.",
+  "Koliko puta smo nekoga povrijedili jednom jedinom riječju, a da toga nismo bili ni svjesni?",
+  "Koliko puta je jedna lijepa riječ nekome vratila osmijeh na lice?",
+  "Naš narod kaže: S kim si, takav si.",
+  "Zato pazite s kim se družite i kakve riječi slušate, jer riječi ulaze u srce.",
+  "Allah dželle šanuhu u suri El-Ahzab kaže:",
+  "Ja ejjuhellezine amenu ittekullahe ve kulu kavlen sedida.",
+  "O vjernici, bojte se Allaha i govorite istinu.",
+  "Prenosi se od Ebu Hurejre, radijallahu anhu, da je Poslanik s.a.v.s. rekao: Lijepa riječ je sadaka.",
+  "Subhanallah, koliko je to lahko, a koliko je vrijedno kod Allaha.",
+  "Kada pozdravite komšiju, to je sadaka.",
+  "Kada utješite bolesnog, to je sadaka.",
+  "Kada svom djetetu kažete da ga volite, i to je sadaka.",
+  "A ružna riječ, ogovaranje i laž ruše ono što smo godinama gradili.",
+  "Neka nam Allah da snage da čuvamo svoje jezike, da govorimo samo ono što je dobro i da budemo od onih koji spajaju srca, a ne od onih koji ih razdvajaju.",
+  "Allahumme ja mukallibel kulubi sebbit kulubena ala dinike.",
+  "Allahu e'lem.",
+  "Ve ahiru dava na enil hamdu lillahi rabbil alemin."
+];

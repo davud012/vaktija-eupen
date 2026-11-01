@@ -241,6 +241,12 @@
         <button class="dugme sporedno" id="spremi-lozinku" type="button" data-t="sinDugme"></button>
         <div class="mali" id="sin-stanje"></div>
 
+        <label style="margin-top:22px" data-t="probaNaslov"></label>
+        <div class="mali" data-t="probaInfo"></div>
+        <button class="dugme sporedno" id="proba-dugme" type="button" data-t="probaDugme"></button>
+        <pre id="proba-izvjestaj" class="mali skriveno" style="white-space:pre-wrap;background:rgba(0,0,0,.3);padding:10px;border-radius:10px;max-height:420px;overflow:auto;user-select:text;-webkit-user-select:text"></pre>
+        <button class="dugme sporedno skriveno" id="proba-kopiraj" type="button" data-t="probaKopiraj"></button>
+
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
         <div class="mali" data-t="odjavaInfo"></div>
         <div class="mali" id="verzija" style="margin-top:14px;opacity:.6"></div>
@@ -253,6 +259,7 @@
 <script src="../lib/mqtt.min.js"></script>
 <script src="../prijevod-veza.js"></script>
 <script src="../lib/anthropic.min.js"></script>
+<script src="proba-hutba.js"></script>
 <script>
 (function () {
   "use strict";
@@ -317,6 +324,7 @@
       infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Radi u svakom pregledniku (i Chrome/Google na iPhoneu). Gemini odmah i prevodi po smislu. Treba Gemini ključ (aistudio.google.com).",
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
       gNe: "Gemini greška", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
+      probaNaslov: "Probna hutba", probaInfo: "Pošalje probnu hutbu (oko 300 riječi) kroz pravi prijevod – kao da je izgovorena. Na kraju se pojavi izvještaj koji možete kopirati.", probaDugme: "Pokreni probnu hutbu", probaKopiraj: "Kopiraj izvještaj", probaKopirano: "✓ Kopirano",
       sinNaslov: "Lozinka i svi uređaji", sinInfo: "Sa ovom lozinkom svaki mobitel ili računar automatski dobije iste postavke (i ključeve). Najmanje 8 znakova. Postavke se šalju šifrovane.",
       novaLozinka: "Nova lozinka", ponoviLozinku: "Ponovi lozinku", sinDugme: "Spremi i prenesi na sve uređaje",
       sinKratka: "Lozinka mora imati najmanje 8 znakova.", sinRazlicite: "Lozinke nisu iste.",
@@ -369,6 +377,7 @@
       infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Geht in jedem Browser (auch Chrome/Google auf dem iPhone). Gemini übersetzt gleich mit, nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com).",
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
       gNe: "Gemini-Fehler", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
+      probaNaslov: "Probe-Hutba", probaInfo: "Schickt eine Probe-Hutba (ca. 300 Wörter) durch die echte Übersetzung – als wäre sie gesprochen. Am Ende erscheint ein Bericht zum Kopieren.", probaDugme: "Probe-Hutba starten", probaKopiraj: "Bericht kopieren", probaKopirano: "✓ Kopiert",
       sinNaslov: "Passwort & alle Geräte", sinInfo: "Mit diesem Passwort bekommt jedes Handy oder jeder PC automatisch dieselben Einstellungen (auch die Schlüssel). Mindestens 8 Zeichen. Die Einstellungen werden verschlüsselt übertragen.",
       novaLozinka: "Neues Passwort", ponoviLozinku: "Passwort wiederholen", sinDugme: "Speichern & auf alle Geräte übertragen",
       sinKratka: "Das Passwort braucht mindestens 8 Zeichen.", sinRazlicite: "Die Passwörter sind nicht gleich.",
@@ -421,6 +430,7 @@
       infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Fonctionne dans tout navigateur (aussi Chrome/Google sur iPhone). Gemini traduit en même temps, selon le sens. Nécessite une clé Gemini (aistudio.google.com).",
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
       gNe: "Erreur Gemini", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
+      probaNaslov: "Khutba d'essai", probaInfo: "Envoie une khutba d'essai (env. 300 mots) dans la vraie traduction – comme si elle était prononcée. À la fin, un rapport à copier apparaît.", probaDugme: "Lancer la khutba d'essai", probaKopiraj: "Copier le rapport", probaKopirano: "✓ Copié",
       sinNaslov: "Mot de passe et tous les appareils", sinInfo: "Avec ce mot de passe, chaque téléphone ou ordinateur reçoit automatiquement les mêmes paramètres (y compris les clés). Au moins 8 caractères. Les paramètres sont transmis chiffrés.",
       novaLozinka: "Nouveau mot de passe", ponoviLozinku: "Répéter le mot de passe", sinDugme: "Enregistrer et transférer sur tous les appareils",
       sinKratka: "Le mot de passe doit comporter au moins 8 caractères.", sinRazlicite: "Les mots de passe ne sont pas identiques.",
@@ -829,6 +839,8 @@
     // Manche Browser (z. B. Safari auf dem iPhone) schließen Sätze lange nicht ab. Darum wird Text
     // weitergegeben, sobald der Imam kurz pausiert (1 s) oder sich ~20 Wörter angesammelt haben.
     var predato = 0, zadnjiInterim = "", zadnjaPromjena = 0;
+    // Skraćenice nisu kraj rečenice / Abkürzungen sind kein Satzende
+    var SKRACENICE_BS = /^(s\.a\.v\.s\.|s\.a\.w\.s\.|a\.s\.|r\.a\.|d[zž]\.[sš]\.|tj\.|npr\.|br\.|sv\.|god\.|h\.)[,:]?$/i;
     function rijeciOd(tekst) { return tekst.split(/\s+/).filter(Boolean); }
     function predaj(tekst) {
       var s1 = trenutna || novaRecenica(); trenutna = null;
@@ -843,11 +855,11 @@
       if (!n) return;
       var tiho = Date.now() - zadnjaPromjena, uzmi = 0, j;
       var kraj = -1;
-      for (j = n - 1; j >= 0; j--) if (/[.!?…]["“”»]?$/.test(novo[j])) { kraj = j; break; }
+      for (j = n - 1; j >= 0; j--) if (/[.!?…]["“”»]?$/.test(novo[j]) && !SKRACENICE_BS.test(novo[j])) { kraj = j; break; }
       if (kraj >= 0 && (tiho > 800 || kraj <= n - 3)) uzmi = kraj + 1;          // cijela rečenica / ganzer Satz
       else if (tiho > 1800 && n >= 7) uzmi = n;                                // pauza / Pause
       else if (tiho > 3500) uzmi = n;                                          // duga pauza / lange Pause
-      else if (n >= 28) {                                                      // dugo bez tačke / lange ohne Punkt
+      else if (n >= 35) {                                                      // dugo bez tačke / lange ohne Punkt
         for (j = n - 5; j >= 10; j--) if (/[,;:]$/.test(novo[j])) { uzmi = j + 1; break; }
         if (!uzmi) uzmi = n - 4;
       }
@@ -1031,6 +1043,13 @@
     [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
     [/\b(el|al)[\s-]*hamdu?\s*li?l+ah[ie]?\s*(rab+il[\s-]*['’]?alemin)?\b/gi, null],
     [/\b[wv][ae]s*[\s-]*s?s[ae]l[ae]tu?\s*[wv][ae]s*[\s-]*s?s[ae]l[ae]mu?\s*['’]?al[ae]\s*(r[ae]sul[iu]?l+ah[ie]?|e?[sš]+e?r[ae]f[ie]l[\s-]*enbija(i)?\s*v?e?l?[\s-]*murselin)\b/gi, null],
+    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*v[ae]\s*k[uo]l[uo]\s*kavl[ae]n\s*sedid[ae]n?\b/gi, "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ وَقُولُوا قَوْلًا سَدِيدًا · Sure Al-Ahzab 33:70"],
+    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*hak+a\s*t[uo]k[ae]tihi\s*v[ae]\s*la\s*t[ae]m[uo]t[uo]n+[ae]\s*il+a\s*v[ae]\s*en(t|d)[uo]m\s*m[uo]slim[uo]n\b/gi, "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ · Sure Al-Imran 3:102"],
+    [/\bv[ae]\s*a?h[iu]r[ue]?\s*d[ae]['’]?v[ae]\s*n[ae]\s*e?n[ie]?l?[\s-]*hamd[uo]\s*li?l+ah[ie]?\s*rab+il[\s-]*['’]?alemin\b/gi, "وَآخِرُ دَعْوَانَا أَنِ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَالَمِينَ"],
+    [/\ballahum+[ae]\s*ja\s*m[uo]k[ae]l+ib[ae]l[\s-]*k[uo]l[uo]bi?\s*s[ae]b+it\s*k[uo]l[uo]b[ae]na\s*['’]?al[ae]\s*din[ie]k[ae]?\b/gi, "ٱللَّهُمَّ يَا مُقَلِّبَ ٱلْقُلُوبِ ثَبِّتْ قُلُوبَنَا عَلَىٰ دِينِكَ"],
+    [/\ballahu\s*[ae]['’]?\s*l[ae]m\b/gi, "ٱللَّهُ أَعْلَمُ"],
+    [/\bradij?[ae]l+ahu\s*['’]?anh[uo]\b/gi, "رَضِيَ ٱللَّهُ عَنْهُ"],
+    [/\bradij?[ae]l+ahu\s*['’]?anh[ae]\b/gi, "رَضِيَ ٱللَّهُ عَنْهَا"],
     [/\bsubhan[ae]?l+ah\b/gi, "سُبْحَانَ ٱللَّٰهِ"],
     [/\ballahu\s*e?a?kb[ea]r\b/gi, "ٱللَّٰهُ أَكْبَرُ"],
     [/\bin\s*[sš]a\s*al+ah\b|\bin[sš]al+ah\b/gi, "إِن شَاءَ ٱللَّٰهُ"],
@@ -1083,6 +1102,7 @@
       "- Whenever the imam says something in ARABIC (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, or anything else in Arabic), write exactly that in ARABIC SCRIPT with vowel marks in round brackets, e.g. (بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) or (ٱلْحَمْدُ لِلَّٰهِ). Do not transliterate Arabic into Latin letters and do not translate it - the imam explains it himself.",
       "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
       "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
+      "- Markers like [1] or [2] in the segment stand for Arabic text that is shown separately. Keep every marker exactly once, unchanged, at the matching place in your translation. Example: \"Draga braćo i sestre, [1].\" -> \"Liebe Brüder und Schwestern, [1].\"",
       "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, written right-to-left in Arabic script. Example: \"Elhamdulillah, ves-salatu ves-selamu ala resulillah\" -> (ٱلْحَمْدُ لِلَّٰهِ وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ). Never split it into separate brackets and never mix Latin words into it.",
       "- For a hadith or dua in Arabic: write the Arabic wording you heard; if you cannot make out the Arabic words at all, write " + ci.ar + ".",
       "- LANGUAGE: write ONLY in " + cilj + " (plus Arabic script in brackets as described). NEVER use English: no English words, no notes, no labels like \"Translation:\", no comments, no explanations, no apologies. If something is unclear, translate what you can and leave the rest out.",
@@ -1117,11 +1137,13 @@
     var c = claude(), iz = izvor(), ck = ciljKod();
     if (iz.g !== "ar") r.bs = arapskeFormule(r.bs);
     var posao;
+    r.put = samoArapski(r.bs) ? "arapski" : c ? "Claude" : "Google";
     if (samoArapski(r.bs)) posao = Promise.resolve(r.bs.replace(/\s+\)/g, ")").replace(/\s*[.,;:!?]+\s*$/, ""));                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
     else posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
     var greska = "";
     posao.catch(function (e) {
       greska = String((e && e.message) || e);
+      if (c) r.put = "Google (Claude verworfen: " + greska + ")";
       return c ? prevediGoogle(r.bs, iz.g, ck) : "";
     }).catch(function (e) { greska = String((e && e.message) || e); return ""; }).then(function (de) {
       de = ocistiIzlaz(de);
@@ -1172,6 +1194,17 @@
       additionalProperties: false
     }
   };
+  // Primjeri kako izgleda dobar odgovor / Beispiele für eine gute Antwort
+  function primjer(ulaz, izlaz, napomena) {
+    return [{ role: "user", content: "New segment (Bosnian):\n" + ulaz }, { role: "assistant", content: JSON.stringify({ translation: izlaz, comment: napomena || "" }) }];
+  }
+  var PRIMJERI_DE = [].concat(
+    primjer("Draga braćo i sestre, cijenjeni džematlije,", "Liebe Brüder und Schwestern, verehrte Gemeinde,"),
+    primjer("svjetova i nek je salavat i selam na našeg", "der Welten, und Segen und Frieden auf unseren", "Bruchstück, nur übersetzt"),
+    primjer("Naš Poslanik ﷺ je rekao: Lijepa riječ je sadaka.", "Unser Prophet ﷺ sagte: Das gute Wort ist eine Sadaqa."),
+    primjer("Uzvišeni Allah u Kur'anu kaže: I recite ljudima lijepe riječi.", "Der Erhabene Allah sagt im Koran: Und sagt zu den Menschen schöne Worte."),
+    primjer("Draga", "Liebe", "einzelnes Wort, Anrede")
+  );
   var bezFormata = false;   // ako API ne prihvati format / falls die API das Format nicht annimmt
   function zahtjevClaude(c, iz, ck, sadrzaj) {
     var haiku = $("prevodilac").value === "claude-haiku";
@@ -1180,7 +1213,7 @@
       max_tokens: 2000,
       output_config: bezFormata ? { effort: "low" } : { effort: "low", format: FORMAT_PRIJEVODA },
       system: uputa(iz, ck),
-      messages: [{ role: "user", content: sadrzaj }]
+      messages: (ck === "de" && !bezFormata ? PRIMJERI_DE : []).concat([{ role: "user", content: sadrzaj }])
     };
     if (haiku) return c.messages.create(p);
     p.betas = ["server-side-fallback-2026-07-01"]; p.fallbacks = "default";
@@ -1197,14 +1230,27 @@
   }
   // Ako se u prijevodu pojave bosanske riječi iz originala (npr. "poslanika", "svjetova"), model objašnjava umjesto da prevodi
   // Tauchen bosnische Wörter aus dem Original in der Übersetzung auf, erklärt das Modell statt zu übersetzen
-  var DOZVOLJENE = /^(allah|allahu|muhammed|muhammad|muhammeda|kur'an|kuran|bismillah|amin|amen|ramazan|bajram|d[zž]uma|hutba|ibrahim|isa|musa|nuh|adem|merjem|mekka|medina|mekke|medine|ka'ba)$/i;
+  var DOZVOLJENE = /^(allah|allahu|muhammed|muhammad|muhammeda|kur'an|kuran|bismillah|amin|amen|ramazan|bajram|d[zž]uma|hutba|ibrahim|isa|musa|nuh|adem|merjem|mekka|medina|mekke|medine|ka'ba|hurejre|hurejra|aiša|aisa|omer|osman|alija|hasan|husejn|fatima|bilal|ebu-bekr|bekr|abdullah|enes|džibril|džebrail|sulejman|jusuf|ibrahima|muhammedu|seid|sejid)$/i;
   function imaIzvornihRijeci(prijevod, izvorniTekst, iz, ck) {
     if (iz.g === "ar" || (iz.g === "bs" && ck === "bs") || iz.g === ck) return false;
     var rijeci = {}; (izvorniTekst.toLowerCase().match(/[a-zčćžšđ']{5,}/g) || []).forEach(function (w) { if (!DOZVOLJENE.test(w)) rijeci[w] = 1; });
-    return (prijevod.toLowerCase().match(/[a-zčćžšđäöüß']{5,}/g) || []).some(function (w) { return rijeci[w]; });
+    var izvan = prijevod.toLowerCase().replace(/"[^"]*"|„[^“”]*[“”]|«[^»]*»/g, " ");
+    var uNavodnicima = (prijevod.toLowerCase().match(/"[^"]*"|„[^“”]*[“”]|«[^»]*»/g) || []).join(" ");
+    // Bosanska riječ u navodnicima = objašnjenje; inače tek od dvije različite riječi
+    // Bosnisches Wort in Anführungszeichen = Erklärung; sonst erst ab zwei verschiedenen Wörtern
+    if ((uNavodnicima.match(/[a-zčćžšđ']{4,}/g) || []).some(function (w) { return rijeci[w] || /[čćšđž]/.test(w); })) return true;
+    var nadjene = (izvan.match(/[a-zčćžšđäöüß']{5,}/g) || []).filter(function (w) { return rijeci[w]; });
+    return nadjene.filter(function (w, i) { return nadjene.indexOf(w) === i; }).length >= 2;
   }
   function prevediClaude(c, r, iz, ck) {
-    var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs;
+    // Arapski tekst ne ide Claudeu – zamijeni se oznakom [1], [2] i vrati tačno onakav kakav je bio
+    // Arabischer Text geht nicht an Claude – er wird durch [1], [2] ersetzt und danach unverändert zurückgesetzt
+    var blokovi = [], naPocetku = [];
+    var seg = r.bs.replace(/\([^()]*[\u0600-\u06FF][^()]*\)/g, function (m, poz) {
+      blokovi.push(m); naPocetku.push(!r.bs.slice(0, poz).trim());
+      return "[" + blokovi.length + "]";
+    });
+    var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + seg;
     return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
       if (!bezFormata && e && e.status === 400) { bezFormata = true; return zahtjevClaude(c, iz, ck, sadrzaj); }
       throw e;
@@ -1213,6 +1259,11 @@
       var tekst = odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
       var prijevod = tekst;
       try { var j = JSON.parse(tekst); if (j && typeof j.translation === "string") prijevod = j.translation; } catch (e2) {}
+      blokovi.forEach(function (b, k) {
+        var oznaka = "[" + (k + 1) + "]";
+        if (prijevod.indexOf(oznaka) >= 0) prijevod = prijevod.split(oznaka).join(b);
+        else prijevod = naPocetku[k] ? b + " " + prijevod : prijevod + " " + b;
+      });
       prijevod = ocistiIzlaz(prijevod);
       // Engleski ili objašnjenje -> umjesto toga Google / Englisch oder Erklärung -> stattdessen Google
       if (prijevod !== "-" && imaEngleskog(prijevod, ck)) throw new Error("engleski");
@@ -1294,15 +1345,16 @@
   // Arapski tekst desno-nalijevo / Arabischer Text von rechts nach links
   function sArapskim(s) {
     // Arapski u zagradi: svoj red, zdesna nalijevo / Arabisch in Klammern: eigene Zeile, von rechts nach links
-    s = String(s).replace(/\(([^()]*[\u0600-\u06FF][^()]*)\)/g, function (cijelo, unutra) {
-      var d = unutra.split(/\s+·\s+/);
-      return "\u0001" + d[0] + "\u0002" + (d[1] || "") + "\u0003";
-    });
-    return esc(s).replace(/\u0001([^\u0002]*)\u0002([^\u0003]*)\u0003/g, function (x, ar, izvor) {
-      return '<span class="ar-blok" dir="rtl">(' + ar + ')</span>' + (izvor ? '<span class="ar-izvor">' + izvor + '</span>' : "");
-    }).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*/g,
-      function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
+    return String(s).split(/(\([^()]*[؀-ۿ][^()]*\))/).map(function (dio, i) {
+      if (i % 2 === 1) {
+        var d = dio.slice(1, -1).split(/\s+·\s+/);
+        return '<span class="ar-blok" dir="rtl">(' + esc(d[0].trim()) + ')</span>' + (d[1] ? '<span class="ar-izvor">' + esc(d[1]) + '</span>' : "");
+      }
+      return esc(dio).replace(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s–—]*/g,
+        function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
+    }).join("");
   }
+
   function prikaziTok() {
     var zadnje = recenice.filter(function (r) { return r.bs; }).slice(-6).reverse();
     $("tok").innerHTML = zadnje.length ? zadnje.map(function (r) {
@@ -1311,6 +1363,34 @@
         (r.gotovo ? sArapskim(r.de) : "…") + '</div></div>';
     }).join("") : '<div class="prazno">' + t("prazno") + '</div>';
   }
+
+  /* =================== Probna hutba / Probe-Hutba =================== */
+  var probaTece = false;
+  $("proba-dugme").addEventListener("click", function () {
+    if (probaTece || !window.PROBA_HUTBA) return;
+    probaTece = true; this.disabled = true;
+    var lista = [], i = 0;
+    $("proba-izvjestaj").classList.remove("skriveno"); $("proba-izvjestaj").textContent = "…";
+    (function sljedeca() {
+      if (i >= PROBA_HUTBA.length) { setTimeout(gotovo, 12000); return; }
+      var r = novaRecenica(); r.bs = PROBA_HUTBA[i++]; r.ulaz = r.bs; lista.push(r);
+      prevedi(r);
+      setTimeout(sljedeca, 2600);
+    })();
+    function gotovo() {
+      var tekst = "Probe-Hutba · " + $("prevodilac").value + " · " + ($("verzija").textContent || "") + "\n\n" + lista.map(function (r, k) {
+        return (k + 1) + ") " + r.ulaz + "\n   → " + (r.gotovo ? (r.neuspio ? "FEHLER" : r.de) : "(keine Antwort)") + "\n   [" + (r.put || "?") + "]";
+      }).join("\n\n");
+      $("proba-izvjestaj").textContent = tekst;
+      $("proba-kopiraj").classList.remove("skriveno");
+      probaTece = false; $("proba-dugme").disabled = false;
+    }
+  });
+  $("proba-kopiraj").addEventListener("click", function () {
+    var tx = $("proba-izvjestaj").textContent, dugme = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(function () { dugme.textContent = t("probaKopirano"); },
+      function () { var rng = document.createRange(); rng.selectNodeContents($("proba-izvjestaj")); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(rng); });
+  });
 
   /* =================== Automatsko ažuriranje / Automatische Aktualisierung =================== */
   // Nova verzija na GitHubu -> stranica se sama učita ponovo (ne dok mikrofon ili TV radi)
