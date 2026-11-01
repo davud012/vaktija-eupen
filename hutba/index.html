@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#071226">
 <title>Hutba – prijevod uživo</title>
 <style>
+  @font-face { font-family: "Amiri"; src: url("../fonts/Amiri-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF; }
   :root {
     --pozadina: #071226; --kartica: rgba(255, 255, 255, 0.06); --rub: rgba(227, 194, 122, 0.28);
     --zlato: #e3c27a; --tekst: #f3efe6; --blijedo: #9fb0c8; --crveno: #e5484d; --zeleno: #3dd68c;
@@ -997,6 +998,7 @@
       var j = JSON.parse(tekst);
       var orig = String(j.original || "").trim(), pr = String(j.translation || "").trim();
       if (!orig || orig === "-" || !pr || pr === "-") { ukloni(r); return; }
+      pr = ocistiIzlaz(pr);
       if (/^¶/.test(pr)) { r.p = true; pr = pr.replace(/^¶\s*/, ""); }
       r.bs = orig; r.de = pr; r.gotovo = true;
       if (upozorenjeFn && upozorenjeFn.gemini) upozori(null);
@@ -1020,11 +1022,13 @@
       "- Translate the meaning, not word for word. Write natural, clear " + cilj + " that a native speaker would actually say.",
       "- Proverbs and idioms: use the matching saying in " + cilj + " or a natural paraphrase. Example into German: \"S kim si, takav si.\" -> \"Sag mir, mit wem du umgehst, und ich sage dir, wer du bist.\" (not \"Mit wem du bist, so bist du.\")",
       "- The text comes from speech recognition: punctuation may be missing, words may be misheard, a segment may stop mid-sentence. Infer the intended words from context and translate the fragment so it reads naturally. Do not add content that was not said and do not finish sentences the imam has not finished.",
-      "- Religious terms (German shown as the model; for other languages use the usual term Muslims use in that language): Allah stays \"Allah\". Poslanik / Muhammed a.s. / s.a.v.s. -> \"der Prophet Muhammad (s.a.w.)\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
-      "- Arabic formulas stay in the usual transliteration of " + cilj + " (German: Alhamdulillah, Subhanallah, Allahu akbar, Inschallah, Maschallah, Bismillah, As-salamu alaikum).",
+      "- The blessing on the Prophet (sallallahu alejhi ve sellem, salallahu alejhi vesellem, s.a.v.s., a.s. after Muhammed, صلى الله عليه وسلم) is ALWAYS written only as the single sign ﷺ, never spelled out and never translated. Example: \"Poslanik, sallallahu alejhi ve sellem, je rekao\" -> \"Der Prophet ﷺ sagte\".",
+      "- Religious terms (German shown as the model; for other languages use the usual term Muslims use in that language): Allah stays \"Allah\". Poslanik / Muhammed -> \"der Prophet Muhammad ﷺ\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
+      "- Whenever the imam says something in ARABIC (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, or anything else in Arabic), write exactly that in ARABIC SCRIPT with vowel marks in round brackets, e.g. (بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) or (ٱلْحَمْدُ لِلَّٰهِ). Do not transliterate Arabic into Latin letters and do not translate it - the imam explains it himself.",
       "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
       "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
-      "- The same for a well-known hadith or dua quoted in Arabic: keep it in Arabic in round brackets only if you are sure of the exact wording, otherwise " + ci.ar + ".",
+      "- For a hadith or dua in Arabic: write the Arabic wording you heard; if you cannot make out the Arabic words at all, write " + ci.ar + ".",
+      "- LANGUAGE: write ONLY in " + cilj + " (plus Arabic script in brackets as described). NEVER use English: no English words, no notes, no labels like \"Translation:\", no comments, no explanations, no apologies. If something is unclear, translate what you can and leave the rest out.",
       "- Keep the respectful tone of a sermon. Prefer short, readable sentences.",
       "- Paragraphs for the reader: if the new segment clearly begins a new thought or a new part of the sermon (a new topic, a new story, a new hadith or verse, a new address like \"Draga braćo i sestre\", the closing dua), start your output with the character ¶ followed by a space. Otherwise do not use ¶.",
       "",
@@ -1057,7 +1061,7 @@
       greska = String((e && e.message) || e);
       return c ? prevediGoogle(r.bs, iz.g, ck) : "";
     }).catch(function (e) { greska = String((e && e.message) || e); return ""; }).then(function (de) {
-      de = (de || "").trim();
+      de = ocistiIzlaz(de);
       if (de === "-" || de === "–") { ukloni(r); return; }
       if (/^¶/.test(de)) { r.p = true; de = de.replace(/^¶\s*/, ""); }
       if (!de) {
@@ -1074,6 +1078,17 @@
     });
   }
 
+  // Ukloniti oznake i napomene koje model ponekad doda / Etiketten und Anmerkungen entfernen, die das Modell manchmal anhängt
+  function ocistiIzlaz(x) {
+    x = String(x || "").trim();
+    x = x.replace(/^(translation|übersetzung|traduction|prijevod|çeviri|new segment)\s*(\([^)]*\))?\s*:\s*/i, "");
+    x = x.replace(/\s*\((note|n\.b\.|translator'?s? note|context)[^)]*\)\s*$/i, "");
+    x = x.split(/\n+\s*(note|n\.b\.|explanation|translator'?s? note)\s*:/i)[0];
+    x = x.replace(/^["„“”]+|["„“”]+$/g, "").trim();
+    // Salavat kao znak ﷺ / Segensformel als Zeichen ﷺ
+    x = x.replace(/\s*,?\s*\(?\s*(s\.?\s*a\.?\s*[wv]\.?\s*s\.?|s\.\s*a\.\s*w\.|sallallahu\s+['’]?alaihi\s+wa\s*sallam|sallallahu\s+alejhi\s+ve\s*sellem)\s*\)?\s*,?(?=\s|$)/gi, " ﷺ");
+    return x;
+  }
   function prevediClaude(c, r, iz, ck) {
     var poziv = $("prevodilac").value === "claude-haiku"
       // Haiku: vrlo jeftino / sehr günstig
