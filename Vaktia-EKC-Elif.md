@@ -89,6 +89,9 @@ Tipps von unterwegs:
 
 - Handy-Seite: **https://davud012.github.io/vaktija-eupen/hutba/**, Passwort **123** (in `vaktija.js` unter `hutbaPrijevod.lozinka` änderbar)
 - Ablauf: Knopf **„Auf Fernseher übertragen“** → Fernseher zeigt die Übersetzung. Dann **Mikrofon** drücken und sprechen. Am Ende Mikrofon aus und Knopf **„Beenden“**. Ist das Mikrofon 15 Minuten aus, geht der Fernseher von selbst zurück. Mikrofon ohne Fernseher geht auch (Übersetzung nur am Handy). Auf dem Fernseher steht **nur Deutsch**, ohne den bosnischen Text (Wunsch des Nutzers).
+- Handy-Seite einsprachig: oben rechts **DE / BS / FR** umschalten (wird gemerkt)
+- Roter Knopf **„Hutba beenden“** (erscheint, sobald Fernseher oder Mikrofon läuft) beendet Mikrofon und Fernseher zusammen
+- iPhone: Die Spracherkennung des Browsers geht nur in **Safari** (mit eingeschalteter Diktierfunktion/Siri). In Chrome, Brave oder der Google-App auf dem iPhone blockiert Apple sie. Die Seite zeigt dann einen Knopf „In Safari öffnen“. Für eine Lösung in jedem Browser müsste der Ton selbst aufgenommen und an einen Cloud-Dienst geschickt werden (z. B. Gemini oder Whisper, braucht einen Schlüssel).
 - Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
 - Mikrofon-Erlaubnis speichert der Browser selbst: bei der Frage „Bei Besuch der Website zulassen“ wählen, nicht „Nur dieses Mal“
 - Übersetzer wählbar unter „Einstellungen“: **Google** (Standard, kostenlos, eher Wort für Wort, erkennt keine Koran-Verse) oder **Claude** (Modell claude-opus-5-5, nach Sinn, ca. 0,50 € pro Hutba, braucht einen API-Schlüssel, der nur auf dem Handy gespeichert wird)
