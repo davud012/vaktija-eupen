@@ -12,7 +12,9 @@ var PRAVILA = {
   sabahPrijeIzlaska: 60,   // Sabah-Ezan = Sonnenaufgang - 60 Min.
   ikametNakon: 10,         // Gebet = Ezan + 10 Min. (alle Gebete)
   hutbaLjeti: "14:00",     // Freitagspredigt in der Sommerzeit (MESZ)
-  hutbaZimi: "13:00"       // Freitagspredigt in der Winterzeit (MEZ)
+  hutbaZimi: "13:00",      // Freitagspredigt in der Winterzeit (MEZ)
+  // Ischa zu fester Uhrzeit in einem Zeitraum (Entscheidung der Gemeinde), Gebet = Uhrzeit + 10 Min.
+  jacijaFiksno: { vrijeme: "19:00", od: "2026-11-01", do: "2026-12-31" }
 };
 
 function uMinute(hhmm) { var p = hhmm.split(":"); return +p[0] * 60 + +p[1]; }
@@ -38,6 +40,8 @@ function istSommerzeit(jahr, monat, tag) {       // monat: 1–12
  */
 function tagesplan(datum, zeile) {
   var t = zeile.split(/\s+/);
+  var JF = PRAVILA.jacijaFiksno;
+  if (JF && datum >= JF.od && datum <= JF["do"]) t[5] = JF.vrijeme;
   var j = +datum.slice(0, 4), m = +datum.slice(5, 7), d = +datum.slice(8, 10);
   var freitag = new Date(Date.UTC(j, m - 1, d)).getUTCDay() === 5;
   var izlazak = uMinute(t[1]);

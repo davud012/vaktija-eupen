@@ -285,6 +285,9 @@
 
   /* ---------- Dizajn 5: Nebo – pravo nebo iznad Eupena / Der echte Himmel über Eupen ---------- */
   body.dizajn-5 { background: #061223; }
+  /* Mirna plava pozadina umjesto živog neba / Ruhiger blauer Hintergrund statt lebendigem Himmel */
+  body.dizajn-5.plavo { background: linear-gradient(180deg, #24478f 0%, #1a3672 45%, #0f234d 100%) fixed; }
+  body.dizajn-5.plavo .nebo { display: none; }
   body.dizajn-5 .uzorak, body.dizajn-5 .svjetla { display: none; }
   body.dizajn-5 .nebo { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
   .nebo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -636,6 +639,8 @@
   var TRAJANJE = P.trajanjeNamaza === undefined ? 10 : P.trajanjeNamaza;
   var SABAH = P.sabahPrijeIzlaska === undefined ? 60 : P.sabahPrijeIzlaska;
   var EKRAN = P.trajanjeEkranaVakta === undefined ? 30 : P.trajanjeEkranaVakta;
+  // Trajanje ekrana vakta po namazu / Dauer des Gebetsbildschirms je Gebet
+  function ekranZa(kljuc) { return typeof EKRAN === "object" ? (EKRAN[kljuc] || 20) : EKRAN; }
 
   // Za probu: index.html?vrijeme=2026-10-22T18:31:30 / Zum Testen einer bestimmten Uhrzeit
   var trazeniDizajn = /[?&]dizajn=(\d)/.exec(location.search);
@@ -686,6 +691,9 @@
     var red = V[kljucDatuma(d)];
     if (!red) return null;
     var t = red.split(/\s+/);
+    // Fiksna jacija (npr. 19:00 do kraja decembra) / Feste Ischa (z. B. 19:00 bis Ende Dezember)
+    var JF = P.jacijaFiksno, kd = kljucDatuma(d);
+    if (JF && JF.vrijeme && (!JF.od || kd >= JF.od) && (!JF["do"] || kd <= JF["do"])) t[5] = JF.vrijeme;
     var petak = d.getDay() === 5 && D;
     var namazi = [];
     for (var i = 0; i < VAKTI.length; i++) {
@@ -701,7 +709,7 @@
         n.ezan = n.vakat;
       }
       n.ikamet = n.dzuma ? n.ezan : n.ezan + IKAMET;
-      n.kraj = n.dzuma ? n.ezan + D.trajanje : Math.max(n.ezan + EKRAN, n.ikamet + TRAJANJE);
+      n.kraj = n.dzuma ? n.ezan + D.trajanje : Math.max(n.ezan + ekranZa(v.kljuc), n.ikamet + 1);
       namazi.push(n);
     }
     return { vremena: t, namazi: namazi, petak: petak };
@@ -852,7 +860,8 @@
     if (!danas) { sakrijVakatEkran(); return; }
 
     var s = sad.getHours() * 3600 + sad.getMinutes() * 60 + sad.getSeconds();
-    if (DIZAJN === 5 && window.Nebo) {
+    if (DIZAJN === 5 && P.nebo === false) document.body.classList.add("plavo");
+  if (DIZAJN === 5 && window.Nebo && P.nebo !== false) {
       Nebo.azuriraj(sad);
       if (window.Prilike && Nebo.zadnje) Prilike.azuriraj(Nebo.zadnje.sunce.alt);
     }

@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-01.15 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-01.16 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -27,6 +27,10 @@ var POSTAVKE = {
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
   lagano: false,
 
+  /* Pozadina: true = živo nebo (sunce, mjesec, oblaci), false = mirna plava pozadina (brže na slabijem uređaju).
+     Hintergrund: true = lebendiger Himmel, false = ruhiger blauer Hintergrund (schneller auf schwachen Geräten). */
+  nebo: false,
+
   /* Naziv džemata / Name der Gemeinde */
   naziv: "Džemat EKC Elif Eupen",
 
@@ -44,7 +48,7 @@ var POSTAVKE = {
 
   /* Koliko minuta od ezana se prikazuje ekran vakta (zatim opet glavni ekran).
      Wie viele Minuten ab dem Ezan der Gebetsbildschirm bleibt (danach wieder Hauptbildschirm). */
-  trajanjeEkranaVakta: 30,
+  trajanjeEkranaVakta: { zora: 15, podne: 20, ikindija: 20, aksam: 20, jacija: 20 },
 
   /* Koliko minuta se prikazuje "Namaz je počeo".
      Wie viele Minuten "Das Gebet hat begonnen" angezeigt wird. */
@@ -61,6 +65,10 @@ var POSTAVKE = {
   /* Prijevod hutbe uživo (TEST): imam otvori .../vaktija-eupen/hutba/ na mobitelu.
      Live-Übersetzung der Predigt (TEST): Imam öffnet .../vaktija-eupen/hutba/ am Handy.
      lozinka = Passwort für die Handy-Seite, kanal = Name der Verbindung Handy -> Fernseher */
+  /* Jacija u fiksno vrijeme u određenom periodu (namaz = vrijeme + ikametNakon).
+     Ischa zu einer festen Uhrzeit in einem Zeitraum (Gebet = Uhrzeit + ikametNakon). */
+  jacijaFiksno: { vrijeme: "19:00", od: "2026-11-01", do: "2026-12-31" },
+
   hutbaPrijevod: {
     ukljuceno: true,
     lozinka: "123",

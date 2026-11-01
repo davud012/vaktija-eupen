@@ -37,6 +37,7 @@ Datei: `vaktija.json`
 | **Sabah-Ezan** | Sonnenaufgang (izlazak) **− 60 Minuten** |
 | **Gebet (Ikamet)** | Ezan **+ 10 Minuten**, bei allen 5 Gebeten |
 | Ezan Podne, Ikindija, Akšam, Jacija | = Vakat aus der Tabelle |
+| **Jacija fest (Gemeinde-Entscheidung)** | vom **01.11.2026 bis 31.12.2026** immer **19:00**, Gebet **19:10** (statt Takvim-Zeit) |
 | **Džuma (Freitag): Hutba/Predigt** | **14:00 in der Sommerzeit**, **13:00 in der Winterzeit** |
 
 Sommerzeit in Belgien: vom letzten Sonntag im März bis zum letzten Sonntag im Oktober.
@@ -63,12 +64,12 @@ Die Werte stammen aus dem **echten Takvim** (November/Dezember 2026).
 
 | Datum | Zora | Sabah Ezan / Gebet | Izlazak | Podne / Gebet | Ikindija / Gebet | Akšam / Gebet | Jacija / Gebet | Džuma |
 |---|---|---|---|---|---|---|---|---|
-| 2026-11-02 (Mo) | 05:40 | 06:27 / 06:37 | 07:27 | 12:26 / 12:36 | 14:49 / 14:59 | 17:15 / 17:25 | 18:55 / 19:05 | – |
-| 2026-11-06 (Fr) | 05:46 | 06:34 / 06:44 | 07:34 | 12:26 / 12:36 | 14:43 / 14:53 | 17:08 / 17:18 | 18:48 / 18:58 | **13:00** |
-| 2026-11-13 (Fr) | 05:57 | 06:46 / 06:56 | 07:46 | 12:27 / 12:37 | 14:35 / 14:45 | 16:57 / 17:07 | 18:37 / 18:47 | **13:00** |
-| 2026-12-10 (Do) | 06:29 | 07:26 / 07:36 | 08:26 | 12:35 / 12:45 | 14:19 / 14:29 | 16:35 / 16:45 | 18:15 / 18:25 | – |
-| 2026-12-11 (Fr) | 06:30 | 07:27 / 07:37 | 08:27 | 12:36 / 12:46 | 14:19 / 14:29 | 16:35 / 16:45 | 18:15 / 18:25 | **13:00** |
-| 2026-12-31 (Do) | 06:40 | 07:37 / 07:47 | 08:37 | 12:45 / 12:55 | 14:29 / 14:39 | 16:44 / 16:54 | 18:24 / 18:34 | – |
+| 2026-11-02 (Mo) | 05:40 | 06:27 / 06:37 | 07:27 | 12:26 / 12:36 | 14:49 / 14:59 | 17:15 / 17:25 | **19:00 / 19:10** | – |
+| 2026-11-06 (Fr) | 05:46 | 06:34 / 06:44 | 07:34 | 12:26 / 12:36 | 14:43 / 14:53 | 17:08 / 17:18 | **19:00 / 19:10** | **13:00** |
+| 2026-11-13 (Fr) | 05:57 | 06:46 / 06:56 | 07:46 | 12:27 / 12:37 | 14:35 / 14:45 | 16:57 / 17:07 | **19:00 / 19:10** | **13:00** |
+| 2026-12-10 (Do) | 06:29 | 07:26 / 07:36 | 08:26 | 12:35 / 12:45 | 14:19 / 14:29 | 16:35 / 16:45 | **19:00 / 19:10** | – |
+| 2026-12-11 (Fr) | 06:30 | 07:27 / 07:37 | 08:27 | 12:36 / 12:46 | 14:19 / 14:29 | 16:35 / 16:45 | **19:00 / 19:10** | **13:00** |
+| 2026-12-31 (Do) | 06:40 | 07:37 / 07:47 | 08:37 | 12:45 / 12:55 | 14:29 / 14:39 | 16:44 / 16:54 | **19:00 / 19:10** | – |
 
 Sonderfall: Wenn Jacija sehr spät ist (z. B. 23:55), fällt das Gebet (+10 Min.) auf **nach Mitternacht**.
 Die App sollte das als nächsten Kalendertag behandeln und nicht als 00:05 desselben Tages.

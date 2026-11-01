@@ -129,6 +129,12 @@ Tipps von unterwegs:
 - Datum groß geschrieben und ohne Punkt nach dem Jahr: „Nedjelja, 1. Novembar 2026“
 - Sekunden oben rechts klein und ruhig, ohne Animation
 
+## Änderungen 1.11.2026 (Abend)
+
+- **Jacija fest um 19:00, Gebet 19:10**, vom 01.11. bis 31.12.2026 (`vaktija.js` → `jacijaFiksno`). Ab Januar gilt wieder der Takvim. Auch im Paket für den App-Entwickler eingetragen.
+- **Gebets-Bildschirm** je Gebet: Sabah 15 Min., Podne 20, Ikindija 20, Akšam 20, Jacija 20 (ab Ezan, `trajanjeEkranaVakta`). Džuma unverändert.
+- **Ruhiger blauer Hintergrund** statt lebendigem Himmel (`nebo: false`), weil die Box beim Himmel ruckelte. Damit gibt es auch keine Wetter-Animationen mehr. Zurück zum Himmel: `nebo: true`.
+
 ## Später geplant
 
 - **Neuer Takvim:** Jedes Jahr im **Dezember** die Takvim-Seiten fürs nächste Jahr fotografieren und Claude schicken. Claude trägt sie in `vaktija.js` ein und lädt sie hoch. Der Fernseher übernimmt das automatisch.
