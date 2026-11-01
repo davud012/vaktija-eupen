@@ -507,7 +507,10 @@
   }
   .he-traka.bez-animacije { transition: none; }
   /* Odlomci: novi dio počinje u novom redu, stari su malo tamniji / Absätze: neuer Teil in neuer Zeile, alte etwas dunkler */
-  .he-odlomak { margin-top: 0.75em; transition: opacity 1.4s ease; }
+  .he-odlomak { margin-top: 1.4em; transition: opacity 1.4s ease; }
+  /* Svaka rečenica u svom redu, s malim razmakom / Jeder Satz in eigener Zeile, mit kleinem Abstand */
+  .he-recenica { margin-top: 0.55em; }
+  .he-recenica:first-child { margin-top: 0; }
   .he-odlomak:first-child { margin-top: 0; }
   .he-odlomak.prosli { opacity: 0.5; }
   .he-rijec { animation: he-rijec 0.5s ease-out both; }
@@ -1038,24 +1041,42 @@
       });
       return out;
     }
+    var recenica = null, krajRecenice = false;
+    // Kraj rečenice: . ! ? … (ali ne skraćenice kao "z.", "bzw.", "1.") / Satzende (aber keine Abkürzungen)
+    var SKRACENICE = /^(z|d|u|o|s|a|bzw|ca|nr|vgl|usw|etc|dr|st|hl|bzw|evtl|ggf|inkl|v|vs|bspw)\.$/i;
+    function jeKrajRecenice(w) {
+      if (/\d+:\d+(-\d+)?\)$/.test(w)) return true;   // kraj citata iz Kur'ana / Ende eines Koran-Zitats
+      if (!/[.!?…]["»”“)\]]*$/.test(w)) return false;
+      if (SKRACENICE.test(w) || /^\d+\.$/.test(w)) return false;
+      return true;
+    }
     function noviOdlomak() {
       if (odlomak && !odlomak.childNodes.length) return;
       if (odlomak) odlomak.classList.add("prosli");
       odlomak = document.createElement("div");
       odlomak.className = "he-odlomak";
       traka.appendChild(odlomak);
+      recenica = null; krajRecenice = false;
+    }
+    function novaRecenicaTV() {
+      recenica = document.createElement("div");
+      recenica.className = "he-recenica";
+      odlomak.appendChild(recenica);
+      krajRecenice = false;
     }
     function dodajRijec(r, bezAnimacije) {
       if (r.novi) { noviOdlomak(); return; }
       if (!odlomak) noviOdlomak();
-      var zadnji = odlomak.lastChild;
+      if (!recenica || krajRecenice) novaRecenicaTV();
+      var zadnji = recenica.lastChild;
       var bezRazmaka = !zadnji || /^[)\].,;:!?»“]/.test(r.t) || (zadnji.textContent && /[(\[„«]$/.test(zadnji.textContent));
-      if (!bezRazmaka) odlomak.appendChild(document.createTextNode(" "));
+      if (!bezRazmaka) recenica.appendChild(document.createTextNode(" "));
       var el = document.createElement(r.ar ? "bdi" : "span");
       if (r.ar) { el.className = "ar" + (bezAnimacije ? "" : " he-rijec"); el.dir = "rtl"; }
       else if (!bezAnimacije) el.className = "he-rijec";
       el.textContent = r.t;
-      odlomak.appendChild(el);
+      recenica.appendChild(el);
+      if (!r.ar && jeKrajRecenice(r.t)) krajRecenice = true;
     }
     // Pomjeranje: zadnji red uvijek dole, staro polako gore / Letzte Zeile immer unten, Altes gleitet nach oben
     function pomjeri() {
@@ -1112,7 +1133,7 @@
     function ocisti() {
       stanjeId = {}; pustenoDo = {}; red = []; clearTimeout(tajmer); tajmer = null;
       traka.innerHTML = ""; traka.style.transform = ""; cekanje.style.display = "";
-      odlomak = null; rijeciUOdlomku = 0; zadnjaRijec = "";
+      odlomak = null; recenica = null; krajRecenice = false; rijeciUOdlomku = 0; zadnjaRijec = "";
     }
     function pokazi() {
       zadnjiPuls = Date.now();
