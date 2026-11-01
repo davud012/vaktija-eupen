@@ -223,6 +223,7 @@
         <label for="prevodilac" data-t="prevodilac"></label>
         <select id="prevodilac">
           <option value="google" data-t="optGoogle"></option>
+          <option value="claude-haiku" data-t="optHaiku"></option>
           <option value="claude" data-t="optClaude"></option>
         </select>
         <div class="mali" id="prevodilac-info"></div>
@@ -275,6 +276,7 @@
       u5: "Kad preglednik pita za mikrofon, izaberite <b>Dozvoli</b> (ako postoji: „pri svakoj posjeti“, ne „samo ovaj put“).",
       tokNaslov: "Prijevod", prazno: "Još ništa",
       postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac",
+      optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 1–2 centa po hutbi. Treba Claude ključ.",
       optGoogle: "Google – besplatno", optClaude: "Claude – po smislu, uz plaćanje",
       infoGoogle: "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.",
       infoClaude: "Prevodi po smislu i prepoznaje ajete iz Kur'ana. Treba ključ (oko 0,50 € po hutbi).",
@@ -321,6 +323,7 @@
       u5: "Wenn der Browser nach dem Mikrofon fragt, <b>Zulassen</b> wählen (falls angeboten: „bei jedem Besuch“, nicht „nur dieses Mal“).",
       tokNaslov: "Übersetzung", prazno: "Noch nichts",
       postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer",
+      optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 1–2 Cent pro Hutba. Braucht einen Claude-Schlüssel.",
       optGoogle: "Google – kostenlos", optClaude: "Claude – nach Sinn, kostenpflichtig",
       infoGoogle: "Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.",
       infoClaude: "Übersetzt nach Sinn und erkennt Koran-Verse. Braucht einen Schlüssel (ca. 0,50 € pro Hutba).",
@@ -367,6 +370,7 @@
       u5: "Quand le navigateur demande le micro, choisissez <b>Autoriser</b> (si proposé : « à chaque visite », pas « cette fois seulement »).",
       tokNaslov: "Traduction", prazno: "Rien pour l'instant",
       postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur",
+      optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 1–2 centimes par khutba. Nécessite une clé Claude.",
       optGoogle: "Google – gratuit", optClaude: "Claude – selon le sens, payant",
       infoGoogle: "Gratuit, mais traduit plutôt mot à mot. Les versets du Coran ne sont pas reconnus.",
       infoClaude: "Traduit selon le sens et reconnaît les versets du Coran. Nécessite une clé (env. 0,50 € par khutba).",
@@ -504,7 +508,7 @@
   var j0 = citaj("hutba-jezik"); if (j0) $("jezik").value = j0;
   else if (IOS) $("jezik").value = "hr-HR";   // iPhone ne zna bosanski / iPhone kann kein Bosnisch
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
-  $("prevodilac").value = citaj("hutba-prevodilac") === "claude" ? "claude" : "google";
+  $("prevodilac").value = /^claude(-haiku)?$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "google";
   $("kljuc").value = citaj("hutba-kljuc") || "";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
@@ -536,9 +540,9 @@
     $("prevodilac-dio").classList.toggle("skriveno", gem);
     $("prepoznavanje-info").textContent = gem ? t("infoGemini") : t("infoAuto");
     $("gkljuc-stanje").textContent = citaj("hutba-gkljuc") ? "  " + t("spremljeno") : "";
-    var cl = $("prevodilac").value === "claude";
+    var pv = $("prevodilac").value, cl = pv !== "google";
     $("claude-dio").classList.toggle("skriveno", !cl);
-    $("prevodilac-info").textContent = cl ? t("infoClaude") : t("infoGoogle");
+    $("prevodilac-info").textContent = pv === "claude" ? t("infoClaude") : pv === "claude-haiku" ? t("infoHaiku") : t("infoGoogle");
     $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  " + t("spremljeno") : "";
   }
   $("spremi-kljuc").addEventListener("click", function () {
@@ -924,7 +928,7 @@
   var klijent = null;
   function claude() {
     var k = citaj("hutba-kljuc");
-    if ($("prevodilac").value !== "claude" || !k || !window.Anthropic) return null;
+    if ($("prevodilac").value === "google" || !k || !window.Anthropic) return null;
     if (!klijent) klijent = new Anthropic({ apiKey: k, dangerouslyAllowBrowser: true, maxRetries: 1, timeout: 30000 });
     return klijent;
   }
@@ -964,7 +968,16 @@
   }
 
   function prevediClaude(c, r, iz, ck) {
-    return c.beta.messages.create({
+    var poziv = $("prevodilac").value === "claude-haiku"
+      // Haiku: vrlo jeftino / sehr günstig
+      ? c.messages.create({
+          model: "claude-haiku-5-5",
+          max_tokens: 2000,
+          output_config: { effort: "low" },
+          system: uputa(iz, ck),
+          messages: [{ role: "user", content: kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs }]
+        })
+      : c.beta.messages.create({
       model: MODEL,
       max_tokens: 2000,
       output_config: { effort: "low" },
@@ -972,7 +985,8 @@
       fallbacks: "default",
       system: uputa(iz, ck),
       messages: [{ role: "user", content: kontekst(r) + "New segment (" + iz.ime + "):\n" + r.bs }]
-    }).then(function (odg) {
+    });
+    return poziv.then(function (odg) {
       if (odg.stop_reason === "refusal") throw new Error("refusal");
       return odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
     }).catch(function (e) {
@@ -989,20 +1003,45 @@
     if (tren) dijelovi.push(tren);
     var rez = [];
     return dijelovi.reduce(function (p, dio) {
-      return p.then(function () { return googleJedan(dio, sl, tl, 1); }).then(function (x) { rez.push(x); });
+      return p.then(function () { return googleJedan(dio, sl, tl); }).then(function (x) { rez.push(x); });
     }, Promise.resolve()).then(function () { return rez.join(" "); });
   }
-  function googleJedan(tekst, sl, tl, pokusaji) {
-    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sl + "&tl=" + tl + "&dt=t&q=" + encodeURIComponent(tekst);
-    return fetch(url).then(function (o) {
-      if (!o.ok) throw new Error("Google " + o.status);
-      return o.json();
-    }).then(function (d) {
-      return (d[0] || []).map(function (x) { return x[0]; }).join("");
-    }).catch(function (e) {
-      if (pokusaji > 0) return new Promise(function (ok) { setTimeout(ok, 900); }).then(function () { return googleJedan(tekst, sl, tl, pokusaji - 1); });
-      throw new Error("Google: " + ((e && e.message) || e));
-    });
+  // Više besplatnih puteva: ako jedan ne radi (npr. Google blokira), probati sljedeći
+  // Mehrere kostenlose Wege: geht einer nicht (z. B. Google sperrt), den nächsten versuchen
+  var PUTEVI = [
+    function (q, sl, tl) {
+      return dohvati("https://translate.googleapis.com/translate_a/t?client=gtx&sl=" + sl + "&tl=" + tl + "&q=" + encodeURIComponent(q)).then(function (d) {
+        var x = d && d[0]; if (Array.isArray(x)) x = x[0];
+        if (typeof x !== "string") throw new Error("format"); return x;
+      });
+    },
+    function (q, sl, tl) {
+      return dohvati("https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sl + "&tl=" + tl + "&dt=t&q=" + encodeURIComponent(q)).then(function (d) {
+        return (d[0] || []).map(function (x) { return x[0]; }).join("");
+      });
+    },
+    function (q, sl, tl) {
+      return dohvati("https://api.mymemory.translated.net/get?langpair=" + sl + "|" + tl + "&q=" + encodeURIComponent(q)).then(function (d) {
+        var x = d && d.responseData && d.responseData.translatedText;
+        if (!x || d.responseStatus !== 200) throw new Error("MyMemory " + (d && d.responseStatus)); return x;
+      });
+    }
+  ];
+  var IMENA_PUTEVA = ["Google", "Google 2", "MyMemory"], dobarPut = 0;
+  function dohvati(url) {
+    return fetch(url).then(function (o) { if (!o.ok) throw new Error(o.status); return o.json(); });
+  }
+  function googleJedan(tekst, sl, tl) {
+    var greske = [];
+    function probaj(k) {
+      if (k >= PUTEVI.length) return Promise.reject(new Error(greske.join(" · ")));
+      var i = (dobarPut + k) % PUTEVI.length;
+      return PUTEVI[i](tekst, sl, tl).then(function (x) { dobarPut = i; return x; }, function (e) {
+        greske.push(IMENA_PUTEVA[i] + ": " + ((e && e.message) || e));
+        return probaj(k + 1);
+      });
+    }
+    return probaj(0);
   }
 
   function ukloni(r) {
