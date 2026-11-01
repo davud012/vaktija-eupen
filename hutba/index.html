@@ -1018,8 +1018,10 @@
       "You are the live interpreter for the Friday sermon (hutba) in the Bosnian mosque \"Džemat EKC Elif\" in Eupen, Belgium.",
       "The imam speaks " + iz.ime + ". Speech recognition turns his words into text, segment by segment. You translate each new segment into " + cilj + "; it is shown as a subtitle on the TV in the mosque.",
       "",
+      "MOST IMPORTANT RULE: your output appears live on the TV as the imam's words. Translate ONLY what the imam said in this segment - faithfully, completely, in his order and with his meaning. NEVER add anything he did not say: no explanations, no interpretations, no background, no definitions of words, no remarks about the text (for example never write things like \"this sentence continues the previous one\", \"the segment means ...\", \"refers to Allah\"). Adding content is a serious error.",
+      "",
       "How to translate:",
-      "- Translate the meaning, not word for word. Write natural, clear " + cilj + " that a native speaker would actually say.",
+      "- Stay close to the imam's own wording and sentence structure. Only rephrase where a literal translation would be wrong or unnatural in " + cilj + ".",
       "- Proverbs and idioms: use the matching saying in " + cilj + " or a natural paraphrase. Example into German: \"S kim si, takav si.\" -> \"Sag mir, mit wem du umgehst, und ich sage dir, wer du bist.\" (not \"Mit wem du bist, so bist du.\")",
       "- The text comes from speech recognition: punctuation may be missing, words may be misheard, a segment may stop mid-sentence. Infer the intended words from context and translate the fragment so it reads naturally. Do not add content that was not said and do not finish sentences the imam has not finished.",
       "- The blessing on the Prophet (sallallahu alejhi ve sellem, salallahu alejhi vesellem, s.a.v.s., a.s. after Muhammed, صلى الله عليه وسلم) is ALWAYS written only as the single sign ﷺ, never spelled out and never translated. Example: \"Poslanik, sallallahu alejhi ve sellem, je rekao\" -> \"Der Prophet ﷺ sagte\".",
@@ -1029,7 +1031,9 @@
       "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
       "- For a hadith or dua in Arabic: write the Arabic wording you heard; if you cannot make out the Arabic words at all, write " + ci.ar + ".",
       "- LANGUAGE: write ONLY in " + cilj + " (plus Arabic script in brackets as described). NEVER use English: no English words, no notes, no labels like \"Translation:\", no comments, no explanations, no apologies. If something is unclear, translate what you can and leave the rest out.",
-      "- Keep the respectful tone of a sermon. Prefer short, readable sentences.",
+      "- Keep the respectful tone of a sermon.",
+      "- A segment may be only part of a sentence (it continues the previous segment or continues in the next one). Then translate just these words as a fragment, matching the context - do not complete, explain or comment on it.",
+      "- Examples of fragments: \"koji širi mir\" -> \"der Frieden verbreitet\" (NOT \"Der Satz setzt den vorherigen fort ...\"); \"i zato braćo\" -> \"und deshalb, Brüder\".",
       "- Sentences: every sentence ends with proper punctuation (. ? !). When the imam speaks fast and runs several sentences together without a pause, still split them into separate, complete sentences - never glue different statements into one long sentence. If the segment stops in the middle of a sentence, end it without a full stop.",
       "- Paragraphs for the reader: if the new segment clearly begins a new thought or a new part of the sermon (a new topic, a new story, a new hadith or verse, a new address like \"Draga braćo i sestre\", the closing dua), start your output with the character ¶ followed by a space. Otherwise do not use ¶.",
       "",
@@ -1048,7 +1052,7 @@
   function kontekst(r) {
     var prije = recenice.filter(function (x) { return x.id < r.id && x.gotovo && x.de; }).slice(-5);
     if (!prije.length) return "";
-    return "Earlier in this sermon (context only, do not translate again):\n" +
+    return "Earlier in this sermon (context only - do NOT translate, repeat or comment on it):\n" +
       prije.map(function (x) { return "Original: " + x.bs + "\nTranslation: " + x.de; }).join("\n") + "\n\n";
   }
 
@@ -1086,6 +1090,13 @@
     x = x.replace(/\s*\((note|n\.b\.|translator'?s? note|context)[^)]*\)\s*$/i, "");
     x = x.split(/\n+\s*(note|n\.b\.|explanation|translator'?s? note)\s*:/i)[0];
     x = x.replace(/^["„“”]+|["„“”]+$/g, "").trim();
+    // Sätze mit Bemerkungen über den Text entfernen / Sätze mit Bemerkungen über den Text entfernen
+    var META = /\b(segment|fragment|der satz setzt|setzt (den|die|das) vorherigen|vorherige[nrs]? (satz|segment|teil)|bezieht sich auf|im kontext|this sentence|the segment|continues the previous|ce segment|la phrase continue|ovaj segment|rečenica nastavlja)\b/i;
+    if (META.test(x)) {
+      var dijelovi = x.match(/[^.!?…]+[.!?…]*\s*/g) || [x];
+      x = dijelovi.filter(function (d) { return !META.test(d); }).join("").trim();
+      if (!x) x = "-";
+    }
     // Salavat kao znak ﷺ / Segensformel als Zeichen ﷺ
     x = x.replace(/\s*,?\s*\(?\s*(s\.?\s*a\.?\s*[wv]\.?\s*s\.?|s\.\s*a\.\s*w\.|sallallahu\s+['’]?alaihi\s+wa\s*sallam|sallallahu\s+alejhi\s+ve\s*sellem)\s*\)?\s*,?(?=\s|$)/gi, " ﷺ");
     return x;

@@ -1097,7 +1097,13 @@
       var sljedeca = red.shift();
       dodajRijec(sljedeca); pomjeri();
       if (sljedeca.novi) { tajmer = setTimeout(sljedecaRijec, 350); return; }
-      var pauza = red.length > 30 ? 70 : red.length > 14 ? 130 : red.length > 6 ? 190 : 260;
+      // Tempo prema broju rečenica koje čekaju: nikad sve odjednom, najviše ~2 rečenice kašnjenja
+      // Tempo nach Anzahl wartender Sätze: nie alles auf einmal, höchstens ~2 Sätze Rückstand
+      var cekaju = 0;
+      for (var i = 0; i < red.length; i++) if (!red[i].novi && !red[i].ar && jeKrajRecenice(red[i].t)) cekaju++;
+      if (red.length && !jeKrajRecenice(red[red.length - 1].t)) cekaju++;
+      var pauza = cekaju <= 1 ? 330 : cekaju === 2 ? 250 : cekaju === 3 ? 180 : 130;
+      if (sljedeca.ar) pauza += 400;   // arapski tekst malo duže / arabischen Text etwas länger zeigen
       tajmer = setTimeout(sljedecaRijec, pauza);
     }
     function dodajTekst(tekst, odmah, novi) {
