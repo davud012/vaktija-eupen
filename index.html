@@ -474,6 +474,45 @@
   body.lagano .vakat-ekran.svjez .valovi { display: none; }
   body.lagano .ve-ornament .crta { stroke-dasharray: none; stroke-dashoffset: 0; }
   body.lagano .vakat-ekran.vidljiv .ve-ornament .crta { animation: none; }
+
+  /* ---------- Prijevod hutbe uživo / Live-Übersetzung der Predigt ---------- */
+  .hutba-ekran {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 30; color: #fbf8f1;
+    background: linear-gradient(180deg, rgba(4, 10, 24, 0.55) 0%, rgba(4, 10, 24, 0.82) 45%, rgba(4, 10, 24, 0.92) 100%);
+    opacity: 0; visibility: hidden; transition: opacity 1.2s ease, visibility 0s linear 1.2s;
+  }
+  .hutba-ekran.vidljiv { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+  body.hutba-aktivna .overlay, body.hutba-aktivna .vakat-ekran { opacity: 0 !important; }
+  .he-vrh { position: absolute; top: 4vh; left: 4vw; right: 4vw; display: flex; align-items: center; justify-content: space-between; }
+  .he-naslov { font-size: 2.1vw; line-height: 1.3; text-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.5); }
+  .he-naslov .de { color: rgba(251, 248, 241, 0.65); font-size: 0.75em; }
+  .he-uzivo {
+    display: inline-flex; align-items: center; gap: 0.7vw; margin-right: 1.4vw; vertical-align: 0.25em;
+    font-size: 0.6em; font-weight: 700; letter-spacing: 0.12em; padding: 0.5vh 1vw; border-radius: 3vh;
+    background: rgba(229, 72, 77, 0.18); border: 0.12vw solid rgba(229, 72, 77, 0.7); color: #ff8a8d;
+  }
+  .he-uzivo i { width: 0.8vw; height: 0.8vw; border-radius: 50%; background: #e5484d; animation: he-puls 1.6s ease-in-out infinite; }
+  @keyframes he-puls { 50% { opacity: 0.25; } }
+  .he-sat { font-size: 3vw; font-weight: 300; font-variant-numeric: tabular-nums; text-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.5); }
+  .he-linije {
+    position: absolute; left: 7vw; right: 7vw; top: 16vh; bottom: 12vh;
+    display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%); mask-image: linear-gradient(180deg, transparent 0%, #000 22%);
+  }
+  .he-linija { margin-top: 3.2vh; animation: he-ulaz 0.7s cubic-bezier(.2, .8, .2, 1) both; transition: opacity 0.8s ease; }
+  .he-linija .njem { font-size: 3.5vw; line-height: 1.28; font-weight: 400; text-shadow: 0 0.3vh 1.4vh rgba(0, 0, 0, 0.55); }
+  .he-linija .ar { font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; color: #e3c27a; font-size: 1.2em; }
+  .he-linija.ceka .njem { color: rgba(251, 248, 241, 0.45); }
+  .he-linija.stara { opacity: 0.42; }
+  .he-linija.stara .njem { font-size: 2.6vw; }
+  @keyframes he-ulaz { from { opacity: 0; transform: translateY(3vh); } to { opacity: 1; transform: none; } }
+  .he-cekanje { font-size: 2.4vw; color: rgba(251, 248, 241, 0.6); text-align: center; margin-bottom: 20vh; }
+  .he-cekanje .de { font-size: 0.75em; }
+  .he-dno {
+    position: absolute; bottom: 4vh; left: 0; right: 0; text-align: center; font-size: 1.25vw; color: rgba(251, 248, 241, 0.5);
+  }
+  body.lagano .he-uzivo i { animation: none; }
+  body.lagano .he-linije { -webkit-mask-image: none; mask-image: none; }
 </style>
 </head>
 <body>
@@ -539,10 +578,21 @@
   <div class="ve-sat" id="ve-sat"></div>
 </div>
 
+<div class="hutba-ekran" id="hutba-ekran">
+  <div class="he-vrh">
+    <div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de">· Predigt – Übersetzung</span></div>
+    <div class="he-sat" id="he-sat"></div>
+  </div>
+  <div class="he-linije" id="he-linije"></div>
+  <div class="he-dno">Automatski prijevod · Automatische Übersetzung – kann Fehler enthalten</div>
+</div>
+
 <script src="vaktija.js"></script>
 <script src="nebeski-kalendar.js"></script>
 <script src="nebo.js"></script>
 <script src="prilike.js"></script>
+<script src="lib/mqtt.min.js"></script>
+<script src="prijevod-veza.js"></script>
 <script>
 (function () {
   var VAKTI = [
@@ -939,6 +989,91 @@
   }
   setInterval(function () { provjeriNovuVerziju(false); }, 5 * 60 * 1000);
 
+
+  /* ---------- Prijevod hutbe uživo (TEST) / Live-Übersetzung der Predigt (TEST) ---------- */
+  (function () {
+    var HP = P.hutbaPrijevod, ekran = $("hutba-ekran"), linije = $("he-linije");
+    var TEST = /[?&]test=hutba/.test(location.search);
+    if (!HP || !HP.ukljuceno) return;
+    var sesija = null, recenice = {}, zadnjiPuls = 0, vidljiv = false;
+
+    function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function sArapskim(t) {
+      return esc(t).replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF][\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s]*/g,
+        function (a) { return '<bdi class="ar" dir="rtl">' + a.trim() + '</bdi> '; });
+    }
+    function prikazi() {
+      var lista = Object.keys(recenice).map(function (k) { return recenice[k]; })
+        .filter(function (r, i, a) { return r.bs && r.de !== "-" && (r.gotovo || r === a[a.length - 1]); })
+        .sort(function (a, b) { return a.id - b.id; }).slice(-4);
+      if (!lista.length) {
+        linije.innerHTML = '<div class="he-cekanje">Prijevod počinje kad imam progovori …<br><span class="de">Die Übersetzung beginnt, sobald der Imam spricht …</span></div>';
+        return;
+      }
+      var postojece = {};
+      Array.prototype.forEach.call(linije.children, function (el) { if (el.dataset.id) postojece[el.dataset.id] = el; });
+      var novo = document.createDocumentFragment();
+      lista.forEach(function (r, i) {
+        var el = postojece[r.id] || document.createElement("div");
+        el.dataset.id = r.id;
+        el.className = "he-linija" + (r.gotovo ? "" : " ceka") + (i < lista.length - 2 ? " stara" : "");
+        el.innerHTML = '<div class="njem">' + (r.gotovo ? sArapskim(r.de) : "…") + '</div>';
+        novo.appendChild(el);
+      });
+      linije.innerHTML = ""; linije.appendChild(novo);
+    }
+    function pokazi() {
+      zadnjiPuls = Date.now();
+      if (vidljiv) return;
+      vidljiv = true; ekran.classList.add("vidljiv"); document.body.classList.add("hutba-aktivna");
+      prikazi();
+    }
+    function sakrij() {
+      if (!vidljiv) return;
+      vidljiv = false; ekran.classList.remove("vidljiv"); document.body.classList.remove("hutba-aktivna");
+    }
+    function novaSesija(s) {
+      if (s === sesija) return;
+      sesija = s; recenice = {}; linije.innerHTML = "";
+    }
+    function naPoruku(tema, m) {
+      if (tema === "stanje") {
+        if (!m.aktivno) { sakrij(); return; }
+        // Stara zadržana poruka (mobitel se ugasio) – ne prikazivati
+        // Alte gespeicherte Nachricht (Handy war weg) – nicht anzeigen
+        if (m.t && Math.abs(Date.now() - m.t) > 90000 && !vidljiv) return;
+        novaSesija(m.s);
+        (m.zadnje || []).forEach(function (r) { if (!recenice[r.id]) recenice[r.id] = r; });
+        pokazi(); prikazi();
+      } else if (tema === "tekst") {
+        novaSesija(m.s);
+        recenice[m.id] = m;
+        pokazi(); prikazi();
+      }
+    }
+    setInterval(function () {
+      if (vidljiv) {
+        var d = sada();
+        $("he-sat").textContent = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+        // Mobitel se ne javlja 25 s -> nazad na vaktiju / Handy meldet sich 25 s nicht -> zurück zu den Gebetszeiten
+        if (!TEST && Date.now() - zadnjiPuls > 25000) sakrij();
+      }
+    }, 1000);
+
+    if (TEST) {
+      novaSesija("test");
+      [["S kim si, takav si. Zato pazite s kim se družite, braćo i sestre.", "Sag mir, mit wem du umgehst, und ich sage dir, wer du bist. Achtet deshalb darauf, mit wem ihr eure Zeit verbringt, liebe Brüder und Schwestern."],
+       ["Poslanik, sallallahu alejhi ve sellem, je rekao da je čovjek na vjeri svog prijatelja.", "Der Prophet Muhammad (s.a.w.) sagte, dass der Mensch die Religion seines Freundes annimmt."],
+       ["Allah dželle šanuhu kaže: elif lam mim, zalikel kitabu la rejbe fih", "Allah, erhaben ist Er, sagt: (الٓمٓ – ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ · Sure Al-Baqara 2:1-2)"],
+       ["Neka nam Allah olakša da budemo dobri jedni prema drugima", ""]].forEach(function (x, i) {
+        recenice[i + 1] = { id: i + 1, bs: x[0], de: x[1], gotovo: !!x[1] };
+      });
+      pokazi(); prikazi();
+      return;
+    }
+    if (!window.PrijevodVeza || !window.mqtt) return;
+    try { PrijevodVeza.povezi(HP.kanal, { naPoruku: naPoruku }); } catch (e) { /* bez prijevoda / ohne Übersetzung */ }
+  })();
   osvjezi();
   setInterval(osvjezi, BRZINA > 1 ? 100 : 1000);
 })();

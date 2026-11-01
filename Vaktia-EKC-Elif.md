@@ -85,9 +85,20 @@ Tipps von unterwegs:
 - Kein OK-Knopf bzw. keine Bildschirmtastatur: Mausmodus der Fernbedienung ausschalten, Tastatur in den Einstellungen aktivieren (Paramètres → Préférences de l'appareil → Clavier), oder eine USB-Tastatur bzw. ein LAN-Kabel nehmen.
 - Das kleine Fenster mit „+“ unten links auf dem Box-Startbildschirm ist nur die Favoriten-Leiste und wird nicht gebraucht.
 
+## Hutba-Übersetzung live (TEST-Version, seit 1.11.2026)
+
+- Handy-Seite: **https://davud012.github.io/vaktija-eupen/hutba/**, Passwort **123** (in `vaktija.js` unter `hutbaPrijevod.lozinka` änderbar)
+- Imam drückt das Mikrofon → Fernseher wechselt automatisch zur Übersetzung. Auf dem Fernseher steht **nur Deutsch**, ohne den bosnischen Text (Wunsch des Nutzers).
+- Mikrofon wieder drücken oder Seite schließen → Fernseher geht zurück zu den Gebetszeiten (spätestens nach 25 Sekunden)
+- Übersetzung nach Sinn mit **Claude** (Modell claude-opus-5-5): Dafür einmal einen Claude-API-Schlüssel im Handy unter „Einstellungen & Test“ eintragen. Der Schlüssel bleibt nur auf dem Handy. Ohne Schlüssel wird einfach mit Google übersetzt (eher Wort für Wort).
+- Koran-Rezitation wird nicht übersetzt. Stattdessen erscheint der Vers auf Arabisch in Klammern mit der Quelle, z. B. (الٓمٓ · Sure Al-Baqara 2:1). Das passiert nur, wenn der Vers sicher erkannt wird, sonst erscheint [Rezitation auf Arabisch].
+- Verbindung Handy → Fernseher: zwei kostenlose öffentliche MQTT-Server (HiveMQ, EMQX). Kanalname steht in `vaktija.js` unter `hutbaPrijevod.kanal`.
+- Dateien: `hutba/index.html` (Handy), `prijevod-veza.js` (Verbindung), `lib/` (Bibliotheken), Anzeige in `index.html`
+- Testen ohne Imam: Handy-Seite → „Einstellungen & Test“ → Satz an den Fernseher senden. Fernseher-Vorschau: Adresse + `?test=hutba`
+- Offen: echter Test in der Moschee (Mikrofon, Hall), eventuell ein Ansteckmikrofon, später ein richtiges Passwort und eine geschützte Verbindung
+
 ## Später geplant
 
-- **Live-Übersetzung (Dolmetscher)** der Hutba von Bosnisch auf Deutsch auf dem Fernseher (vom Nutzer auf später verschoben)
 - **Neuer Takvim:** Jedes Jahr im **Dezember** die Takvim-Seiten fürs nächste Jahr fotografieren und Claude schicken. Claude trägt sie in `vaktija.js` ein und lädt sie hoch. Der Fernseher übernimmt das automatisch.
   Wichtig: Aktuell ist nur bis **31.12.2026** echt eingetragen. Der Takvim für 2027 muss also **vor Januar** kommen.
 - Gespräch mit dem **App-Entwickler** (Paket in `fuer-app-entwickler/` liegt bereit)

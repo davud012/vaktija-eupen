@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-10-31.3 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-01.1 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -56,6 +56,15 @@ var POSTAVKE = {
     hutbaLjeti: "14:00",
     hutbaZimi: "13:00",
     trajanje: 40
+  },
+
+  /* Prijevod hutbe uživo (TEST): imam otvori .../vaktija-eupen/hutba/ na mobitelu.
+     Live-Übersetzung der Predigt (TEST): Imam öffnet .../vaktija-eupen/hutba/ am Handy.
+     lozinka = Passwort für die Handy-Seite, kanal = Name der Verbindung Handy -> Fernseher */
+  hutbaPrijevod: {
+    ukljuceno: true,
+    lozinka: "123",
+    kanal: "ekc-elif-eupen-hutba-q7m4x2"
   },
 
   /* true = PRIMJER podaci (nisu službeni). Kad se unese pravi takvim -> false.
