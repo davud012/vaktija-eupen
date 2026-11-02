@@ -160,6 +160,6 @@ Tipps von unterwegs:
 - Abschalten: in vaktija.js `sutraNakonJacije: false`.
 - Kein grüner Blitz mehr beim Laden: Grundhintergrund ist jetzt dunkelblau (Grün nur noch bei Design 1).
 
-## Hintergrundmuster (2026-11-02.1)
-- Marokkanisches Muster (Vierpass mit Stern + gestufter Stern, goldene Doppellinien) als ruhiges Hintergrundmuster: `slike/uzorak-maroko.svg`.
-- Eingebunden in index.html über `body.dizajn-5.plavo::before` (Größe `9vw`, Deckkraft `0.09`, keine Animation → keine Last für die Box). Stärker sichtbar: opacity erhöhen; größer: 9vw erhöhen.
+## Hintergrundmuster (2026-11-02.2)
+- Islamisches 8-Sterne-Netz (goldene Linien, selbst gezeichnet nach Vorlage des Nutzers – Vorlage selbst hatte ein Wasserzeichen, daher nicht übernommen): `slike/uzorak-zvijezde.svg` (Script: Sternpolygone {8/3}, Radius 50, Raster 100).
+- Eingebunden in index.html über `body.dizajn-5.plavo::before`: Größe `15vw`, Deckkraft `0.2`, Verlauf per mask-image (oben schwach, unten kräftig wie in der Vorlage). Keine Animation → keine Last für die Box.
