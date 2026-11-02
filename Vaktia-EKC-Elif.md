@@ -160,6 +160,7 @@ Tipps von unterwegs:
 - Abschalten: in vaktija.js `sutraNakonJacije: false`.
 - Kein grüner Blitz mehr beim Laden: Grundhintergrund ist jetzt dunkelblau (Grün nur noch bei Design 1).
 
-## Hintergrundmuster (2026-11-02.2)
-- Islamisches 8-Sterne-Netz (goldene Linien, selbst gezeichnet nach Vorlage des Nutzers – Vorlage selbst hatte ein Wasserzeichen, daher nicht übernommen): `slike/uzorak-zvijezde.svg` (Script: Sternpolygone {8/3}, Radius 50, Raster 100).
-- Eingebunden in index.html über `body.dizajn-5.plavo::before`: Größe `15vw`, Deckkraft `0.2`, Verlauf per mask-image (oben schwach, unten kräftig wie in der Vorlage). Keine Animation → keine Last für die Box.
+## Hintergrundmuster (2026-11-02.3)
+- Islamisches Kreuz-und-Stern-Muster (goldene Linien), selbst gezeichnet nach Vorlage des Nutzers. Die Vorlagen hatten Wasserzeichen und wurden deshalb nicht übernommen.
+- Datei: `slike/uzorak-zvijezde.svg`. Erzeugt mit `fuer-app-entwickler/muster-generator.py` (Hankin-Verfahren auf Achteck-Quadrat-Raster): `python3 muster-generator.py 45 ../slike/uzorak-zvijezde.svg 1.6` (Winkel 45°, Linienstärke 1.6).
+- Eingebunden in index.html über `body.dizajn-5.plavo::before`: Größe `9vw`, Deckkraft `0.22`, Verlauf per mask-image (oben schwach, unten kräftig). Keine Animation → keine Last für die Box.
