@@ -291,6 +291,9 @@
   body.dizajn-5 { background: #061223; }
   /* Mirna plava pozadina umjesto živog neba / Ruhiger blauer Hintergrund statt lebendigem Himmel */
   body.dizajn-5.plavo { background: linear-gradient(180deg, #1a3868 0%, #142b52 45%, #0f1a30 100%); min-height: 100vh; }
+  /* Marokanski uzorak u pozadini (miran, bez animacije) / Marokkanisches Muster im Hintergrund (ruhig, ohne Animation) */
+  body.dizajn-5.plavo::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+    background: url("slike/uzorak-maroko.svg") center top / 9vw 9vw repeat; opacity: 0.09; }
   /* Stanje veze za prijevod (samo prve 2 minute) / Verbindungsstatus für die Übersetzung (nur die ersten 2 Minuten) */
   .veza-tv { position: fixed; left: 1.5vw; bottom: 1.2vh; z-index: 40; display: none; font-size: 1vw; color: rgba(251, 248, 241, 0.6); transition: opacity 2s ease; }
   .veza-tv i { display: inline-block; width: 0.7vw; height: 0.7vw; border-radius: 50%; background: #e5484d; margin-right: 0.5vw; vertical-align: middle; }
