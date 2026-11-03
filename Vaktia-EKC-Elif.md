@@ -178,3 +178,8 @@ Tipps von unterwegs:
   - Technik: Claude liefert `arabic_meanings` (für die Marker [1], [2]) und `verses[].meaning`; die Seite setzt sie hinter den arabischen Block. Bei Google wird der arabische Block zusätzlich Arabisch→Zielsprache übersetzt. Zielsprache Arabisch: keine Übersetzung dahinter.
   - Gesprochen Deutsch/Arabisch: kein arabischer Klammerblock, alles wird normal übersetzt.
   - **Segensspruch immer nur ﷺ**: auch ausgeschriebene Formen („Friede und Segen seien auf ihm“, „que la paix … soit sur lui“, „neka je mir … na njim“, صلى الله عليه وسلم) werden in ﷺ umgewandelt (Prompt + Nachbearbeitung in `ocistiIzlaz`).
+- **Update 2026-11-03.4 – falsch gehörtes Arabisch (iPhone):** Die Spracherkennung (Apple, Kroatisch/Bosnisch) schreibt Arabisch als bosnisch aussehende Wörter („mila Rahman Rahim“, „sa veselim“, „usro“).
+  - Feste Erkennung: „mila Rahman Rahim“ u. ä. → Bismillah; „Poslanik/Muhammed sa veselim / salala alej vesellem“ → ﷺ.
+  - Kurze Stücke (unter 4 Wörtern ohne Punkt) warten bis 5 s auf den nächsten Teil und werden zusammen übersetzt (vorher kamen „Usro“, „Kaže“ einzeln).
+  - Prompt-Hinweise auf typische Fehlhörungen (z. B. „usro/jusro“ nach „Allah kaže“ = 94:5-6).
+  - Gemini-Audio-Modus (hört das echte Arabisch) unterstützt jetzt auch Verse aus dem Mushaf (`verses` im Schema).

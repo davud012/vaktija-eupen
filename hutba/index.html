@@ -728,6 +728,7 @@
   /* =================== Prepoznavanje govora / Spracherkennung =================== */
   function podrzavaGovor() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
 
+  var cekaR = null, cekaTimer = null;
   function slusaj() {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     var r = new SR();
@@ -746,9 +747,22 @@
     // Skraćenice nisu kraj rečenice / Abkürzungen sind kein Satzende
     var SKRACENICE_BS = /^(s\.a\.v\.s\.|s\.a\.w\.s\.|a\.s\.|r\.a\.|d[zž]\.[sš]\.|tj\.|npr\.|br\.|sv\.|god\.|h\.)[,:]?$/i;
     function rijeciOd(tekst) { return tekst.split(/\s+/).filter(Boolean); }
+    // Kratki komadići (1-3 riječi bez tačke) čekaju sljedeći dio – sami se ne mogu dobro prevesti
+    // Kurze Stücke (1-3 Wörter ohne Punkt) warten auf den nächsten Teil – allein lassen sie sich nicht gut übersetzen
     function predaj(tekst) {
       var s1 = trenutna || novaRecenica(); trenutna = null;
-      s1.bs = tekst; s1.konacno = true; zadnjiKraj = Date.now();
+      if (cekaR) {
+        clearTimeout(cekaTimer);
+        if (s1 !== cekaR) ukloni(s1);
+        s1 = cekaR; tekst = cekaR.bs + " " + tekst; cekaR = null;
+      }
+      s1.bs = tekst; zadnjiKraj = Date.now();
+      if (rijeciOd(tekst).length < 4 && !/[.!?…]["“”»]?$/.test(tekst)) {
+        cekaR = s1; prikaziTok();
+        cekaTimer = setTimeout(function () { var x = cekaR; cekaR = null; if (x) { x.konacno = true; prevedi(x); } }, 5000);
+        return;
+      }
+      s1.konacno = true;
       prevedi(s1);
     }
     // Šalje se po mogućnosti cijela rečenica (do tačke), ne pojedinačne riječi
@@ -912,7 +926,10 @@
       generationConfig: {
         temperature: 0.2,
         responseMimeType: "application/json",
-        responseSchema: { type: "OBJECT", properties: { original: { type: "STRING" }, translation: { type: "STRING" } }, required: ["original", "translation"] }
+        responseSchema: { type: "OBJECT", properties: {
+          original: { type: "STRING" }, translation: { type: "STRING" },
+          verses: { type: "ARRAY", items: { type: "OBJECT", properties: { sura: { type: "INTEGER" }, from: { type: "INTEGER" }, to: { type: "INTEGER" }, meaning: { type: "STRING" } }, required: ["sura", "from", "to", "meaning"] } }
+        }, required: ["original", "translation", "verses"] }
       }
     };
     fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(citaj("hutba-gkljuc") || ""), {
@@ -925,6 +942,7 @@
       var j = JSON.parse(tekst);
       var orig = String(j.original || "").trim(), pr = String(j.translation || "").trim();
       if (!orig || orig === "-" || !pr || pr === "-") { ukloni(r); return; }
+      if (iz.g === "bs") pr = umetniAjete(pr, j.verses || [], ck);
       pr = ocistiIzlaz(pr);
       if (/^¶/.test(pr)) { r.p = true; pr = pr.replace(/^¶\s*/, ""); }
       r.bs = orig; r.de = pr; r.gotovo = true;
@@ -943,7 +961,9 @@
   // Häufige arabische Formeln (so wie die Spracherkennung sie schreibt) sofort in arabische Schrift – genau, ohne Raten.
   var FORMULE = [
     [/\b(e?u[zs]u\s*bil+ahi\s*mine?[\s-]*[sš]+[\s-]*[sš]?ej[tț]an[ie]?r?[\s-]*r?ra?d[zž]?im)\b/gi, "أَعُوذُ بِٱللَّٰهِ مِنَ ٱلشَّيْطَٰنِ ٱلرَّجِيمِ"],
-    [/\b(bi?smi?l+ah?i?r?[\s-]*(r?rahmani?r?[\s-]*)?r?rahim|bismil+ah)\b/gi, "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"],
+    [/\b(bi?smi?l+ah?i?r?[\s-]*(r?rahmani?r?[\s-]*)?r?rahim|bismil+ah|(bi?s+[\s-]*)?mil+[ae]h?[\s-]*(i?r[\s-]*)?r?[ae]?h?man[ie]?r?[\s-]*r?r?ah?im[ae]?)\b/gi, "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"],
+    // Salavat iza "Poslanik/Muhammed", kako ga prepoznavanje čuje (npr. "sa veselim") / Segensformel nach "Poslanik/Muhammed", wie die Erkennung sie hört
+    [/((?:poslanik|muhamme?d|resulul+ah|vjerovjesnik|alejhisselam)[a-zčćžšđ]*,?)\s+(?:s[ae]l+[ae]?\s*l+?[ae]hu\s*|s[ae]l+[ae]l+[ae]\s+|sa\s+|sala\s+)?(?:a?l[ae]j?h?i?\s*)?v[ae]\s*s[ae]l+[ie]m[a-z]*/gi, "$1 ﷺ"],
     [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
     [/\b(el|al)[\s-]*hamdu?\s*li?l+ah[ie]?\s*(rab+il[\s-]*['’]?alemin)?\b/gi, null],
     [/\b[wv][ae]s*[\s-]*s?s[ae]l[ae]tu?\s*[wv][ae]s*[\s-]*s?s[ae]l[ae]mu?\s*['’]?al[ae]\s*(r[ae]sul[iu]?l+ah[ie]?|e?[sš]+e?r[ae]f[ie]l[\s-]*enbija(i)?\s*v?e?l?[\s-]*murselin)\b/gi, null],
@@ -966,6 +986,7 @@
     var t3 = FORMULE.reduce(function (t2, f) {
       return t2.replace(f[0], function (cijelo) {
         var ar = f[1];
+        if (ar && ar.indexOf && ar.indexOf("$1") === 0) return cijelo.replace(f[0], ar);
         if (ar && typeof ar === "object") return tekstAjeta(ar, ciljKod()) || "(" + ar.rez + ")";   // ajet iz Mushafa / Vers aus dem Mushaf
         if (!ar && /s[ae]l[ae]tu?\s*[wv]/i.test(cijelo)) ar = /enbija/i.test(cijelo) ? "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ أَشْرَفِ ٱلْأَنْبِيَاءِ وَٱلْمُرْسَلِينَ" : "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ";
         if (!ar && /hamd/i.test(cijelo)) ar = /rab+il/i.test(cijelo) ? "ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ" : "ٱلْحَمْدُ لِلَّٰهِ";
@@ -996,6 +1017,7 @@
       "- ARABIC inside the Bosnian sermon: whenever the imam says something in Arabic (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum), write exactly that Arabic in ARABIC SCRIPT with vowel marks in round brackets and write its " + cilj + " translation DIRECTLY after the closing bracket - nothing in between, no words like \"that means\", no quotation marks. Example into German: \"Bismillahir-rahmanir-rahim\" -> \"(بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) Im Namen Allahs, des Allerbarmers, des Barmherzigen.\" Do not transliterate Arabic into Latin letters.",
       "- QUR'AN VERSES: when the imam recites or quotes a verse of the Qur'an in Arabic (the speech recognizer often writes the Arabic as garbled Latin letters, e.g. \"elif lam mim\", \"kul huvallahu ehad\", \"ja ejjuhellezine amenu\"), identify the verse. Do NOT write the Arabic yourself. Put the marker [Q1] at that place in \"translation\" (a second verse quotation in the same segment gets [Q2], and so on) and add an entry to \"verses\": {\"sura\": sura number, \"from\": first verse number, \"to\": last verse number, \"meaning\": the " + cilj + " translation of the meaning of the COMPLETE verse(s)}. Always give the complete verse(s): if the imam recites only part of a verse, still give that verse number and the meaning of the whole verse. The exact Arabic text, the source and your meaning are inserted automatically at the marker - do not write the meaning into \"translation\" yourself. Example: \"Allah kaže: inna ma'al usri jusra\" -> translation \"Allah sagt: [Q1]\", verses [{\"sura\": 94, \"from\": 6, \"to\": 6, \"meaning\": \"Gewiss, mit der Schwierigkeit kommt Erleichterung.\"}].",
       "- Only add a verse when you are confident which verse it is (the words match clearly, or the imam names the sura and verse). If the imam is clearly reciting Qur'an but you cannot identify the verse with confidence, write " + ci.rec + " and no entry in \"verses\" - never guess a verse. If the earlier context already shows the same verse (the recitation was split across segments), do not add it again.",
+      "- The speech recognizer only knows Bosnian/Croatian, so Arabic often comes out as Bosnian-looking words. Use the context to recognize it, e.g. \"mila Rahman Rahim\" = Bismillahir-rahmanir-rahim; \"sa veselim\" / \"salala alej vesellem\" after Poslanik = sallallahu alejhi ve sellem (ﷺ); \"usro\", \"jusro\", \"usri jusra\", \"fe inne meal usri\" after \"Allah kaže\" = fe inne me'al-usri jusra (Ash-Sharh 94:5-6); \"elham dulila\" = Elhamdulillah. Never translate such misheard words literally (e.g. never \"mit Fröhlichen\" for \"sa veselim\").",
       "- Bosnian (non-Arabic) paraphrases of a verse (\"Allah u Kur'anu kaže: ...\" followed by Bosnian words) are translated normally; do not add a verse entry for them.",
       "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\", and put the " + cilj + " translation of each block into \"arabic_meanings\" (same order). Do not write that meaning into \"translation\" - it is inserted after the marker automatically. Example: \"Draga braćo i sestre, [1].\" with [1] = ٱلْحَمْدُ لِلَّٰهِ -> translation \"Liebe Brüder und Schwestern, [1].\", arabic_meanings [\"Alles Lob gebührt Allah.\"].",
       "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, followed by ONE translation. Never split it into separate brackets and never mix Latin words into it.",
