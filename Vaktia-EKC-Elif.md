@@ -184,3 +184,6 @@ Tipps von unterwegs:
   - Prompt-Hinweise auf typische Fehlhörungen (z. B. „usro/jusro“ nach „Allah kaže“ = 94:5-6).
   - Gemini-Audio-Modus (hört das echte Arabisch) unterstützt jetzt auch Verse aus dem Mushaf (`verses` im Schema).
 - **Update 2026-11-03.5:** weitere Fehlhörungen fest erkannt: „hamdo bila“, „Alhamdulillahi Rabbil Alamin“, „a hamdo lila rabil alemin“ → الحمد لله (رب العالمين); „mila Rahim“ → Bismillah. Doppelte gleiche arabische Blöcke werden zu einem. Sinnlose Wörter neben Arabisch („Kajesu Fatih“) soll die KI weglassen statt übersetzen.
+- **Update 2026-11-03.6 – Gemini als Übersetzer, Schlüssel bleiben:**
+  - Übersetzer-Auswahl jetzt: Google (kostenlos) · Claude Haiku · Claude · **Gemini – nach Sinn, kostenlos**. Gemini nutzt denselben Schlüssel wie die Gemini-Spracherkennung (`hutba-gkljuc`, Modell `gemini-flash-latest`), gleiche Regeln/JSON-Felder wie Claude (Verse aus dem Mushaf, Arabisch + Übersetzung). Fehler → automatisch Google.
+  - Gespeicherte Schlüssel (Claude und Gemini) werden nicht mehr gelöscht, wenn man mit leerem Feld „Speichern“ drückt oder den Übersetzer wechselt; beim Zurückwechseln wird der gespeicherte Schlüssel wieder benutzt.

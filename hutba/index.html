@@ -222,6 +222,7 @@
           <option value="google" data-t="optGoogle"></option>
           <option value="claude-haiku" data-t="optHaiku"></option>
           <option value="claude" data-t="optClaude"></option>
+          <option value="gemini" data-t="optGeminiP"></option>
         </select>
         <div class="mali" id="prevodilac-info"></div>
 
@@ -288,6 +289,7 @@
       optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 5 centi po hutbi. Ajete prepoznaje slabije. Treba Claude ključ.",
       guthaben: "Na Claude računu nema više kredita – prevodi se besplatno preko Google-a. Dopunite kredit na platform.claude.com.",
       optGoogle: "Google – besplatno", optClaude: "Claude – po smislu, uz plaćanje",
+      optGeminiP: "Gemini – po smislu, besplatno", infoGeminiP: "Prevodi po smislu i prepoznaje ajete. Besplatno sa Gemini ključem iz Google AI Studija (aistudio.google.com/apikey). Ključ unesite gore kod Gemini.",
       infoGoogle: "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.",
       infoClaude: "Najbolji prijevod, prepoznaje ajete i piše cijeli ajet na arapskom sa izvorom. Treba ključ (oko 1,50–2 € po hutbi). Ako nestane kredita, automatski prelazi na Google.",
       kljuc: "Claude API ključ", kljucInfo: "Ostaje samo na ovom mobitelu.", spremi: "Spremi", spremljeno: "✓ spremljeno",
@@ -337,6 +339,7 @@
       optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 5 Cent pro Hutba. Erkennt Verse schlechter. Braucht einen Claude-Schlüssel.",
       guthaben: "Kein Guthaben mehr auf dem Claude-Konto – es wird kostenlos über Google übersetzt. Guthaben auf platform.claude.com aufladen.",
       optGoogle: "Google – kostenlos", optClaude: "Claude – nach Sinn, kostenpflichtig",
+      optGeminiP: "Gemini – nach Sinn, kostenlos", infoGeminiP: "Übersetzt nach Sinn und erkennt Koran-Verse. Kostenlos mit einem Gemini-Schlüssel von Google AI Studio (aistudio.google.com/apikey). Den Schlüssel oben bei Gemini eintragen.",
       infoGoogle: "Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.",
       infoClaude: "Beste Übersetzung, erkennt Koran-Verse und zeigt den ganzen Vers auf Arabisch mit Quelle. Braucht einen Schlüssel (ca. 1,50–2 € pro Hutba). Ist das Guthaben leer, geht es automatisch mit Google weiter.",
       kljuc: "Claude-API-Schlüssel", kljucInfo: "Bleibt nur auf diesem Handy gespeichert.", spremi: "Speichern", spremljeno: "✓ gespeichert",
@@ -386,6 +389,7 @@
       optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 5 centimes par khutba. Reconnaît moins bien les versets. Nécessite une clé Claude.",
       guthaben: "Plus de crédit sur le compte Claude – la traduction continue gratuitement via Google. Rechargez le crédit sur platform.claude.com.",
       optGoogle: "Google – gratuit", optClaude: "Claude – selon le sens, payant",
+      optGeminiP: "Gemini – selon le sens, gratuit", infoGeminiP: "Traduit selon le sens et reconnaît les versets. Gratuit avec une clé Gemini de Google AI Studio (aistudio.google.com/apikey). Saisir la clé ci-dessus, chez Gemini.",
       infoGoogle: "Gratuit, mais traduit plutôt mot à mot. Les versets du Coran ne sont pas reconnus.",
       infoClaude: "Meilleure traduction, reconnaît les versets du Coran et affiche le verset entier en arabe avec la source. Nécessite une clé (env. 1,50–2 € par khutba). Si le crédit est épuisé, la traduction continue automatiquement avec Google.",
       kljuc: "Clé API Claude", kljucInfo: "Reste uniquement sur ce téléphone.", spremi: "Enregistrer", spremljeno: "✓ enregistrée",
@@ -534,7 +538,7 @@
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
   // Standard je Claude Haiku (jednom prebaciti sa Claude) / Standard ist Claude Haiku (einmalig von Claude umstellen)
   if (!citaj("hutba-v4")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude-haiku"); pisiTiho("hutba-v4", "da"); }
-  $("prevodilac").value = /^(claude(-haiku)?|google)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
+  $("prevodilac").value = /^(claude(-haiku)?|google|gemini)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
   $("kljuc").value = citaj("hutba-kljuc") || "";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
@@ -547,7 +551,8 @@
   var G_MODEL = "gemini-flash-latest";
   $("prepoznavanje").addEventListener("change", function () { pisi("hutba-prepoznavanje", this.value); prikaziPrevodioca(); });
   $("spremi-gkljuc").addEventListener("click", function () {
-    pisi("hutba-gkljuc", $("gkljuc").value.trim() || null);
+    if ($("gkljuc").value.trim()) pisi("hutba-gkljuc", $("gkljuc").value.trim());
+    $("gkljuc").value = citaj("hutba-gkljuc") || "";
     var m = $("gmodel").value.trim(); pisi("hutba-gmodel", m && m !== G_MODEL ? m : null);
     prikaziPrevodioca();
   });
@@ -567,18 +572,21 @@
   $("prevodilac").addEventListener("change", function () { pisi("hutba-prevodilac", this.value); prikaziPrevodioca(); });
   function prikaziPrevodioca() {
     var gem = $("prepoznavanje").value === "gemini";
-    $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI);
+    $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI && $("prevodilac").value !== "gemini");
     $("prevodilac-dio").classList.toggle("skriveno", gem);
     $("prepoznavanje-info").textContent = gem ? t("infoGemini") : t("infoAuto");
     $("gkljuc-stanje").textContent = citaj("hutba-gkljuc") ? "  " + t("spremljeno") : "";
-    var pv = $("prevodilac").value, cl = pv !== "google";
+    var pv = $("prevodilac").value, cl = /^claude/.test(pv);
     $("claude-dio").classList.toggle("skriveno", !cl);
-    $("prevodilac-info").textContent = pv === "claude" ? t("infoClaude") : pv === "claude-haiku" ? t("infoHaiku") : t("infoGoogle");
+    $("prevodilac-info").textContent = pv === "claude" ? t("infoClaude") : pv === "claude-haiku" ? t("infoHaiku") : pv === "gemini" ? t("infoGeminiP") : t("infoGoogle");
     $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  " + t("spremljeno") : "";
   }
   $("spremi-kljuc").addEventListener("click", function () {
+    // Prazno polje ne briše spremljeni ključ / Leeres Feld löscht den gespeicherten Schlüssel nicht
     var v = $("kljuc").value.trim();
-    pisi("hutba-kljuc", v || null); klijent = null; prikaziPrevodioca();
+    if (v) { pisi("hutba-kljuc", v); klijent = null; }
+    $("kljuc").value = citaj("hutba-kljuc") || "";
+    prikaziPrevodioca();
   });
 
   /* ---------- Jezici prijevoda / Übersetzungssprachen ---------- */
@@ -1056,7 +1064,7 @@
   var klijent = null;
   function claude() {
     var k = citaj("hutba-kljuc");
-    if ($("prevodilac").value === "google" || !k || !window.Anthropic) return null;
+    if (!/^claude/.test($("prevodilac").value) || !k || !window.Anthropic) return null;
     if (!klijent) klijent = new Anthropic({ apiKey: k, dangerouslyAllowBrowser: true, maxRetries: 1, timeout: 30000 });
     return klijent;
   }
@@ -1072,16 +1080,17 @@
     r.de = ""; r.gotovo = false;
     prikaziTok(); posaljiRecenicu(r);
     var c = claude(), iz = izvor(), ck = ciljKod();
+    var gm = !c && $("prevodilac").value === "gemini" && citaj("hutba-gkljuc");
     if (iz.g === "bs") r.bs = arapskeFormule(r.bs);
     var posao, samoAr = samoArapski(r.bs) && (iz.g !== "bs" || ck === "ar");
-    r.put = samoAr ? "arapski" : c ? "Claude" : "Google";
+    r.put = samoAr ? "arapski" : c ? "Claude" : gm ? "Gemini" : "Google";
     if (samoAr) posao = Promise.resolve(r.bs.replace(/\s+\)/g, ")").replace(/\s*[.,;:!?]+\s*$/, ""));                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
-    else posao = c ? prevediClaude(c, r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
+    else posao = c ? prevediClaude(c, r, iz, ck) : gm ? prevediGemini(r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
     var greska = "";
     posao.catch(function (e) {
       greska = String((e && e.message) || e);
-      if (c) r.put = "Google (Claude verworfen: " + greska + ")";
-      return c ? prevediGoogle(r.bs, iz.g, ck) : "";
+      if (c || gm) r.put = "Google (" + (c ? "Claude" : "Gemini") + " verworfen: " + greska + ")";
+      return c || gm ? prevediGoogle(r.bs, iz.g, ck) : "";
     }).catch(function (e) { greska = String((e && e.message) || e); return ""; }).then(function (de) {
       de = ocistiIzlaz(de);
       if (de === "-" || de === "–") { ukloni(r); return; }
@@ -1214,6 +1223,50 @@
     return prijevod.replace(/\[Q\d+\]/g, CILJ[ck].rec);
   }
   function prevediClaude(c, r, iz, ck) {
+    return prevediModelom(r, iz, ck, function (sadrzaj) {
+      return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
+        if (e && /credit balance|billing|kredit/i.test(String(e.message || ""))) { upozori(function () { return t("guthaben"); }); throw e; }
+        if (!bezFormata && e && e.status === 400) { bezFormata = true; return zahtjevClaude(c, iz, ck, sadrzaj); }
+        throw e;
+      }).then(function (odg) {
+        if (odg.stop_reason === "refusal") throw new Error("refusal");
+        return odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
+      }).catch(function (e) {
+        if (e && (e.status === 401 || e.status === 403)) upozori(function () { return t("kljucNe"); });
+        throw e;
+      });
+    });
+  }
+  // Gemini kao prevodilac teksta (besplatni ključ) / Gemini als Text-Übersetzer (kostenloser Schlüssel)
+  var G_SHEMA = { type: "OBJECT", properties: {
+    translation: { type: "STRING" },
+    verses: { type: "ARRAY", items: { type: "OBJECT", properties: { sura: { type: "INTEGER" }, from: { type: "INTEGER" }, to: { type: "INTEGER" }, meaning: { type: "STRING" } }, required: ["sura", "from", "to", "meaning"] } },
+    arabic_meanings: { type: "ARRAY", items: { type: "STRING" } },
+    comment: { type: "STRING" }
+  }, required: ["translation", "verses", "arabic_meanings", "comment"] };
+  function prevediGemini(r, iz, ck) {
+    var model = citaj("hutba-gmodel") || G_MODEL;
+    return prevediModelom(r, iz, ck, function (sadrzaj) {
+      var primjeri = ck === "de" ? PRIMJERI_DE.map(function (m) { return { role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }; }) : [];
+      return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(citaj("hutba-gkljuc") || ""), {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: uputa(iz, ck) }] },
+          contents: primjeri.concat([{ role: "user", parts: [{ text: sadrzaj }] }]),
+          generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: G_SHEMA }
+        })
+      }).then(function (o) {
+        return o.json().then(function (d) {
+          if (!o.ok) {
+            if (o.status === 400 || o.status === 403) upozori(function () { return "<b>" + t("gNe") + "</b>" + kodHtml(esc(String((d.error && d.error.message) || o.status).slice(0, 160))); });
+            throw new Error("Gemini " + o.status);
+          }
+          return ((((d.candidates || [])[0] || {}).content || {}).parts || []).map(function (x) { return x.text || ""; }).join("").trim();
+        });
+      });
+    });
+  }
+  function prevediModelom(r, iz, ck, posalji) {
     // Arapski tekst ne ide Claudeu – zamijeni se oznakom [1], [2] i vrati tačno onakav kakav je bio
     // Arabischer Text geht nicht an Claude – er wird durch [1], [2] ersetzt und danach unverändert zurückgesetzt
     var blokovi = [], naPocetku = [];
@@ -1224,13 +1277,7 @@
     var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + seg +
       (blokovi.length ? "\n\nArabic blocks (already in Arabic script - keep the markers, translate them into arabic_meanings):\n" +
         blokovi.map(function (b, k) { return "[" + (k + 1) + "] = " + b.slice(1, -1).split(/\s+·\s+/)[0]; }).join("\n") : "");
-    return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
-      if (e && /credit balance|billing|kredit/i.test(String(e.message || ""))) { upozori(function () { return t("guthaben"); }); throw e; }
-      if (!bezFormata && e && e.status === 400) { bezFormata = true; return zahtjevClaude(c, iz, ck, sadrzaj); }
-      throw e;
-    }).then(function (odg) {
-      if (odg.stop_reason === "refusal") throw new Error("refusal");
-      var tekst = odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
+    return posalji(sadrzaj).then(function (tekst) {
       var prijevod = tekst, ajeti = [], znacenja = [];
       try { var j = JSON.parse(tekst); if (j && typeof j.translation === "string") { prijevod = j.translation; ajeti = j.verses || []; znacenja = j.arabic_meanings || []; } } catch (e2) {}
       prijevod = umetniAjete(prijevod, ajeti, ck);
@@ -1245,9 +1292,6 @@
       if (prijevod !== "-" && imaEngleskog(prijevod, ck)) throw new Error("engleski");
       if (prijevod !== "-" && imaIzvornihRijeci(prijevod, r.bs, iz, ck)) throw new Error("objasnjenje");
       return prijevod;
-    }).catch(function (e) {
-      if (e && (e.status === 401 || e.status === 403)) upozori(function () { return t("kljucNe"); });
-      throw e;
     });
   }
 
