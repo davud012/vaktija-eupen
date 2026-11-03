@@ -532,9 +532,9 @@
   function ucitajPostavkeUFormu() {
   var j0 = citaj("hutba-jezik"); if (j0) $("jezik").value = /^(hr|sr|bs)/.test(j0) ? "bs-BA" : j0;
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
-  // Od verzije 2026-11-03: standard je Claude (ne Haiku) / Ab Version 2026-11-03: Standard ist Claude (nicht Haiku)
-  if (!citaj("hutba-v3")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude"); pisiTiho("hutba-v3", "da"); }
-  $("prevodilac").value = /^(claude(-haiku)?|google)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude";
+  // Standard je Claude Haiku (jednom prebaciti sa Claude) / Standard ist Claude Haiku (einmalig von Claude umstellen)
+  if (!citaj("hutba-v4")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude-haiku"); pisiTiho("hutba-v4", "da"); }
+  $("prevodilac").value = /^(claude(-haiku)?|google)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
   $("kljuc").value = citaj("hutba-kljuc") || "";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
