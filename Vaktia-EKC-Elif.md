@@ -164,3 +164,11 @@ Tipps von unterwegs:
 - Sechseck-Stern-Muster (6-zackige Sterne mit Sechsecken, goldene Linien), selbst gezeichnet nach Vorlage des Nutzers. Die Vorlagen hatten Wasserzeichen und wurden deshalb nicht übernommen.
 - Datei: `slike/uzorak-zvijezde.svg`. Erzeugt mit `fuer-app-entwickler/muster-generator.py` (Hankin-Verfahren auf Sechseck-Raster): `python3 muster-generator.py 30 ../slike/uzorak-zvijezde.svg 1.3` (Winkel 30°, Linienstärke 1.3).
 - Eingebunden in index.html über `body.dizajn-5.plavo::before`: Größe `5.5vw 9.526vw` (Seitenverhältnis der Kachel 1:√3), Deckkraft `0.12`, Verlauf per mask-image (oben schwach, unten kräftiger). Keine Animation → keine Last für die Box.
+
+## Hutba-Übersetzung: Claude statt Haiku, kein Passwort-Abgleich, Koran-Verse aus dem Mushaf (2026-11-03.1)
+- **Standard-Übersetzer ist jetzt „Claude“** (claude-opus-5-5, effort low). Haiku bleibt wählbar. Geräte, die Haiku eingestellt hatten, werden einmalig auf Claude umgestellt (Merker `hutba-v3`).
+  - Kosten grob: Claude ca. 1,50–2 $ pro 30-Min-Hutba, Haiku ca. 5 Cent.
+  - Kein Guthaben mehr (Fehler „credit balance“) → Hinweis am Handy, Übersetzung läuft automatisch über Google weiter.
+- **„Passwort & alle Geräte“ entfernt**: kein verschlüsselter Einstellungs-Abgleich mehr. Anmeldung nur noch mit dem Passwort aus `vaktija.js` (`hutbaPrijevod.lozinka`). Schlüssel bleiben nur auf dem jeweiligen Gerät. Das Handy löscht das alte Paket vom Server (`postavke`), der Fernseher speichert/veröffentlicht es nicht mehr.
+- **Koran-Verse**: Claude liefert nur Sure + Versnummern (JSON-Feld `verses`, Marker `[Q1]` im Text). Der arabische Text wird **exakt aus `hutba/kuran.js`** eingesetzt (Uthmani-Text aus quran-json 3.1.2 / quranenc.com, Lizenz CC BY-SA 4.0 → `hutba/KURAN-LICENCA.txt`), nie von der KI geschrieben. Immer ganze Verse, mehrere Verse mit ﴿٥﴾-Zeichen, Quelle z. B. „Sure Ash-Sharh 94:5-6“. Unsicher → „[Rezitation auf Arabisch]“. Ungültige Sure/Vers wird verworfen.
+- Die festen Formeln 33:70 und 3:102 kommen jetzt auch aus dem Mushaf.

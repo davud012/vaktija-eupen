@@ -234,13 +234,6 @@
         </div>
         </div>
 
-        <label for="nova-lozinka" style="margin-top:22px" data-t="sinNaslov"></label>
-        <div class="mali" data-t="sinInfo"></div>
-        <input id="nova-lozinka" type="password" autocomplete="new-password">
-        <input id="nova-lozinka2" type="password" autocomplete="new-password">
-        <button class="dugme sporedno" id="spremi-lozinku" type="button" data-t="sinDugme"></button>
-        <div class="mali" id="sin-stanje"></div>
-
         <label style="margin-top:22px" data-t="probaNaslov"></label>
         <div class="mali" data-t="probaInfo"></div>
         <button class="dugme sporedno" id="proba-dugme" type="button" data-t="probaDugme"></button>
@@ -260,6 +253,7 @@
 <script src="../prijevod-veza.js"></script>
 <script src="../lib/anthropic.min.js"></script>
 <script src="proba-hutba.js"></script>
+<script src="kuran.js" async></script>
 <script>
 (function () {
   "use strict";
@@ -270,11 +264,8 @@
   function $(id) { return document.getElementById(id); }
   function citaj(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function pisiTiho(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
-  // Ove postavke idu na sve uređaje / Diese Einstellungen gehen auf alle Geräte
-  var SIN_KLJUCEVI = ["hutba-jezik", "hutba-cilj", "hutba-prevodilac", "hutba-kljuc", "hutba-prepoznavanje", "hutba-gkljuc", "hutba-gmodel"];
   function pisi(k, v) {
     pisiTiho(k, v);
-    if (SIN_KLJUCEVI.indexOf(k) >= 0 && window.__promjena) window.__promjena();
   }
 
   /* =================== Tekstovi / Texte / Textes =================== */
@@ -294,10 +285,11 @@
       u5: "Kad preglednik pita za mikrofon, izaberite <b>Dozvoli</b> (ako postoji: „pri svakoj posjeti“, ne „samo ovaj put“).",
       tokNaslov: "Prijevod", prazno: "Još ništa",
       postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac",
-      optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 1–2 centa po hutbi. Treba Claude ključ.",
+      optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 5 centi po hutbi. Ajete prepoznaje slabije. Treba Claude ključ.",
+      guthaben: "Na Claude računu nema više kredita – prevodi se besplatno preko Google-a. Dopunite kredit na platform.claude.com.",
       optGoogle: "Google – besplatno", optClaude: "Claude – po smislu, uz plaćanje",
       infoGoogle: "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.",
-      infoClaude: "Prevodi po smislu i prepoznaje ajete iz Kur'ana. Treba ključ (oko 0,50 € po hutbi).",
+      infoClaude: "Najbolji prijevod, prepoznaje ajete i piše cijeli ajet na arapskom sa izvorom. Treba ključ (oko 1,50–2 € po hutbi). Ako nestane kredita, automatski prelazi na Google.",
       kljuc: "Claude API ključ", kljucInfo: "Ostaje samo na ovom mobitelu.", spremi: "Spremi", spremljeno: "✓ spremljeno",
       odjava: "Odjava i brisanje", odjavaInfo: "Briše sve izgovoreno i prevedeno – na mobitelu, na TV-u i na serveru.",
       odjavaPitanje: "Odjaviti se i obrisati sve izgovoreno?",
@@ -325,11 +317,6 @@
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
       gNe: "Gemini greška", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
       probaNaslov: "Probna hutba", probaInfo: "Pošalje probnu hutbu (oko 300 riječi) kroz pravi prijevod – kao da je izgovorena. Na kraju se pojavi izvještaj koji možete kopirati.", probaDugme: "Pokreni probnu hutbu", probaKopiraj: "Kopiraj izvještaj", probaKopirano: "✓ Kopirano",
-      sinNaslov: "Lozinka i svi uređaji", sinInfo: "Sa ovom lozinkom svaki mobitel ili računar automatski dobije iste postavke (i ključeve). Najmanje 8 znakova. Postavke se šalju šifrovane.",
-      novaLozinka: "Nova lozinka", ponoviLozinku: "Ponovi lozinku", sinDugme: "Spremi i prenesi na sve uređaje",
-      sinKratka: "Lozinka mora imati najmanje 8 znakova.", sinRazlicite: "Lozinke nisu iste.",
-      sinOk: "✓ Postavke se usklađuju na svim uređajima", sinNe: "Još nije uključeno – postavke vrijede samo na ovom uređaju.",
-      sinPromijenjena: "Lozinka je promijenjena na drugom uređaju – prijavite se ponovo.", provjera: "Provjeravam …",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
     },
     de: {
@@ -347,10 +334,11 @@
       u5: "Wenn der Browser nach dem Mikrofon fragt, <b>Zulassen</b> wählen (falls angeboten: „bei jedem Besuch“, nicht „nur dieses Mal“).",
       tokNaslov: "Übersetzung", prazno: "Noch nichts",
       postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer",
-      optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 1–2 Cent pro Hutba. Braucht einen Claude-Schlüssel.",
+      optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 5 Cent pro Hutba. Erkennt Verse schlechter. Braucht einen Claude-Schlüssel.",
+      guthaben: "Kein Guthaben mehr auf dem Claude-Konto – es wird kostenlos über Google übersetzt. Guthaben auf platform.claude.com aufladen.",
       optGoogle: "Google – kostenlos", optClaude: "Claude – nach Sinn, kostenpflichtig",
       infoGoogle: "Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.",
-      infoClaude: "Übersetzt nach Sinn und erkennt Koran-Verse. Braucht einen Schlüssel (ca. 0,50 € pro Hutba).",
+      infoClaude: "Beste Übersetzung, erkennt Koran-Verse und zeigt den ganzen Vers auf Arabisch mit Quelle. Braucht einen Schlüssel (ca. 1,50–2 € pro Hutba). Ist das Guthaben leer, geht es automatisch mit Google weiter.",
       kljuc: "Claude-API-Schlüssel", kljucInfo: "Bleibt nur auf diesem Handy gespeichert.", spremi: "Speichern", spremljeno: "✓ gespeichert",
       odjava: "Abmelden & alles löschen", odjavaInfo: "Löscht alles Gesagte und Übersetzte – am Handy, am Fernseher und auf dem Server.",
       odjavaPitanje: "Abmelden und alles Gesagte löschen?",
@@ -378,11 +366,6 @@
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
       gNe: "Gemini-Fehler", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
       probaNaslov: "Probe-Hutba", probaInfo: "Schickt eine Probe-Hutba (ca. 300 Wörter) durch die echte Übersetzung – als wäre sie gesprochen. Am Ende erscheint ein Bericht zum Kopieren.", probaDugme: "Probe-Hutba starten", probaKopiraj: "Bericht kopieren", probaKopirano: "✓ Kopiert",
-      sinNaslov: "Passwort & alle Geräte", sinInfo: "Mit diesem Passwort bekommt jedes Handy oder jeder PC automatisch dieselben Einstellungen (auch die Schlüssel). Mindestens 8 Zeichen. Die Einstellungen werden verschlüsselt übertragen.",
-      novaLozinka: "Neues Passwort", ponoviLozinku: "Passwort wiederholen", sinDugme: "Speichern & auf alle Geräte übertragen",
-      sinKratka: "Das Passwort braucht mindestens 8 Zeichen.", sinRazlicite: "Die Passwörter sind nicht gleich.",
-      sinOk: "✓ Einstellungen werden auf allen Geräten abgeglichen", sinNe: "Noch nicht eingerichtet – Einstellungen gelten nur auf diesem Gerät.",
-      sinPromijenjena: "Das Passwort wurde auf einem anderen Gerät geändert – bitte neu anmelden.", provjera: "Prüfe …",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
     },
     fr: {
@@ -400,10 +383,11 @@
       u5: "Quand le navigateur demande le micro, choisissez <b>Autoriser</b> (si proposé : « à chaque visite », pas « cette fois seulement »).",
       tokNaslov: "Traduction", prazno: "Rien pour l'instant",
       postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur",
-      optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 1–2 centimes par khutba. Nécessite une clé Claude.",
+      optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 5 centimes par khutba. Reconnaît moins bien les versets. Nécessite une clé Claude.",
+      guthaben: "Plus de crédit sur le compte Claude – la traduction continue gratuitement via Google. Rechargez le crédit sur platform.claude.com.",
       optGoogle: "Google – gratuit", optClaude: "Claude – selon le sens, payant",
       infoGoogle: "Gratuit, mais traduit plutôt mot à mot. Les versets du Coran ne sont pas reconnus.",
-      infoClaude: "Traduit selon le sens et reconnaît les versets du Coran. Nécessite une clé (env. 0,50 € par khutba).",
+      infoClaude: "Meilleure traduction, reconnaît les versets du Coran et affiche le verset entier en arabe avec la source. Nécessite une clé (env. 1,50–2 € par khutba). Si le crédit est épuisé, la traduction continue automatiquement avec Google.",
       kljuc: "Clé API Claude", kljucInfo: "Reste uniquement sur ce téléphone.", spremi: "Enregistrer", spremljeno: "✓ enregistrée",
       odjava: "Se déconnecter et tout effacer", odjavaInfo: "Efface tout ce qui a été dit et traduit – sur le téléphone, la TV et le serveur.",
       odjavaPitanje: "Se déconnecter et tout effacer ?",
@@ -431,11 +415,6 @@
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
       gNe: "Erreur Gemini", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
       probaNaslov: "Khutba d'essai", probaInfo: "Envoie une khutba d'essai (env. 300 mots) dans la vraie traduction – comme si elle était prononcée. À la fin, un rapport à copier apparaît.", probaDugme: "Lancer la khutba d'essai", probaKopiraj: "Copier le rapport", probaKopirano: "✓ Copié",
-      sinNaslov: "Mot de passe et tous les appareils", sinInfo: "Avec ce mot de passe, chaque téléphone ou ordinateur reçoit automatiquement les mêmes paramètres (y compris les clés). Au moins 8 caractères. Les paramètres sont transmis chiffrés.",
-      novaLozinka: "Nouveau mot de passe", ponoviLozinku: "Répéter le mot de passe", sinDugme: "Enregistrer et transférer sur tous les appareils",
-      sinKratka: "Le mot de passe doit comporter au moins 8 caractères.", sinRazlicite: "Les mots de passe ne sont pas identiques.",
-      sinOk: "✓ Paramètres synchronisés sur tous les appareils", sinNe: "Pas encore configuré – les paramètres ne valent que sur cet appareil.",
-      sinPromijenjena: "Le mot de passe a été changé sur un autre appareil – veuillez vous reconnecter.", provjera: "Vérification …",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
     }
   };
@@ -452,8 +431,6 @@
     document.title = t("naslov");
     Array.prototype.forEach.call(document.querySelectorAll("[data-t]"), function (el) { el.innerHTML = t(el.getAttribute("data-t")); });
     $("lozinka").placeholder = t("lozinka");
-    $("nova-lozinka").placeholder = t("novaLozinka"); $("nova-lozinka2").placeholder = t("ponoviLozinku");
-    prikaziSinhronizaciju();
     Array.prototype.forEach.call(document.querySelectorAll(".jezici"), function (k) {
       k.innerHTML = ["de", "bs", "fr"].map(function (j) {
         return '<button type="button" data-j="' + j + '" class="' + (j === JEZIK ? "aktivan" : "") + '">' + j.toUpperCase() + '</button>';
@@ -505,86 +482,12 @@
     $("glavno").classList.remove("skriveno");
     pokreni();
   }
-  /* ---------- Šifrovane postavke za sve uređaje / Verschlüsselte Einstellungen für alle Geräte ---------- */
-  var paketPostavki = null, startStranice = Date.now(), sinTimer = null;
-  function b64(buf) { var b = new Uint8Array(buf), s2 = ""; for (var i = 0; i < b.length; i++) s2 += String.fromCharCode(b[i]); return btoa(s2); }
-  function izB64(x) { var s2 = atob(x), b = new Uint8Array(s2.length); for (var i = 0; i < s2.length; i++) b[i] = s2.charCodeAt(i); return b; }
-  function kljucIz(lozinka, sol) {
-    return crypto.subtle.importKey("raw", new TextEncoder().encode(lozinka), "PBKDF2", false, ["deriveKey"]).then(function (k) {
-      return crypto.subtle.deriveKey({ name: "PBKDF2", salt: sol, iterations: 150000, hash: "SHA-256" }, k, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
-    });
-  }
-  function sifruj(podaci, lozinka) {
-    var sol = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
-    return kljucIz(lozinka, sol).then(function (k) {
-      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, k, new TextEncoder().encode(JSON.stringify(podaci)));
-    }).then(function (ct) { return { v: 1, t: Date.now(), sol: b64(sol), iv: b64(iv), ct: b64(ct) }; });
-  }
-  function desifruj(paket, lozinka) {
-    return kljucIz(lozinka, izB64(paket.sol)).then(function (k) {
-      return crypto.subtle.decrypt({ name: "AES-GCM", iv: izB64(paket.iv) }, k, izB64(paket.ct));
-    }).then(function (pt) { return JSON.parse(new TextDecoder().decode(pt)); });
-  }
-  function sakupiPostavke() { var o = {}; SIN_KLJUCEVI.forEach(function (k) { o[k] = citaj(k); }); return o; }
-  function primijeniPostavke(o) {
-    SIN_KLJUCEVI.forEach(function (k) { if (k in o) pisiTiho(k, o[k]); });
-    ucitajPostavkeUFormu();
-  }
-  function objaviPostavke() {
-    var lz = citaj("hutba-sin-lozinka");
-    if (!lz || !veza || !window.crypto || !crypto.subtle) return;
-    sifruj(sakupiPostavke(), lz).then(function (pk) {
-      paketPostavki = pk; pisiTiho("hutba-sin-t", String(pk.t));
-      veza.posalji("postavke", pk, true);
-      prikaziSinhronizaciju();
-    });
-  }
-  window.__promjena = function () { clearTimeout(sinTimer); sinTimer = setTimeout(objaviPostavke, 1200); };
-  function naPaket(pk) {
-    if (!pk || !pk.ct) return;
-    if (paketPostavki && paketPostavki.t >= pk.t) return;
-    paketPostavki = pk;
-    var lz = citaj("hutba-sin-lozinka");
-    if (!lz || citaj("hutba-prijava") !== "da") return;
-    if (Number(citaj("hutba-sin-t") || 0) >= pk.t) return;
-    desifruj(pk, lz).then(function (o) {
-      primijeniPostavke(o); pisiTiho("hutba-sin-t", String(pk.t)); prikaziSinhronizaciju();
-    }, function () {
-      // Lozinka promijenjena negdje drugo / Passwort woanders geändert
-      pisiTiho("hutba-prijava", null); pisiTiho("hutba-sin-lozinka", null);
-      alert(t("sinPromijenjena")); location.reload();
-    });
-  }
-  function prikaziSinhronizaciju() {
-    var el = $("sin-stanje"); if (!el) return;
-    el.textContent = citaj("hutba-sin-lozinka") ? t("sinOk") : t("sinNe");
-  }
-  $("spremi-lozinku").addEventListener("click", function () {
-    var a1 = $("nova-lozinka").value, a2 = $("nova-lozinka2").value;
-    if (a1.length < 8) { $("sin-stanje").textContent = t("sinKratka"); return; }
-    if (a1 !== a2) { $("sin-stanje").textContent = t("sinRazlicite"); return; }
-    pisiTiho("hutba-sin-lozinka", a1); pisiTiho("hutba-prijava", "da");
-    $("nova-lozinka").value = $("nova-lozinka2").value = "";
-    objaviPostavke();
-  });
-
-  // Prijava: ako postoje šifrovane postavke, vrijedi samo njihova lozinka; inače početna lozinka
-  // Anmeldung: gibt es verschlüsselte Einstellungen, gilt nur deren Passwort; sonst das Start-Passwort
+  // Prijava samo sa lozinkom iz vaktija.js / Anmeldung nur mit dem Passwort aus vaktija.js
   $("forma-lozinke").addEventListener("submit", function (e) {
     e.preventDefault();
-    var lz = $("lozinka").value.trim();
-    function provjeri() {
-      if (!paketPostavki && Date.now() - startStranice < 4000) { $("greska-lozinke").textContent = t("provjera"); setTimeout(provjeri, 400); return; }
-      if (paketPostavki) {
-        desifruj(paketPostavki, lz).then(function (o) {
-          pisiTiho("hutba-sin-lozinka", lz); pisiTiho("hutba-prijava", "da"); pisiTiho("hutba-sin-t", String(paketPostavki.t));
-          primijeniPostavke(o); $("greska-lozinke").textContent = ""; otvori();
-        }, function () { $("greska-lozinke").textContent = t("pogresna"); $("lozinka").select(); });
-      } else if (lz === LOZINKA) {
-        pisiTiho("hutba-prijava", "da"); $("greska-lozinke").textContent = ""; otvori();
-      } else { $("greska-lozinke").textContent = t("pogresna"); $("lozinka").select(); }
-    }
-    provjeri();
+    if ($("lozinka").value.trim() === LOZINKA) {
+      pisiTiho("hutba-prijava", "da"); $("greska-lozinke").textContent = ""; otvori();
+    } else { $("greska-lozinke").textContent = t("pogresna"); $("lozinka").select(); }
   });
   $("odjava").addEventListener("click", function () {
     if (!confirm(t("odjavaPitanje"))) return;
@@ -592,9 +495,6 @@
     recenice = []; prikaziTok();
     // I na serveru ništa ne ostaje / Auch auf dem Server bleibt nichts
     if (veza) veza.obrisiZadrzano("stanje");
-    // Ako su postavke na svim uređajima, ključevi se brišu i s ovog uređaja (vraćaju se nakon prijave)
-    // Wenn Einstellungen auf allen Geräten liegen, werden die Schlüssel auch hier gelöscht (kommen nach Anmeldung zurück)
-    if (citaj("hutba-sin-lozinka")) { pisiTiho("hutba-kljuc", null); pisiTiho("hutba-gkljuc", null); pisiTiho("hutba-sin-lozinka", null); pisiTiho("hutba-sin-t", null); }
     pisiTiho("hutba-prijava", null);
     setTimeout(function () { location.reload(); }, 700);
   });
@@ -610,10 +510,12 @@
     if (veza) return;
     veza = PrijevodVeza.povezi(KANAL, {
       volja: { aktivno: false, razlog: "veza" },
-      teme: ["postavke"],
-      naPoruku: function (tema, m) { if (tema === "postavke") naPaket(m); },
       naStanjeVeze: function (n) { brojVeza = n; prikaziVezu(); },
-      naPovezivanje: function () { if (aktivno) posaljiStanje(); }
+      naPovezivanje: function () {
+        // Stari šifrovani paket postavki obrisati sa servera / Altes verschlüsseltes Einstellungspaket vom Server löschen
+        setTimeout(function () { if (veza) veza.obrisiZadrzano("postavke"); }, 1500);
+        if (aktivno) posaljiStanje();
+      }
     });
   }
   function pokreni() {
@@ -630,7 +532,9 @@
   function ucitajPostavkeUFormu() {
   var j0 = citaj("hutba-jezik"); if (j0) $("jezik").value = /^(hr|sr|bs)/.test(j0) ? "bs-BA" : j0;
   var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
-  $("prevodilac").value = /^claude(-haiku)?$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "google";
+  // Od verzije 2026-11-03: standard je Claude (ne Haiku) / Ab Version 2026-11-03: Standard ist Claude (nicht Haiku)
+  if (!citaj("hutba-v3")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude"); pisiTiho("hutba-v3", "da"); }
+  $("prevodilac").value = /^(claude(-haiku)?|google)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude";
   $("kljuc").value = citaj("hutba-kljuc") || "";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
@@ -1043,8 +947,8 @@
     [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
     [/\b(el|al)[\s-]*hamdu?\s*li?l+ah[ie]?\s*(rab+il[\s-]*['’]?alemin)?\b/gi, null],
     [/\b[wv][ae]s*[\s-]*s?s[ae]l[ae]tu?\s*[wv][ae]s*[\s-]*s?s[ae]l[ae]mu?\s*['’]?al[ae]\s*(r[ae]sul[iu]?l+ah[ie]?|e?[sš]+e?r[ae]f[ie]l[\s-]*enbija(i)?\s*v?e?l?[\s-]*murselin)\b/gi, null],
-    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*v[ae]\s*k[uo]l[uo]\s*kavl[ae]n\s*sedid[ae]n?\b/gi, "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ وَقُولُوا قَوْلًا سَدِيدًا · Sure Al-Ahzab 33:70"],
-    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*hak+a\s*t[uo]k[ae]tihi\s*v[ae]\s*la\s*t[ae]m[uo]t[uo]n+[ae]\s*il+a\s*v[ae]\s*en(t|d)[uo]m\s*m[uo]slim[uo]n\b/gi, "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ · Sure Al-Imran 3:102"],
+    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*v[ae]\s*k[uo]l[uo]\s*kavl[ae]n\s*sedid[ae]n?\b/gi, { sura: 33, from: 70, to: 70, rez: "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ وَقُولُوا قَوْلًا سَدِيدًا · Sure Al-Ahzab 33:70" }],
+    [/\bja\s*e[jy]+u?h?[ae]l+[ae]?\s*zin[ae]?\s*amen[uo]\s*it+[ae]k[uo]l+ah[ae]?\s*hak+a\s*t[uo]k[ae]tihi\s*v[ae]\s*la\s*t[ae]m[uo]t[uo]n+[ae]\s*il+a\s*v[ae]\s*en(t|d)[uo]m\s*m[uo]slim[uo]n\b/gi, { sura: 3, from: 102, to: 102, rez: "يَا أَيُّهَا ٱلَّذِينَ آمَنُوا ٱتَّقُوا ٱللَّهَ حَقَّ تُقَاتِهِ وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ · Sure Al-Imran 3:102" }],
     [/\bv[ae]\s*a?h[iu]r[ue]?\s*d[ae]['’]?v[ae]\s*n[ae]\s*e?n[ie]?l?[\s-]*hamd[uo]\s*li?l+ah[ie]?\s*rab+il[\s-]*['’]?alemin\b/gi, "وَآخِرُ دَعْوَانَا أَنِ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَالَمِينَ"],
     [/\ballahum+[ae]\s*ja\s*m[uo]k[ae]l+ib[ae]l[\s-]*k[uo]l[uo]bi?\s*s[ae]b+it\s*k[uo]l[uo]b[ae]na\s*['’]?al[ae]\s*din[ie]k[ae]?\b/gi, "ٱللَّهُمَّ يَا مُقَلِّبَ ٱلْقُلُوبِ ثَبِّتْ قُلُوبَنَا عَلَىٰ دِينِكَ"],
     [/\ballahu\s*[ae]['’]?\s*l[ae]m\b/gi, "ٱللَّهُ أَعْلَمُ"],
@@ -1062,6 +966,7 @@
     var t3 = FORMULE.reduce(function (t2, f) {
       return t2.replace(f[0], function (cijelo) {
         var ar = f[1];
+        if (ar && typeof ar === "object") return tekstAjeta(ar, ciljKod()) || "(" + ar.rez + ")";   // ajet iz Mushafa / Vers aus dem Mushaf
         if (!ar && /s[ae]l[ae]tu?\s*[wv]/i.test(cijelo)) ar = /enbija/i.test(cijelo) ? "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ أَشْرَفِ ٱلْأَنْبِيَاءِ وَٱلْمُرْسَلِينَ" : "وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ";
         if (!ar && /hamd/i.test(cijelo)) ar = /rab+il/i.test(cijelo) ? "ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ" : "ٱلْحَمْدُ لِلَّٰهِ";
         if (!ar) ar = /berekat/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ وَبَرَكَاتُهُ" : /rahmet/i.test(cijelo) ? "ٱلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّٰهِ" : "ٱلسَّلَامُ عَلَيْكُمْ";
@@ -1100,8 +1005,9 @@
       "- Bosnian words that are easily mistranslated: \"recite\" / \"recite ljudima\" is the imperative of reći = \"sagt\" (\"I recite ljudima lijepe riječi\" -> \"Und sagt zu den Menschen schöne Worte\"), NOT \"rezitieren\"; \"učiti\" (Kur'an) = rezitieren; \"Hvala Allahu, Gospodaru svjetova\" -> \"Alles Lob gebührt Allah, dem Herrn der Welten\"; \"salavat i selam na našeg Poslanika\" -> \"Segen und Frieden auf unseren Propheten ﷺ\"; \"draga braćo i sestre\" -> \"liebe Brüder und Schwestern\".",
       "- Religious terms (German shown as the model; for other languages use the usual term Muslims use in that language): Allah stays \"Allah\". Poslanik / Muhammed -> \"der Prophet Muhammad ﷺ\". Kur'an -> Koran, ajet -> Vers, sura -> Sure, hadis -> Hadith, namaz -> Gebet, džuma -> Freitagsgebet, hutba -> Predigt, dova -> Bittgebet, sevap -> Belohnung (bei Allah), grijeh -> Sünde, Džennet -> Paradies, Džehennem -> Hölle, Ramazan -> Ramadan, Bajram -> Bayram, ummet -> Umma, iman -> Glaube, takva -> Gottesfurcht, sadaka -> Spende (Sadaqa), zekat -> Zakat, ahiret -> Jenseits, brat/sestra (address) -> Bruder/Schwester.",
       "- Whenever the imam says something in ARABIC (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, or anything else in Arabic), write exactly that in ARABIC SCRIPT with vowel marks in round brackets, e.g. (بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) or (ٱلْحَمْدُ لِلَّٰهِ). Do not transliterate Arabic into Latin letters and do not translate it - the imam explains it himself.",
-      "- Qur'an recitation in Arabic: the speech recognizer may write Arabic as garbled Latin letters (e.g. \"elif lam mim\", \"bismilahir rahmanir rahim\", \"kul huvallahu ehad\"). Do NOT translate recited verses - the imam explains them himself. Instead identify the verse and write it in Arabic script in round brackets, with the source before the closing bracket: (Arabic text · " + ci.sura + " <name> <sura number>:<verse number>). Example: \"elif lam mim\" -> (الٓمٓ · " + ci.sura + " Al-Baqara 2:1). Several verses: (Arabic text · " + ci.sura + " Al-Ikhlas 112:1-4). Use the exact Qur'an wording of the standard Mushaf with vowel marks, but leave out verse-end symbols and pause marks (۝ ۛ ۚ ۖ etc.); separate verses with \" – \". Never write Arabic you are not sure of. The speech around the recitation is translated normally.",
-      "- Only do this when you are confident which verse it is (the fragment matches clearly, or the imam names the sura). If you cannot identify it with confidence, write: " + ci.rec + " - never guess a verse.",
+      "- QUR'AN VERSES: when the imam recites or quotes a verse of the Qur'an in Arabic (the speech recognizer often writes the Arabic as garbled Latin letters, e.g. \"elif lam mim\", \"kul huvallahu ehad\", \"ja ejjuhellezine amenu\"), identify the verse. Do NOT write the Arabic yourself and do NOT translate the recited Arabic - the imam explains it himself. Instead put the marker [Q1] at that place in \"translation\" (a second verse quotation in the same segment gets [Q2], and so on) and add an entry to \"verses\": {\"sura\": sura number, \"from\": first verse number, \"to\": last verse number}. Always give the COMPLETE verse(s): if the imam recites only part of a verse, still give that verse number. The exact Arabic text and the source are inserted automatically from the Mushaf. Example: \"Allah kaže: inna ma'al usri jusra\" -> translation \"Allah sagt: [Q1]\", verses [{\"sura\": 94, \"from\": 6, \"to\": 6}].",
+      "- Only add a verse when you are confident which verse it is (the words match clearly, or the imam names the sura and verse). If the imam is clearly reciting Qur'an but you cannot identify the verse with confidence, write " + ci.rec + " and no entry in \"verses\" - never guess a verse. If the earlier context already shows the same verse (the recitation was split across segments), do not add it again.",
+      "- Bosnian (non-Arabic) paraphrases of a verse (\"Allah u Kur'anu kaže: ...\" followed by Bosnian words) are translated normally; do not add a verse entry for them.",
       "- Markers like [1] or [2] in the segment stand for Arabic text that is shown separately. Keep every marker exactly once, unchanged, at the matching place in your translation. Example: \"Draga braćo i sestre, [1].\" -> \"Liebe Brüder und Schwestern, [1].\"",
       "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, written right-to-left in Arabic script. Example: \"Elhamdulillah, ves-salatu ves-selamu ala resulillah\" -> (ٱلْحَمْدُ لِلَّٰهِ وَٱلصَّلَاةُ وَٱلسَّلَامُ عَلَىٰ رَسُولِ ٱللَّٰهِ). Never split it into separate brackets and never mix Latin words into it.",
       "- For a hadith or dua in Arabic: write the Arabic wording you heard; if you cannot make out the Arabic words at all, write " + ci.ar + ".",
@@ -1112,7 +1018,7 @@
       "- Sentences: every sentence ends with proper punctuation (. ? !). When the imam speaks fast and runs several sentences together without a pause, still split them into separate, complete sentences - never glue different statements into one long sentence. If the segment stops in the middle of a sentence, end it without a full stop.",
       "- Paragraphs for the reader: if the new segment clearly begins a new thought or a new part of the sermon (a new topic, a new story, a new hadith or verse, a new address like \"Draga braćo i sestre\", the closing dua), start your output with the character ¶ followed by a space. Otherwise do not use ¶.",
       "",
-      "OUTPUT FORMAT: a JSON object with two fields. \"translation\": only the words that appear on the TV - the " + cilj + " translation of the NEW segment, nothing else, never English. \"comment\": put any note, doubt, explanation or remark here (it is never shown). If the new segment contains nothing meaningful (noise, a single filler word), set \"translation\" to \"-\"."
+      "OUTPUT FORMAT: a JSON object with three fields. \"translation\": only the words that appear on the TV - the " + cilj + " translation of the NEW segment, with [Q1], [Q2] markers for Qur'an verses, nothing else, never English. \"verses\": the identified Qur'an verses in marker order (empty list if none). \"comment\": put any note, doubt, explanation or remark here (it is never shown). If the new segment contains nothing meaningful (noise, a single filler word), set \"translation\" to \"-\"."
     ].join("\n");
   }
 
@@ -1187,16 +1093,24 @@
     schema: {
       type: "object",
       properties: {
-        translation: { type: "string", description: "Only the translated words for the TV screen" },
+        translation: { type: "string", description: "Only the translated words for the TV screen, with [Q1], [Q2] markers for Qur'an verses" },
+        verses: {
+          type: "array", description: "Qur'an verses recited in Arabic, in marker order",
+          items: {
+            type: "object",
+            properties: { sura: { type: "integer" }, from: { type: "integer" }, to: { type: "integer" } },
+            required: ["sura", "from", "to"], additionalProperties: false
+          }
+        },
         comment: { type: "string", description: "Any note or explanation - never shown" }
       },
-      required: ["translation", "comment"],
+      required: ["translation", "verses", "comment"],
       additionalProperties: false
     }
   };
   // Primjeri kako izgleda dobar odgovor / Beispiele für eine gute Antwort
   function primjer(ulaz, izlaz, napomena) {
-    return [{ role: "user", content: "New segment (Bosnian):\n" + ulaz }, { role: "assistant", content: JSON.stringify({ translation: izlaz, comment: napomena || "" }) }];
+    return [{ role: "user", content: "New segment (Bosnian):\n" + ulaz }, { role: "assistant", content: JSON.stringify({ translation: izlaz, verses: [], comment: napomena || "" }) }];
   }
   var PRIMJERI_DE = [].concat(
     primjer("Draga braćo i sestre, cijenjeni džematlije,", "Liebe Brüder und Schwestern, verehrte Gemeinde,"),
@@ -1242,6 +1156,27 @@
     var nadjene = (izvan.match(/[a-zčćžšđäöüß']{5,}/g) || []).filter(function (w) { return rijeci[w]; });
     return nadjene.filter(function (w, i) { return nadjene.indexOf(w) === i; }).length >= 2;
   }
+  // Ajet iz Mushafa (tačan tekst iz kuran.js, ne od AI) / Vers aus dem Mushaf (genauer Text aus kuran.js, nicht von der KI)
+  function arBroj(n) { return String(n).replace(/[0-9]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".charAt(+d); }); }
+  function tekstAjeta(a, ck) {
+    var K = window.KURAN, s = a && +a.sura, od = a && +a.from, ddo = a && +(a.to || a.from);
+    if (!K || !(s >= 1 && s <= 114)) return "";
+    var sura = K.a[s - 1];
+    if (!(od >= 1 && ddo >= od && ddo <= sura.length && ddo - od < 12)) return "";
+    var dijelovi = [];
+    for (var i = od; i <= ddo; i++) dijelovi.push(sura[i - 1] + (ddo > od ? " ﴿" + arBroj(i) + "﴾" : ""));
+    return "(" + dijelovi.join(" ") + " · " + CILJ[ck].sura + " " + K.n[s - 1] + " " + s + ":" + od + (ddo > od ? "-" + ddo : "") + ")";
+  }
+  function umetniAjete(prijevod, ajeti, ck) {
+    (ajeti || []).forEach(function (a, k) {
+      var oznaka = "[Q" + (k + 1) + "]", blok = tekstAjeta(a, ck);
+      if (!blok) blok = CILJ[ck].rec;
+      if (prijevod.indexOf(oznaka) >= 0) prijevod = prijevod.split(oznaka).join(blok);
+      else prijevod = prijevod + " " + blok;
+    });
+    // preostale oznake bez ajeta / übrige Marker ohne Vers
+    return prijevod.replace(/\[Q\d+\]/g, CILJ[ck].rec);
+  }
   function prevediClaude(c, r, iz, ck) {
     // Arapski tekst ne ide Claudeu – zamijeni se oznakom [1], [2] i vrati tačno onakav kakav je bio
     // Arabischer Text geht nicht an Claude – er wird durch [1], [2] ersetzt und danach unverändert zurückgesetzt
@@ -1252,13 +1187,15 @@
     });
     var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + seg;
     return zahtjevClaude(c, iz, ck, sadrzaj).catch(function (e) {
+      if (e && /credit balance|billing|kredit/i.test(String(e.message || ""))) { upozori(function () { return t("guthaben"); }); throw e; }
       if (!bezFormata && e && e.status === 400) { bezFormata = true; return zahtjevClaude(c, iz, ck, sadrzaj); }
       throw e;
     }).then(function (odg) {
       if (odg.stop_reason === "refusal") throw new Error("refusal");
       var tekst = odg.content.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("").trim();
-      var prijevod = tekst;
-      try { var j = JSON.parse(tekst); if (j && typeof j.translation === "string") prijevod = j.translation; } catch (e2) {}
+      var prijevod = tekst, ajeti = [];
+      try { var j = JSON.parse(tekst); if (j && typeof j.translation === "string") { prijevod = j.translation; ajeti = j.verses || []; } } catch (e2) {}
+      prijevod = umetniAjete(prijevod, ajeti, ck);
       blokovi.forEach(function (b, k) {
         var oznaka = "[" + (k + 1) + "]";
         if (prijevod.indexOf(oznaka) >= 0) prijevod = prijevod.split(oznaka).join(b);
@@ -1409,6 +1346,7 @@
   setInterval(provjeriVerziju, 3 * 60000);
 
   /* =================== Start =================== */
+  pisiTiho("hutba-sin-lozinka", null); pisiTiho("hutba-sin-t", null);   // stari abgleich / alter Abgleich
   ucitajPostavkeUFormu();
   prevediStranicu();
   povezi();

@@ -1296,37 +1296,19 @@
       return;
     }
     if (!window.PrijevodVeza || !window.mqtt) return;
-    // TV čuva šifrovane postavke (ne može ih pročitati) i ponovo ih objavi ako ih server izgubi
-    // Der Fernseher hebt die verschlüsselten Einstellungen auf (kann sie nicht lesen) und veröffentlicht sie neu, falls der Server sie verliert
-    var tvVeza = null, videnPaketT = 0, startVeze = Date.now();
+    // Sinhronizacija postavki je ukinuta – staru kopiju obrisati / Einstellungs-Abgleich abgeschafft – alte Kopie löschen
+    try { localStorage.removeItem("hutba-postavke-paket"); } catch (e) {}
+    var tvVeza = null, startVeze = Date.now();
     setTimeout(function () { var el = $("veza-tv"); if (el.className.indexOf(" ok") >= 0) el.className += " skriven"; }, 120000);
-    function sacuvaniPaket() { try { return JSON.parse(localStorage.getItem("hutba-postavke-paket") || "null"); } catch (e) { return null; } }
-    function obnoviPaket() {
-      var pk = sacuvaniPaket();
-      if (tvVeza && pk && pk.t > videnPaketT) tvVeza.posalji("postavke", pk, true);
-    }
-    var staroNaPoruku = naPoruku;
-    naPoruku = function (tema, m, zadrzano) {
-      if (tema === "postavke") {
-        if (!m || !m.ct || !m.t) return;
-        videnPaketT = Math.max(videnPaketT, m.t);
-        var pk = sacuvaniPaket();
-        if (!pk || m.t > pk.t) { try { localStorage.setItem("hutba-postavke-paket", JSON.stringify(m)); } catch (e) {} }
-        return;
-      }
-      staroNaPoruku(tema, m, zadrzano);
-    };
     try {
       tvVeza = PrijevodVeza.povezi(HP.kanal, {
-        teme: ["stanje", "tekst", "postavke"], naPoruku: naPoruku,
+        teme: ["stanje", "tekst"], naPoruku: naPoruku,
         naStanjeVeze: function (n, ukupno) {
           var el = $("veza-tv");
           el.className = "veza-tv" + (n > 0 ? " ok" : "") + (Date.now() - startVeze > 120000 && n > 0 ? " skriven" : "");
           el.querySelector("span").textContent = n > 0 ? "Prijevod spreman · Übersetzung bereit (" + n + "/" + ukupno + ")" : "Prijevod: nema veze · Übersetzung: keine Verbindung";
-        },
-        naPovezivanje: function () { videnPaketT = 0; setTimeout(obnoviPaket, 6000); }
+        }
       });
-      setInterval(obnoviPaket, 30 * 60000);
     } catch (e) { /* bez prijevoda / ohne Übersetzung */ }
   })();
   osvjezi();
