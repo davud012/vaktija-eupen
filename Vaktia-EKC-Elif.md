@@ -183,3 +183,4 @@ Tipps von unterwegs:
   - Kurze Stücke (unter 4 Wörtern ohne Punkt) warten bis 5 s auf den nächsten Teil und werden zusammen übersetzt (vorher kamen „Usro“, „Kaže“ einzeln).
   - Prompt-Hinweise auf typische Fehlhörungen (z. B. „usro/jusro“ nach „Allah kaže“ = 94:5-6).
   - Gemini-Audio-Modus (hört das echte Arabisch) unterstützt jetzt auch Verse aus dem Mushaf (`verses` im Schema).
+- **Update 2026-11-03.5:** weitere Fehlhörungen fest erkannt: „hamdo bila“, „Alhamdulillahi Rabbil Alamin“, „a hamdo lila rabil alemin“ → الحمد لله (رب العالمين); „mila Rahim“ → Bismillah. Doppelte gleiche arabische Blöcke werden zu einem. Sinnlose Wörter neben Arabisch („Kajesu Fatih“) soll die KI weglassen statt übersetzen.
