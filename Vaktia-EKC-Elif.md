@@ -249,3 +249,5 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **App-Symbol für Verknüpfung auf dem Handy:** `slike/apple-touch-icon.png` (iPhone), `slike/ikona-192.png`, `ikona-512.png`, `ikona-512-maskable.png` (Android), `slike/favicon.png` + `favicon.ico` (Browser-Tab). `manifest.webmanifest` („Vaktija Elif“) und `hutba/manifest.webmanifest` („Hutba Elif“), Hintergrund Creme #fbf8ef.
 - **2026-11-04.18:** Countdown in den letzten 15 Min. vor dem Gebet bleibt golden, pulsiert aber nicht mehr (wird nicht mehr größer/kleiner).
 - **2026-11-04.20:** Grüne Ringe (Wellen) auf dem Gebetsbildschirm entfernt, weil der TV dabei ruckelte.
+- **2026-11-04.21:** Gebetsbildschirm unten „Sljedeći namaz“ zeigt jetzt die **Ezan-Zeit** (z. B. Sabah sutra u 06:32, Jacija u 19:00), nicht mehr die Gebetszeit (+10 Min.).
+- **Jacija-Regel:** Ezan frühestens 19:00. Ist die Jacija laut Takvim später als 19:00, gilt der Takvim (`jacijaFiksno: { vrijeme: "19:00" }`, ohne Enddatum, gilt also auch für den nächsten Takvim).

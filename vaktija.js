@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.20 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.21 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
@@ -41,9 +41,9 @@ var POSTAVKE = {
   /* Prijevod hutbe uživo (TEST): imam otvori .../vaktija-eupen/hutba/ na mobitelu.
      Live-Übersetzung der Predigt (TEST): Imam öffnet .../vaktija-eupen/hutba/ am Handy.
      lozinka = Passwort für die Handy-Seite, kanal = Name der Verbindung Handy -> Fernseher */
-  /* Jacija u fiksno vrijeme u određenom periodu (namaz = vrijeme + ikametNakon).
-     Ischa zu einer festen Uhrzeit in einem Zeitraum (Gebet = Uhrzeit + ikametNakon). */
-  jacijaFiksno: { vrijeme: "19:00", od: "2026-11-01", do: "2026-12-31" },
+  /* Jacija najranije u 19:00 (ezan). Ako je po takvimu kasnije od 19:00, vrijedi takvim. Namaz = ezan + ikametNakon.
+     Ischa frühestens um 19:00 (Ezan). Ist sie laut Takvim später als 19:00, gilt der Takvim. Gebet = Ezan + ikametNakon. */
+  jacijaFiksno: { vrijeme: "19:00" },
 
   hutbaPrijevod: {
     ukljuceno: true,

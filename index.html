@@ -539,7 +539,9 @@
     var t = red.split(/\s+/);
     // Fiksna jacija (npr. 19:00 do kraja decembra) / Feste Ischa (z. B. 19:00 bis Ende Dezember)
     var JF = P.jacijaFiksno, kd = kljucDatuma(d);
-    if (JF && JF.vrijeme && (!JF.od || kd >= JF.od) && (!JF["do"] || kd <= JF["do"])) t[5] = JF.vrijeme;
+    // Jacija najranije u JF.vrijeme (npr. 19:00); ako je po takvimu kasnije, vrijedi takvim.
+    // Ischa frühestens um JF.vrijeme (z. B. 19:00); ist sie laut Takvim später, gilt der Takvim.
+    if (JF && JF.vrijeme && (!JF.od || kd >= JF.od) && (!JF["do"] || kd <= JF["do"]) && uMinute(t[5]) < uMinute(JF.vrijeme)) t[5] = JF.vrijeme;
     var petak = d.getDay() === 5 && D;
     var namazi = [];
     for (var i = 0; i < VAKTI.length; i++) {
@@ -646,7 +648,7 @@
       postavi("ve-ime", info.ekran || info.bs);
       postavi("ve-ime-de", info.de);
       if (sljedeci) {
-        var sv = sljedeci.info, imeS = sv.ekran || sv.bs, kad = uVrijeme(sljedeci.dzuma ? sljedeci.ezan : sljedeci.ikamet);
+        var sv = sljedeci.info, imeS = sv.ekran || sv.bs, kad = uVrijeme(sljedeci.ezan);   // vrijeme ezana / Ezan-Zeit
         postavi("ve-sljedeci", "Sljedeći namaz: <b>" + imeS + "</b> " + (sljedeciSutra ? "sutra " : "") + "u <b>" + kad + "</b>" +
           '<br><span class="de">Nächstes Gebet: ' + sv.de + " " + (sljedeciSutra ? "morgen " : "") + "um " + kad + "</span>");
       } else postavi("ve-sljedeci", "");
