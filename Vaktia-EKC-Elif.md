@@ -194,3 +194,7 @@ Tipps von unterwegs:
   - 1 = Logo links neben dem Namen (grünes Design) · 2 = großes Logo oben in der Mitte · 3 = helles Design (Creme, dunkelgrüne Schrift, Original-Logo) · 4 = großes Logo als Wasserzeichen im Hintergrund · 5 = Logo neben der Uhr.
 - Grünes Design: Hintergrund #145a33 → #062615, Akzent sand #d9c59c (aus dem Logo #a59272), Karten dunkelgrün transparent; Gebets- und Hutba-Bildschirm ebenfalls grün.
 - **Update 2026-11-04.2 – aktiv: Layout 6** (Wunsch des Nutzers): helles Design aus Layout 3 (Creme, dunkelgrüne Schrift, Original-Logo links) **+ großes Logo als Wasserzeichen** in der Mitte (Original-Logo, 100vh groß, Deckkraft 0.08). Gebets- und Hutba-Bildschirm sind dabei dunkelgrün mit heller Schrift. Zurück zum blauen Design: `logo: 0` in vaktija.js.
+- **Update 2026-11-04.5 – helles Design auch auf Gebets- und Hutba-Bildschirm** (ohne großes Wasserzeichen):
+  - Gebetsbildschirm: Creme-Hintergrund, dunkelgrüne Schrift, arabischer Name sandgold, kleines Logo oben in der Mitte.
+  - Hutba-Bildschirm: Creme-Hintergrund, dunkelgrüner Text, Arabisch sandgold-braun, kleines Logo links neben „UŽIVO · LIVE“.
+  - Animationen (auch in der leichten Version, nur transform/opacity bzw. einmaliges Linienzeichnen): Logo fliegt beim Erscheinen ein und schwebt danach leicht; Ornament zeichnet sich und dreht sich langsam; beim Ezan grüne Wellen; Hutba-Wörter blenden ein, LIVE-Punkt pulsiert.
