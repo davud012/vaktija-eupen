@@ -374,6 +374,14 @@
   .vakat-ekran:not(.vidljiv) *, .hutba-ekran:not(.vidljiv) * { animation: none !important; }
   body.lagano .he-linije { -webkit-mask-image: none; mask-image: none; }
   body.lagano .he-rijec { animation: none; }
+  /* ---------- Blende s logom (prijelaz) / Logo-Blende (Übergang) ---------- */
+  .blende { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; background: #f3ecdc; opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s; pointer-events: none; }
+  .blende video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .blende.vidljiva { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+  .blende.odlazi { opacity: 0; visibility: visible; transition: opacity 0.9s ease; }
+  /* Dok traje blenda, animacije ispod čekaju (počnu kad se blenda skloni) / Animationen darunter warten, bis die Blende weg ist */
+  body.blende-traje .overlay *, body.blende-traje .vakat-ekran *, body.blende-traje .hutba-ekran * { animation-play-state: paused !important; }
 </style>
 </head>
 <body>
@@ -439,6 +447,8 @@
 </div>
 
 <div class="veza-tv" id="veza-tv"><i></i><span>Prijevod · Übersetzung …</span></div>
+<div class="blende" id="blende"><video id="blende-video" muted playsinline preload="auto"></video></div>
+
 <div class="hutba-ekran" id="hutba-ekran">
   <div class="he-vrh">
     <div class="he-lijevo"><img class="he-logo" src="slike/logo.png" alt=""><div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div></div>
@@ -614,11 +624,52 @@
   var prikazSutra = false, sutraZaPrikaz = null, sutraDatum = null;
   function nacrtajSve() { if (danas) crtajVakte(danas, prikazSutra ? sutraZaPrikaz : null, sutraDatum); }
 
+  // Blenda s logom: 1) TV prelazi na hutbu, 2) počinje vakat, 3) povratak na vaktiju
+  // Logo-Blende: 1) TV wechselt zur Hutba, 2) ein Gebet beginnt, 3) zurück zur Vaktija
+  var blendaTraje = false, blendaTajmer = null;
+  (function () {
+    var v = $("blende-video");
+    // MP4 (H.264) ili WebM – šta uređaj može / MP4 (H.264) oder WebM – was das Gerät kann
+    var mp4 = v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.640028"');
+    var dat = mp4 ? "slike/blende.mp4" : "slike/blende.webm";
+    // Video se učita jednom u memoriju (radi i bez interneta) / Video einmal in den Speicher laden (läuft auch offline)
+    try {
+      var x = new XMLHttpRequest();
+      x.open("GET", dat); x.responseType = "blob";
+      x.onload = function () { if (x.status === 200 && window.URL) v.src = URL.createObjectURL(x.response); else v.src = dat; };
+      x.onerror = function () { v.src = dat; };
+      x.send();
+    } catch (e) { v.src = dat; }
+  })();
+  function blenda() {
+    if (blendaTraje || BRZINA > 1 || P.blenda === false) return;
+    var b = $("blende"), v = $("blende-video");
+    blendaTraje = true;
+    document.body.classList.add("blende-traje");
+    b.className = "blende vidljiva";
+    function kraj() {
+      if (!blendaTraje) return;
+      clearTimeout(blendaTajmer);
+      b.className = "blende odlazi";
+      document.body.classList.remove("blende-traje");
+      setTimeout(function () { b.className = "blende"; blendaTraje = false; }, 950);
+    }
+    v.onended = kraj; v.onerror = kraj;
+    blendaTajmer = setTimeout(kraj, 5000);        // sigurnost / Sicherheit, falls das Video hängt
+    try {
+      v.currentTime = 0;
+      var pr = v.play();
+      if (pr && pr.catch) pr.catch(kraj);
+    } catch (e) { kraj(); }
+  }
+  window.vaktijaBlenda = blenda;
+
   // Ekran vakta / Gebetsbildschirm
   var veAktivan = false, veFaza = "";
   function sakrijVakatEkran() {
     if (!veAktivan) return;
     veAktivan = false; veFaza = "";
+    if (!document.body.classList.contains("hutba-aktivna")) blenda();   // povratak na vaktiju / zurück zur Vaktija
     $("vakat-ekran").className = "vakat-ekran";
     document.body.classList.remove("vakat-aktivan");
     nacrtajSve();                          // kartice ponovo uleću / Karten fliegen wieder herein
@@ -628,6 +679,7 @@
     var info = cilj.info, ve = $("vakat-ekran");
     if (!veAktivan) {
       veAktivan = true;
+      if (s - ezan < EZAN_EKRAN_SEKUNDI) blenda();   // vakat upravo počeo (ne kod ponovnog učitavanja) / Gebet hat gerade begonnen
       document.body.classList.add("vakat-aktivan");
       ve.className = "vakat-ekran vidljiv" + (s - ezan < EZAN_EKRAN_SEKUNDI ? " svjez" : "");
       postavi("ve-arapski", info.ar || "");
@@ -1011,10 +1063,12 @@
     function pokazi() {
       zadnjiPuls = Date.now();
       if (vidljiv) return;
+      blenda();
       vidljiv = true; ekran.classList.add("vidljiv"); document.body.classList.add("hutba-aktivna");
     }
     function sakrij() {
       if (!vidljiv) return;
+      blenda();
       vidljiv = false; ekran.classList.remove("vidljiv"); document.body.classList.remove("hutba-aktivna");
       // Ništa ne ostaje na ekranu / Nichts bleibt gespeichert
       sesija = null;

@@ -3,11 +3,15 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.9 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.10 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
   lagano: true,
+
+  /* Blenda s logom (video) kod: hutbe na TV-u, početka vakta, povratka na vaktiju. false = isključeno.
+     Logo-Blende (Video) bei: Hutba auf dem TV, Gebetsbeginn, Rückkehr zur Vaktija. false = aus. */
+  blenda: true,
 
   /* Naziv džemata / Name der Gemeinde */
   naziv: "Džemat EKC Elif Eupen",

@@ -211,3 +211,10 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Das Aussehen ist unverändert (Bildvergleich vorher/nachher). Die Einstellungen `dizajn`, `raspored`, `font`, `logo`, `uzorak`, `nebo`, `pozadina` gibt es in `vaktija.js` nicht mehr.
 - Behalten: `fuer-app-entwickler/vaktija.json`, weil die App des Entwicklers diesen Link liest.
 - Offline-Speicher (`sw.js`) auf v3, alte Kopien werden gelöscht.
+
+## Logo-Blende (Version 2026-11-04.10)
+- Video vom Nutzer (`vorschau_blende.mp4`), nur der Teil mit dem Logo (1,70–5,32 s), Szene 1 und 2 entfernt → `slike/blende.mp4` (H.264, 170 KB) und `slike/blende.webm` (VP9, 110 KB, falls das Gerät kein H.264 kann). Länge 3,6 s.
+- Erscheint über allem (Vollbild) bei: 1) TV wechselt zur Hutba (Handy „Prikaži na TV-u“), 2) Gebetsbeginn genau zur Ezan-Zeit, 3) Rückkehr zur Vaktija (Ende des Gebetsbildschirms, und auch wenn die Hutba endet).
+- Beim Neuladen mitten im Gebetsbildschirm kommt keine Blende (nur in der ersten Minute ab Ezan).
+- Die Animationen darunter warten, bis die Blende weg ist; Blende blendet in 0,9 s aus.
+- Das Video wird einmal in den Speicher geladen und offline gespeichert. Ausschalten: `blenda: false` in vaktija.js.
