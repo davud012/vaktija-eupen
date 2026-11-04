@@ -218,3 +218,4 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Beim Neuladen mitten im Gebetsbildschirm kommt keine Blende (nur in der ersten Minute ab Ezan).
 - Die Animationen darunter warten, bis die Blende weg ist; Blende blendet in 0,9 s aus.
 - Das Video wird einmal in den Speicher geladen und offline gespeichert. Ausschalten: `blenda: false` in vaktija.js.
+- **Fix 2026-11-04.11:** Bei Akšam (17:11) kam die Blende auf der Box nicht. Grund: Der Android-Browser in Fully Kiosk startet Videos nicht ohne Antippen (Autoplay-Sperre), die Seite hat die Blende dann übersprungen. Jetzt ist die Blende ein **animiertes Bild** (`slike/blende.webp`, 1600 px, 25 Bilder/s, 390 KB), das ohne Sperre abspielt. Das MP4 und das WebM wurden entfernt. Getestet mit eingeschalteter Autoplay-Sperre.
