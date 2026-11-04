@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.1 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.2 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -28,8 +28,9 @@ var POSTAVKE = {
   lagano: true,
   /* Logo džemata: 0 = bez logotipa (plava tema), 1-5 = raspored s logotipom (zelena tema, 3 = svijetla)
      Logo der Gemeinde: 0 = ohne Logo (blaues Design), 1-5 = Layout mit Logo (grünes Design, 3 = hell)
-     1 = lijevo uz naziv · 2 = gore u sredini · 3 = svijetlo, lijevo · 4 = veliki vodeni žig · 5 = uz sat */
-  logo: 0,
+     1 = lijevo uz naziv · 2 = gore u sredini · 3 = svijetlo, lijevo · 4 = veliki vodeni žig · 5 = uz sat
+     6 = svijetlo + vodeni žig / hell + Wasserzeichen */
+  logo: 6,
 
   /* Pozadina: true = živo nebo (sunce, mjesec, oblaci), false = mirna plava pozadina (brže na slabijem uređaju).
      Hintergrund: true = lebendiger Himmel, false = ruhiger blauer Hintergrund (schneller auf schwachen Geräten). */
