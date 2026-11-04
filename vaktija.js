@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.5 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.6 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -31,6 +31,8 @@ var POSTAVKE = {
      1 = lijevo uz naziv · 2 = gore u sredini · 3 = svijetlo, lijevo · 4 = veliki vodeni žig · 5 = uz sat
      6 = svijetlo + vodeni žig / hell + Wasserzeichen */
   logo: 6,
+  /* Uzorak zvijezda u pozadini: false = bez / Sternmuster im Hintergrund: false = ohne */
+  uzorak: false,
 
   /* Pozadina: true = živo nebo (sunce, mjesec, oblaci), false = mirna plava pozadina (brže na slabijem uređaju).
      Hintergrund: true = lebendiger Himmel, false = ruhiger blauer Hintergrund (schneller auf schwachen Geräten). */
