@@ -236,3 +236,9 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 
 ## Version 2026-11-04.14 – Diagnose (vorübergehend)
 - Hutba wechselte auf der Box immer noch nicht. Unten links auf dem TV erscheint nach jedem Laden für 15 Minuten eine Diagnose: Chrome-/Android-Version der Box, Uhr der Box, ob die MQTT-Bibliothek geladen ist, Zustand jedes der 3 Server (VERBUNDEN / FEHLER …), Anzahl Nachrichten vom Handy, JavaScript-Fehler. Nutzer schickt ein Foto davon. Danach wieder entfernen (`#dijagnoza` in index.html, `naDogadjaj` in prijevod-veza.js).
+
+## Lösung Hutba auf der Box (2026-11-04.16)
+- **Ursache:** Die Uhr der Box (H20, Android 10, ohne Uhr-Batterie) stand nach dem Neustart auf 1.1.1970 bzw. war falsch → alle sicheren Verbindungen (SSL/wss zu den MQTT-Servern, GitHub) schlugen fehl → keine Hutba, keine Updates, alte gespeicherte Seite.
+- **Behoben:** Datum & Uhrzeit an der Box von Hand eingestellt, Cache in Fully geleert. Hutba funktioniert jetzt.
+- **Achtung nach Stromausfall:** Uhr der Box prüfen (Einstellungen → Datum & Uhrzeit). Ist sie falsch, gehen Hutba und Updates nicht.
+- Diagnose-Anzeige wieder entfernt. Die MQTT-Bibliothek für alte Browser (`lib/mqtt-tv.min.js`) bleibt.

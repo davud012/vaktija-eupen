@@ -35,20 +35,18 @@ var PrijevodVeza = (function () {
       if (opcije.volja) {
         o.will = { topic: kanal + "/stanje", payload: JSON.stringify(opcije.volja), qos: 1, retain: true };
       }
-      var k, adresa = url;
-      function javi(sto) { if (opcije.naDogadjaj) try { opcije.naDogadjaj(adresa, sto); } catch (e) {} }
-      javi("verbinde …");
+      var k;
       var pristup = /^(wss?:\/\/)([^:@\/]+):([^@\/]+)@(.*)$/.exec(url);
       if (pristup) { url = pristup[1] + pristup[4]; o.username = pristup[2]; o.password = pristup[3]; }
-      try { k = mqtt.connect(url, o); } catch (e) { javi("FEHLER: " + e.message); return; }
+      try { k = mqtt.connect(url, o); } catch (e) { return; }
       k.on("connect", function () {
-        stanjeVeze[i] = true; javiStanje(); javi("VERBUNDEN");
+        stanjeVeze[i] = true; javiStanje();
         if (opcije.naPoruku) k.subscribe(opcije.teme ? opcije.teme.map(function (x) { return kanal + "/" + x; }) : [kanal + "/stanje", kanal + "/tekst"], { qos: 0 });
         if (opcije.naPovezivanje) opcije.naPovezivanje();
       });
-      k.on("close", function () { stanjeVeze[i] = false; javiStanje(); javi("getrennt (versucht neu)"); });
+      k.on("close", function () { stanjeVeze[i] = false; javiStanje(); });
       k.on("offline", function () { stanjeVeze[i] = false; javiStanje(); });
-      k.on("error", function (e) { javi("FEHLER: " + (e && e.message ? e.message : e)); /* ponovo se povezuje samo / verbindet sich selbst neu */ });
+      k.on("error", function () { /* ponovo se povezuje samo / verbindet sich selbst neu */ });
       k.on("message", function (tema, sadrzaj, paket) {
         if (!opcije.naPoruku) return;
         var tekst = String(sadrzaj), poruka;

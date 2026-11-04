@@ -383,14 +383,6 @@
 </style>
 </head>
 <body>
-<!-- Dijagnoza (privremeno, 3 min nakon učitavanja) / Diagnose (vorübergehend, 3 Min. nach dem Laden) -->
-<div id="dijagnoza" style="position:fixed;left:1vw;bottom:1vh;z-index:200;background:rgba(0,0,0,0.82);color:#fff;font:1.05vw/1.45 monospace;padding:0.8vw 1vw;border-radius:0.6vw;max-width:60vw;white-space:pre-wrap;display:none"></div>
-<script>
-  var DIJAG = { greske: [], serveri: {}, poruke: 0, zadnja: "" };
-  window.onerror = function (msg, izvor, red) {
-    DIJAG.greske.push(String(msg).slice(0, 90) + " (" + String(izvor || "").split("/").pop() + ":" + red + ")");
-  };
-</script>
 <div class="primjer" id="primjer">PRIMJER – nisu službena vremena · BEISPIEL – keine offiziellen Zeiten</div>
 
 <div class="overlay">
@@ -1083,25 +1075,6 @@
       probe.forEach(function (x, i) { setTimeout(function () { dodajTekst(x, false, i === 2 || i === 4); }, i * 4500); });
       return;
     }
-    // Dijagnoza na ekranu 3 minute / Diagnose auf dem Bildschirm für 3 Minuten
-    (function () {
-      var el = $("dijagnoza"), start = Date.now();
-      function crtaj() {
-        if (Date.now() - start > 900000) { el.style.display = "none"; return; }
-        var ua = navigator.userAgent, ch = /Chrome\/([\d.]+)/.exec(ua), an = /Android ([\d.]+)/.exec(ua);
-        var d = new Date(), t = [];
-        t.push("DIAGNOSE · Version 2026-11-04.15");
-        t.push("Browser: Chrome " + (ch ? ch[1] : "?") + " · Android " + (an ? an[1] : "?"));
-        t.push("Uhr der Box: " + d.toLocaleDateString() + " " + dvije(d.getHours()) + ":" + dvije(d.getMinutes()) + ":" + dvije(d.getSeconds()));
-        t.push("MQTT-Bibliothek: " + (window.mqtt && mqtt.connect ? "geladen" : "FEHLT") + " · Übersetzung: " + (HP && HP.ukljuceno ? "an" : "AUS"));
-        for (var u in DIJAG.serveri) t.push("  " + u.replace(/^wss:\/\/(public:public@)?/, "") + " → " + DIJAG.serveri[u]);
-        t.push("Nachrichten vom Handy: " + DIJAG.poruke + (DIJAG.zadnja ? " (zuletzt " + DIJAG.zadnja + ")" : ""));
-        if (DIJAG.greske.length) t.push("Fehler: " + DIJAG.greske.slice(-4).join(" | "));
-        el.textContent = t.join("\n"); el.style.display = "block";
-        setTimeout(crtaj, 1000);
-      }
-      crtaj();
-    })();
     if (!window.PrijevodVeza || !window.mqtt) return;
     // Sinhronizacija postavki je ukinuta – staru kopiju obrisati / Einstellungs-Abgleich abgeschafft – alte Kopie löschen
     try { localStorage.removeItem("hutba-postavke-paket"); } catch (e) {}
@@ -1110,14 +1083,7 @@
     try {
       tvVeza = PrijevodVeza.povezi(HP.kanal, {
         teme: ["stanje", "tekst"],
-        naPoruku: function (tema, m, z) {
-          DIJAG.poruke++; var d = new Date(); DIJAG.zadnja = tema + " " + dvije(d.getHours()) + ":" + dvije(d.getMinutes()) + ":" + dvije(d.getSeconds());
-          naPoruku(tema, m, z);
-        },
-        naDogadjaj: function (url, sto) {
-          var prije = DIJAG.serveri[url] || "";
-          DIJAG.serveri[url] = sto.indexOf("getrennt") === 0 && prije.indexOf("FEHLER") === 0 ? prije : sto;
-        },
+        naPoruku: naPoruku,
         naStanjeVeze: function (n, ukupno) {
           var el = $("veza-tv");
           el.className = "veza-tv" + (n > 0 ? " ok" : "") + (Date.now() - startVeze > 120000 && n > 0 ? " skriven" : "");
