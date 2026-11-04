@@ -198,3 +198,4 @@ Tipps von unterwegs:
   - Gebetsbildschirm: Creme-Hintergrund, dunkelgrüne Schrift, arabischer Name sandgold, kleines Logo oben in der Mitte.
   - Hutba-Bildschirm: Creme-Hintergrund, dunkelgrüner Text, Arabisch sandgold-braun, kleines Logo links neben „UŽIVO · LIVE“.
   - Animationen (auch in der leichten Version, nur transform/opacity bzw. einmaliges Linienzeichnen): Logo fliegt beim Erscheinen ein und schwebt danach leicht; Ornament zeichnet sich und dreht sich langsam; beim Ezan grüne Wellen; Hutba-Wörter blenden ein, LIVE-Punkt pulsiert.
+- Option ohne Sternmuster: `?muster=0` (Vorschau) bzw. `uzorak: false` in vaktija.js (noch nicht gesetzt).
