@@ -248,12 +248,6 @@
         </div>
         </div>
 
-        <label style="margin-top:22px" data-t="probaNaslov"></label>
-        <div class="mali" data-t="probaInfo"></div>
-        <button class="dugme sporedno" id="proba-dugme" type="button" data-t="probaDugme"></button>
-        <pre id="proba-izvjestaj" class="mali skriveno" style="white-space:pre-wrap;background:rgba(13,61,28,.06);padding:10px;border-radius:10px;max-height:420px;overflow:auto;user-select:text;-webkit-user-select:text"></pre>
-        <button class="dugme sporedno skriveno" id="proba-kopiraj" type="button" data-t="probaKopiraj"></button>
-
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
         <div class="mali" data-t="odjavaInfo"></div>
         <div class="mali" id="verzija" style="margin-top:14px;opacity:.6"></div>
@@ -266,7 +260,6 @@
 <script src="../lib/mqtt.min.js"></script>
 <script src="../prijevod-veza.js"></script>
 <script src="../lib/anthropic.min.js"></script>
-<script src="proba-hutba.js"></script>
 <script src="kuran.js" async></script>
 <script>
 (function () {
@@ -331,7 +324,6 @@
       infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Radi u svakom pregledniku (i Chrome/Google na iPhoneu). Gemini odmah i prevodi po smislu. Treba Gemini ključ (aistudio.google.com).",
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
       gNe: "Gemini greška", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
-      probaNaslov: "Probna hutba", probaInfo: "Pošalje probnu hutbu (oko 300 riječi) kroz pravi prijevod – kao da je izgovorena. Na kraju se pojavi izvještaj koji možete kopirati.", probaDugme: "Pokreni probnu hutbu", probaKopiraj: "Kopiraj izvještaj", probaKopirano: "✓ Kopirano",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
     },
     de: {
@@ -381,7 +373,6 @@
       infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Geht in jedem Browser (auch Chrome/Google auf dem iPhone). Gemini übersetzt gleich mit, nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com).",
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
       gNe: "Gemini-Fehler", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
-      probaNaslov: "Probe-Hutba", probaInfo: "Schickt eine Probe-Hutba (ca. 300 Wörter) durch die echte Übersetzung – als wäre sie gesprochen. Am Ende erscheint ein Bericht zum Kopieren.", probaDugme: "Probe-Hutba starten", probaKopiraj: "Bericht kopieren", probaKopirano: "✓ Kopiert",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
     },
     fr: {
@@ -431,7 +422,6 @@
       infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Fonctionne dans tout navigateur (aussi Chrome/Google sur iPhone). Gemini traduit en même temps, selon le sens. Nécessite une clé Gemini (aistudio.google.com).",
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
       gNe: "Erreur Gemini", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
-      probaNaslov: "Khutba d'essai", probaInfo: "Envoie une khutba d'essai (env. 300 mots) dans la vraie traduction – comme si elle était prononcée. À la fin, un rapport à copier apparaît.", probaDugme: "Lancer la khutba d'essai", probaKopiraj: "Copier le rapport", probaKopirano: "✓ Copié",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
     }
   };
@@ -863,7 +853,6 @@
     if (recenice.length > 200) recenice.shift();
     return r;
   }
-
 
   /* =================== Gemini: snimanje zvuka / Tonaufnahme =================== */
   // Snima zvuk, reže na pauzama (5–14 s) i šalje Geminiju: on prepiše i prevede.
@@ -1401,34 +1390,6 @@
         (r.gotovo ? sArapskim(r.de) : "…") + '</div></div>';
     }).join("") : '<div class="prazno">' + t("prazno") + '</div>';
   }
-
-  /* =================== Probna hutba / Probe-Hutba =================== */
-  var probaTece = false;
-  $("proba-dugme").addEventListener("click", function () {
-    if (probaTece || !window.PROBA_HUTBA) return;
-    probaTece = true; this.disabled = true;
-    var lista = [], i = 0;
-    $("proba-izvjestaj").classList.remove("skriveno"); $("proba-izvjestaj").textContent = "…";
-    (function sljedeca() {
-      if (i >= PROBA_HUTBA.length) { setTimeout(gotovo, 12000); return; }
-      var r = novaRecenica(); r.bs = PROBA_HUTBA[i++]; r.ulaz = r.bs; lista.push(r);
-      prevedi(r);
-      setTimeout(sljedeca, 2600);
-    })();
-    function gotovo() {
-      var tekst = "Probe-Hutba · " + $("prevodilac").value + " · " + ($("verzija").textContent || "") + "\n\n" + lista.map(function (r, k) {
-        return (k + 1) + ") " + r.ulaz + "\n   → " + (r.gotovo ? (r.neuspio ? "FEHLER" : r.de) : "(keine Antwort)") + "\n   [" + (r.put || "?") + "]";
-      }).join("\n\n");
-      $("proba-izvjestaj").textContent = tekst;
-      $("proba-kopiraj").classList.remove("skriveno");
-      probaTece = false; $("proba-dugme").disabled = false;
-    }
-  });
-  $("proba-kopiraj").addEventListener("click", function () {
-    var tx = $("proba-izvjestaj").textContent, dugme = this;
-    (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(function () { dugme.textContent = t("probaKopirano"); },
-      function () { var rng = document.createRange(); rng.selectNodeContents($("proba-izvjestaj")); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(rng); });
-  });
 
   /* =================== Automatsko ažuriranje / Automatische Aktualisierung =================== */
   // Nova verzija na GitHubu -> stranica se sama učita ponovo (ne dok mikrofon ili TV radi)

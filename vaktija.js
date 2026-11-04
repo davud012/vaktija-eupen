@@ -3,48 +3,14 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.8 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.9 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
-  /* Dizajn / Design:
-     1 = Zeleno (kartice)        / Grün (Karten)
-     2 = Lista (plavo i zlato)   / Liste (Nachtblau & Gold)
-     3 = Svijetlo (mreža)        / Hell (Raster)
-     4 = Mihrab (luk)            / Mihrab (Bogen)
-     5 = Nebo (mijenja se kroz dan) / Himmel (wechselt über den Tag) */
-  dizajn: 5,
-
-  /* Samo za dizajn 5 (Nebo) – raspored / Nur für Design 5 (Himmel) – Layout:
-     1 = kartice dole          / Karten unten
-     2 = traka na horizontu    / Leiste am Horizont
-     3 = lista desno           / Liste rechts
-     4 = minimalno, sat u sredini / minimal, Uhr in der Mitte
-     7 = kao 1, sat i podaci u sredini / wie 1, Uhr und Infos in der Mitte */
-  raspored: 7,
-
-  /* Font / Schrift: "" (standard), "Montserrat", "Cormorant", "Josefin", "Cinzel", "Outfit" */
-  font: "",
-
   /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
   lagano: true,
-  /* Logo džemata: 0 = bez logotipa (plava tema), 1-5 = raspored s logotipom (zelena tema, 3 = svijetla)
-     Logo der Gemeinde: 0 = ohne Logo (blaues Design), 1-5 = Layout mit Logo (grünes Design, 3 = hell)
-     1 = lijevo uz naziv · 2 = gore u sredini · 3 = svijetlo, lijevo · 4 = veliki vodeni žig · 5 = uz sat
-     6 = svijetlo + vodeni žig / hell + Wasserzeichen */
-  logo: 6,
-  /* Uzorak zvijezda u pozadini: false = bez / Sternmuster im Hintergrund: false = ohne */
-  uzorak: false,
-
-  /* Pozadina: true = živo nebo (sunce, mjesec, oblaci), false = mirna plava pozadina (brže na slabijem uređaju).
-     Hintergrund: true = lebendiger Himmel, false = ruhiger blauer Hintergrund (schneller auf schwachen Geräten). */
-  nebo: false,
 
   /* Naziv džemata / Name der Gemeinde */
   naziv: "Džemat EKC Elif Eupen",
-
-  /* Slika u pozadini (npr. "dzamija.jpg"). Prazno = bez slike.
-     Hintergrundbild (z. B. "dzamija.jpg"). Leer = ohne Bild. */
-  pozadina: "",
 
   /* Sabah-ezan: 60 minuta prije izlaska sunca.
      Sabah-Ezan: 60 Minuten vor Sonnenaufgang. */

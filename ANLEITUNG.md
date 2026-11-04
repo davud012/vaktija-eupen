@@ -102,4 +102,3 @@ Claude erstellt eine neue `vaktija.js`, die wie oben unter „Updates später“
 An die Adresse anhängen:
 - `?vrijeme=2026-12-10T12:34:50` – eine bestimmte Uhrzeit (hier: kurz vor Podne)
 - `?brzina=600` – Zeitraffer (1 Sekunde = 10 Minuten)
-- `?prilike=kisa` – Wetter simulieren (`vedro`, `oblacno`, `magla`, `kisa`, `snijeg`, `oluja`)

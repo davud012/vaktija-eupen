@@ -28,12 +28,7 @@ Sie läuft im Vollbild auf dem Samsung-Fernseher der Moschee (UE65RU7179, Eingan
 
 ## Was fertig ist
 
-**Design:** Design 5 „Nebo“ (Himmel), Layout 1 (Karten unten), Standard-Schrift.
-- Echter Himmel über Eupen: Sonne, Mond mit echter Mondphase, Planeten (ohne Beschriftung), Sterne, Milchstraße
-- Kein Boden, keine Moschee-Silhouette, kein Laufband
-- Einzige Info: nächstes Gebet und verbleibende Zeit
-- Echtes Wetter aus Eupen (Open-Meteo): Wolken, Regen mit Tropfen auf der Scheibe, Schnee, Gewitter mit Blitzen, Nebel
-- Himmelsereignisse bis 2028 vorberechnet (Finsternisse, Supermond, Konjunktionen, Sternschnuppen)
+**Design (seit 2026-11-04.9 fest, keine anderen Varianten mehr):** helles beiges Design, dunkelgrüne Schrift, Standard-Schrift. Uhr, Name mit kleinem Logo, Datum (BS · DE), Hidžra und „Sljedeće“ in der Mitte, darunter 6 weiße Karten, unten die Džuma-Leiste, großes Logo als Wasserzeichen.
 
 **Gebets-Bildschirm:** Ab dem Ezan 30 Minuten lang ein eigener Bildschirm (arabischer Name, Countdown bis Ikamet, „Namaz je počeo · molimo utišajte mobitele“, danach „Allah neka primi namaz“, dazu das nächste Gebet). Danach zurück zur Hauptanzeige. Eigener Džuma-Bildschirm am Freitag. Der Freitag ist so, wie er ist, **perfekt** und bleibt so.
 
@@ -45,7 +40,7 @@ Außerhalb dieses Zeitraums stehen nur **Beispielzeiten** drin. Dann erscheint o
 - Datum stimmt immer, auch wenn der Fernseher tagelang aus war (Uhr der Box, Korrektur über den Server nur bei mehr als 1 Stunde Abweichung).
 - Uhrzeit-Fehler (Seite ging 2 bis 8 Minuten vor) ist behoben.
 - Offline-Speicher: Fällt das Internet aus, läuft die Anzeige weiter.
-- Leichte Version für schwache Boxen: in `vaktija.js` `lagano: true` setzen, oder an die Adresse `?lagano=1` anhängen.
+- Leichte Version für schwache Boxen: in `vaktija.js` `lagano: true` (aktiv).
 
 ## Wichtige Dateien
 
@@ -53,15 +48,15 @@ Außerhalb dieses Zeitraums stehen nur **Beispielzeiten** drin. Dann erscheint o
 |---|---|
 | `vaktija.js` | **Die Gebetszeiten** und Einstellungen (Name, Regeln, Design). Hier wird der neue Takvim eingetragen. Oben die Versionsnummer hochzählen. |
 | `index.html` | Die Anzeige selbst |
-| `nebo.js` | Himmel (Sonne, Mond, Planeten, Sterne) |
-| `prilike.js` | Wetter-Animationen |
-| `nebeski-kalendar.js` | Himmelsereignisse bis 2028 |
+| `slike/logo.png` | Logo des Džemats |
+| `prijevod-veza.js`, `lib/` | Verbindung Handy ↔ Fernseher (MQTT), Claude für die Übersetzung |
+| `hutba/` | Handyseite für die Hutba-Übersetzung, `kuran.js` = Qur'an-Text (Lizenz in `KURAN-LICENCA.txt`) |
 | `sw.js` | Offline-Speicher |
 | `ANLEITUNG.md` | Anleitung GitHub, Box, Fully Kiosk, AnyDesk |
-| `fuer-app-entwickler/` | Paket für den App-Entwickler: gleiche Zeiten und Regeln (JSON, Regeln als JavaScript, Testfälle) |
+| `fuer-app-entwickler/vaktija.json` | Gebetszeiten als Link für die App des Entwicklers (nicht löschen, seine App liest diese Datei) |
 
 **Zum Ausprobieren** (an die Adresse anhängen):
-`?vrijeme=2026-12-10T12:34:50` (bestimmte Uhrzeit) · `?brzina=600` (Zeitraffer) · `?prilike=kisa` (Wetter: `vedro`, `oblacno`, `magla`, `kisa`, `snijeg`, `oluja`) · `?lagano=1` (leichte Version)
+`?vrijeme=2026-12-10T12:34:50` (bestimmte Uhrzeit) · `?brzina=600` (Zeitraffer)
 
 ## Wo wir gerade stehen: Einrichtung der Box in der Moschee
 
@@ -209,3 +204,10 @@ Tipps von unterwegs:
   - Einschalten in vaktija.js: `raspored: N` und `font: "…"`.
   - **Aktiv auf dem TV (ab Version 2026-11-04.8): `raspored: 7`** = aktuelles Layout (Karten, Schrift, alle Texte wie Layout 1), aber Uhr, Name mit kleinem Logo, Datum (BS · DE), Hidžra und „Sljedeće“ zentriert in der Mitte wie bei C. Zurück zum alten Kopf: `raspored: 1`.
 - **Hutba-Handyseite (/hutba/) im hellen Design:** beiger Hintergrund, dunkelgrüne Schrift, Logo auf Anmeldung und oben neben dem Titel, grüne Knöpfe und Mikrofon, weiße Kästen.
+
+## Aufräumen (Version 2026-11-04.9)
+Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/vaktija-eupen/ und https://davud012.github.io/vaktija-eupen/hutba/
+- Entfernt: alle Vorschau-Varianten (Designs 1–4, Layouts 2–6, Logos 1–5, Schriften, Sternmuster, `?dizajn=`, `?raspored=`, `?logo=`, `?font=`, `?muster=`, `?lagano=`), Himmel (`nebo.js`, `nebeski-kalendar.js`), Wetter (`prilike.js`, holte alle 10 Min. Daten von Open-Meteo, war aber unsichtbar), Probe-Hutba, Beispielbilder, zusätzliche Schriften, App-Entwickler-Extras (Dart, CSV, Regeln, Muster-Generator).
+- Das Aussehen ist unverändert (Bildvergleich vorher/nachher). Die Einstellungen `dizajn`, `raspored`, `font`, `logo`, `uzorak`, `nebo`, `pozadina` gibt es in `vaktija.js` nicht mehr.
+- Behalten: `fuer-app-entwickler/vaktija.json`, weil die App des Entwicklers diesen Link liest.
+- Offline-Speicher (`sw.js`) auf v3, alte Kopien werden gelöscht.
