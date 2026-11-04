@@ -235,4 +235,4 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Schwarzer Rand: lag an der Box (Display → HDMI → Bildgröße), vom Nutzer behoben.
 
 ## Version 2026-11-04.14 – Diagnose (vorübergehend)
-- Hutba wechselte auf der Box immer noch nicht. Unten links auf dem TV erscheint nach jedem Laden für 3 Minuten eine Diagnose: Chrome-/Android-Version der Box, Uhr der Box, ob die MQTT-Bibliothek geladen ist, Zustand jedes der 3 Server (VERBUNDEN / FEHLER …), Anzahl Nachrichten vom Handy, JavaScript-Fehler. Nutzer schickt ein Foto davon. Danach wieder entfernen (`#dijagnoza` in index.html, `naDogadjaj` in prijevod-veza.js).
+- Hutba wechselte auf der Box immer noch nicht. Unten links auf dem TV erscheint nach jedem Laden für 15 Minuten eine Diagnose: Chrome-/Android-Version der Box, Uhr der Box, ob die MQTT-Bibliothek geladen ist, Zustand jedes der 3 Server (VERBUNDEN / FEHLER …), Anzahl Nachrichten vom Handy, JavaScript-Fehler. Nutzer schickt ein Foto davon. Danach wieder entfernen (`#dijagnoza` in index.html, `naDogadjaj` in prijevod-veza.js).

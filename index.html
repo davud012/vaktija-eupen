@@ -1087,10 +1087,10 @@
     (function () {
       var el = $("dijagnoza"), start = Date.now();
       function crtaj() {
-        if (Date.now() - start > 180000) { el.style.display = "none"; return; }
+        if (Date.now() - start > 900000) { el.style.display = "none"; return; }
         var ua = navigator.userAgent, ch = /Chrome\/([\d.]+)/.exec(ua), an = /Android ([\d.]+)/.exec(ua);
         var d = new Date(), t = [];
-        t.push("DIAGNOSE · Version 2026-11-04.14");
+        t.push("DIAGNOSE · Version 2026-11-04.15");
         t.push("Browser: Chrome " + (ch ? ch[1] : "?") + " · Android " + (an ? an[1] : "?"));
         t.push("Uhr der Box: " + d.toLocaleDateString() + " " + dvije(d.getHours()) + ":" + dvije(d.getMinutes()) + ":" + dvije(d.getSeconds()));
         t.push("MQTT-Bibliothek: " + (window.mqtt && mqtt.connect ? "geladen" : "FEHLT") + " · Übersetzung: " + (HP && HP.ukljuceno ? "an" : "AUS"));
