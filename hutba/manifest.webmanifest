@@ -1,0 +1,14 @@
+{
+  "name": "Hutba – prijevod · Džemat EKC Elif Eupen",
+  "short_name": "Hutba Elif",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3ecdc",
+  "theme_color": "#f3ecdc",
+  "icons": [
+    { "src": "../slike/ikona-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "../slike/ikona-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "../slike/ikona-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

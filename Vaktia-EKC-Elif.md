@@ -242,3 +242,8 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **Behoben:** Datum & Uhrzeit an der Box von Hand eingestellt, Cache in Fully geleert. Hutba funktioniert jetzt.
 - **Achtung nach Stromausfall:** Uhr der Box prüfen (Einstellungen → Datum & Uhrzeit). Ist sie falsch, gehen Hutba und Updates nicht.
 - Diagnose-Anzeige wieder entfernt. Die MQTT-Bibliothek für alte Browser (`lib/mqtt-tv.min.js`) bleibt.
+
+## Neues Logo aus dem PDF (2026-11-04.17)
+- Quelle: PDF des Nutzers (Adobe Illustrator, Vektor), **Seite 2** (Logo ohne Schrift), mit pdftocairo bei 400 dpi transparent gerendert und zugeschnitten (2467 × 2333 px).
+- Daraus: `slike/logo.png` (1100 px hoch, Wasserzeichen), `logo-klein.png` (180 px), `logo-mittel.png` (260 px).
+- **App-Symbol für Verknüpfung auf dem Handy:** `slike/apple-touch-icon.png` (iPhone), `slike/ikona-192.png`, `ikona-512.png`, `ikona-512-maskable.png` (Android), `slike/favicon.png` + `favicon.ico` (Browser-Tab). `manifest.webmanifest` („Vaktija Elif“) und `hutba/manifest.webmanifest` („Hutba Elif“), Hintergrund Creme #fbf8ef.
