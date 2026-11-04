@@ -200,3 +200,10 @@ Tipps von unterwegs:
   - Animationen (auch in der leichten Version, nur transform/opacity bzw. einmaliges Linienzeichnen): Logo fliegt beim Erscheinen ein und schwebt danach leicht; Ornament zeichnet sich und dreht sich langsam; beim Ezan grüne Wellen; Hutba-Wörter blenden ein, LIVE-Punkt pulsiert.
 - Option ohne Sternmuster: `?muster=0` (Vorschau) bzw. `uzorak: false` in vaktija.js – **aktiv seit 2026-11-04.6** (Fernseher ohne Sternmuster).
 - **Update 2026-11-04.7:** Grundfarbe vor dem Laden des Skripts ist jetzt Creme statt Blau → kein blaues Aufblitzen mehr beim Neuladen (F5). Blau nur noch, wenn das blaue Design gewählt ist (`logo: 0`).
+- **Layout-Vorschläge (beiges Design)**, ansehen per Adresse, Fernseher bleibt bei Layout 1:
+  - A `?raspored=2` – eine weiße Leiste unten mit allen Zeiten
+  - B `?raspored=3&font=outfit` – Uhr groß links, Liste rechts, Schrift Outfit
+  - C `?raspored=4&font=cormorant` – Uhr groß in der Mitte, Zeiten ohne Kästen, Schrift Cormorant (elegant), weniger Text
+  - D `?raspored=5&font=montserrat` – Uhr links, 6 Karten 3×2 rechts mit Farbleiste oben, weniger Text
+  - E `?raspored=6&font=cormorant` – Tabelle wie ein Takvim
+  - Einschalten in vaktija.js: `raspored: N` und `font: "…"`.

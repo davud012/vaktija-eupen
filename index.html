@@ -500,6 +500,67 @@
   body.dizajn-5.raspored-4 footer { margin-top: 1vh; }
   body.dizajn-5.raspored-4 .dzuma { background: transparent; border-left: none; font-size: 1.3vw; padding: 0.5vh 1vw; }
 
+  /* Raspored 5: fokus – sljedeći namaz veliko lijevo, kartice 3×2 desno / Fokus – nächstes Gebet groß links, Karten 3×2 rechts */
+  body.dizajn-5.raspored-5 .overlay {
+    display: grid; grid-template-columns: 0.9fr 1.1fr; grid-template-rows: auto 1fr auto; column-gap: 3vw;
+    grid-template-areas: "glava vakti" "slj vakti" "dno vakti";
+  }
+  body.dizajn-5.raspored-5 header { grid-area: glava; flex-direction: column; }
+  body.dizajn-5.raspored-5 .sat { text-align: left; font-size: 9vw; margin-top: 3vh; }
+  body.dizajn-5.raspored-5 .naziv { font-size: 2.7vw; }
+  body.dizajn-5.raspored-5 .sljedeci { grid-area: slj; height: auto; margin: 2vh 0 0; justify-content: flex-start; text-align: left; align-self: start; }
+  body.dizajn-5.raspored-5 .sljedeci-tekst { width: 100%; font-size: 2.3vw; }
+  body.dizajn-5.raspored-5 .vakti, body.dizajn-5.raspored-5 .greska { grid-area: vakti; }
+  body.dizajn-5.raspored-5 .vakti { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 1.4vw; height: auto; }
+  body.dizajn-5.raspored-5 footer { grid-area: dno; justify-content: flex-start; }
+  body.dizajn-5.raspored-5 .vakat { border-radius: 1.6vw; }
+  body.dizajn-5.raspored-5 .vakat .ezan { font-size: 4vw; }
+  body.dizajn-5.raspored-5 .vakat .namaz { font-size: 1.2vw; }
+
+  /* Raspored 6: tabela kao takvim / Tabelle wie ein Takvim */
+  body.dizajn-5.raspored-6 .sljedeci { height: 11vh; margin: 0.5vh 0; }
+  body.dizajn-5.raspored-6 .vakti { flex: 1; flex-direction: column; gap: 0; width: 72vw; margin: 0 auto 1vh; padding: 0.8vh 2vw; border-radius: 1.6vw; }
+  body.dizajn-5.raspored-6 .vakat {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; text-align: left; flex: 1;
+    padding: 0 1.6vw; border-radius: 1vw; border: none; border-bottom: 0.12vw solid rgba(138, 115, 80, 0.22);
+  }
+  body.dizajn-5.raspored-6 .vakat:last-child { border-bottom: none; }
+  body.dizajn-5.raspored-6 .vakat .ime { font-size: 2vw; grid-column: 1; grid-row: 1; }
+  body.dizajn-5.raspored-6 .vakat .ime-de { font-size: 1.1vw; grid-column: 1; grid-row: 2; margin: 0; }
+  body.dizajn-5.raspored-6 .vakat .ezan { font-size: 3vw; grid-column: 2; grid-row: 1 / span 2; margin: 0; text-align: center; }
+  body.dizajn-5.raspored-6 .vakat .namaz { font-size: 1.15vw; grid-column: 3; grid-row: 1 / span 2; min-height: 0; text-align: right; }
+  body.dizajn-5.raspored-6 .vakat.sljedeci-vakat::before { border-radius: 1vw; }
+  body.dizajn-5.raspored-6 footer { margin-top: 0; }
+
+  /* Svijetla tema za rasporede 2-6 / Helles Design für Layouts 2-6 */
+  body.svijetlo.dizajn-5.raspored-2 .vakti, body.svijetlo.dizajn-5.raspored-3 .vakti, body.svijetlo.dizajn-5.raspored-6 .vakti {
+    background: rgba(255, 255, 255, 0.72); box-shadow: 0 0.5vh 2.5vh rgba(60, 50, 20, 0.08);
+  }
+  body.svijetlo.dizajn-5 .dzuma { background: rgba(255, 255, 255, 0.75); }
+  body.svijetlo.dizajn-5.raspored-4 .dzuma { background: transparent; }
+  body.svijetlo.dizajn-5 .vakat.sljedeci-vakat { background: rgba(0, 85, 2, 0.08); border-color: #005502; }
+  body.svijetlo.dizajn-5.raspored-5 .vakat { background: rgba(255, 255, 255, 0.75); box-shadow: 0 0.4vh 1.5vh rgba(60, 50, 20, 0.08); }
+  body.svijetlo.dizajn-5.raspored-5 .vakat.prosao { background: rgba(255, 255, 255, 0.45); }
+  body.svijetlo.dizajn-5.raspored-5 .vakat.sljedeci-vakat { background: rgba(0, 85, 2, 0.08); }
+  body.dizajn-5.raspored-6 .vakat, body.svijetlo.dizajn-5.raspored-6 .vakat { background: transparent; box-shadow: none; }
+  body.dizajn-5.raspored-6 .vakat.prosao { opacity: 0.5; }
+  body.svijetlo.dizajn-5.raspored-6 .vakat.sljedeci-vakat { background: rgba(0, 85, 2, 0.08); border: 0.2vw solid #005502; }
+  /* 5: kartice s trakom gore, manje teksta / Karten mit Leiste oben, weniger Text */
+  body.dizajn-5.raspored-5 .naziv { font-size: 2.3vw; white-space: nowrap; }
+  body.dizajn-5.raspored-5 .vakat .ime-de, body.dizajn-5.raspored-5 .hidzra { display: none; }
+  body.svijetlo.dizajn-5.raspored-5 .vakat { border: none; border-top: 0.7vh solid #a59272; border-radius: 0.6vw 0.6vw 1.8vw 1.8vw; }
+  body.svijetlo.dizajn-5.raspored-5 .vakat.sljedeci-vakat { border-top-color: #005502; outline: 0.2vw solid #005502; }
+  /* 4: minimalno, manje teksta / minimal, weniger Text */
+  body.dizajn-5.raspored-4 .vakat .ime-de, body.dizajn-5.raspored-4 .hidzra { display: none; }
+  /* Zaglavlje s logotipom za 3 i 4 / Kopf mit Logo für 3 und 4 */
+  body.dizajn-5.raspored-3 header { flex-direction: column; }
+  body.dizajn-5.raspored-3 .sat { text-align: left; font-size: 8.5vw; margin-top: 3vh; }
+  body.dizajn-5.raspored-3 .naziv { font-size: 2.6vw; white-space: nowrap; }
+  body.dizajn-5.raspored-3 .sljedeci { margin-top: 4vh; }
+  body.logo-6.raspored-4 header > div:first-child { display: flex; flex-direction: column; align-items: center; }
+  body.logo-6.raspored-4 .naslov-blok { display: flex; align-items: center; gap: 1.2vw; margin-top: 1vh; }
+  body.logo-6.raspored-4 .logo { height: 8vh; }
+
   /* ---------- Fontovi / Schriften ---------- */
   @font-face { font-family: "Amiri"; src: url("fonts/Amiri-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF; }
   @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat.ttf"); font-weight: 100 900; }
