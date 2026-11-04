@@ -247,3 +247,4 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Quelle: PDF des Nutzers (Adobe Illustrator, Vektor), **Seite 2** (Logo ohne Schrift), mit pdftocairo bei 400 dpi transparent gerendert und zugeschnitten (2467 × 2333 px).
 - Daraus: `slike/logo.png` (1100 px hoch, Wasserzeichen), `logo-klein.png` (180 px), `logo-mittel.png` (260 px).
 - **App-Symbol für Verknüpfung auf dem Handy:** `slike/apple-touch-icon.png` (iPhone), `slike/ikona-192.png`, `ikona-512.png`, `ikona-512-maskable.png` (Android), `slike/favicon.png` + `favicon.ico` (Browser-Tab). `manifest.webmanifest` („Vaktija Elif“) und `hutba/manifest.webmanifest` („Hutba Elif“), Hintergrund Creme #fbf8ef.
+- **2026-11-04.18:** Countdown in den letzten 15 Min. vor dem Gebet bleibt golden, pulsiert aber nicht mehr (wird nicht mehr größer/kleiner).
