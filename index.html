@@ -15,12 +15,14 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; }
-  html { background: #0f1a30; }
+  /* Prije učitavanja skripte: ista boja kao svijetla tema (nema bljeska) / Vor dem Skript: gleiche Farbe wie das helle Design (kein Aufblitzen) */
+  html { background: #f3ecdc; }
   body {
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--text);
-    background: linear-gradient(180deg, #1a3868 0%, #142b52 45%, #0f1a30 100%);
+    background: linear-gradient(180deg, #fbf8ef 0%, #f3ecdc 55%, #e9dfc8 100%);
   }
+  html:has(body.dizajn-5.plavo:not(.svijetlo)) { background: #0f1a30; }
   body.dizajn-1 {
     background-color: #0b3b2e;
     background-image:
