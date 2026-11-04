@@ -226,3 +226,10 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **Zora heißt jetzt Sabah** (Karte, morgen-Ansicht).
 - **Gebetsbildschirm:** ab Ezan 10 Min. Countdown, danach „Namaz je počeo“ 10 Min. (Jacija 15 Min.), dann Hauptbildschirm. Sabah: Ezan 60 Min. vor Sonnenaufgang (z. B. 06:31), Countdown bis 06:41, bis 06:51. `trajanjeEkranaVakta: { zora: 20, podne: 20, ikindija: 20, aksam: 20, jacija: 25 }`, `trajanjeNamaza: 15`. Freitag (Džuma) unverändert.
 - Schwarzer Rand ums Bild am Samsung: Bild der Box ist verkleinert (Zoom/Bildschirmposition der Box bzw. Bildgröße am TV), Einstellung am Gerät, nicht in der Seite.
+
+## Version 2026-11-04.13
+- **Logo-Blende entfernt** (Wunsch des Nutzers), `slike/blende.webp` gelöscht.
+- **Hutba wechselte auf dem TV nicht (am PC schon):** Die MQTT-Bibliothek `lib/mqtt.min.js` (mqtt.js 5.16, sehr neues JavaScript: Klassenfelder, `?.` usw.) läuft im alten Browser der Box nicht → keine Verbindung. Der Fernseher nutzt jetzt `lib/mqtt-tv.min.js` = mqtt.js 4.3.8, mit esbuild auf ES2015 heruntergerechnet. Das Handy (`hutba/`) nutzt weiter `lib/mqtt.min.js`. Getestet: Handy → TV wechselt zur Hutba und zurück.
+- Großes Logo im Hintergrund stärker: Deckkraft 0.08 → 0.14.
+- Hinweis: Der Browser der Box ist alt (kein flex-`gap`, kein neues JavaScript). Neue Funktionen für den TV immer in einfachem JavaScript (ES5) und ohne neue CSS-Funktionen bauen.
+- Schwarzer Rand: lag an der Box (Display → HDMI → Bildgröße), vom Nutzer behoben.

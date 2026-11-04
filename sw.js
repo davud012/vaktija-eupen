@@ -2,8 +2,8 @@
    Speichert die Seite auf dem Gerät, damit sie auch ohne Internet läuft.
    Uvijek prvo internet (da dođu nove verzije), tek bez interneta sačuvana kopija.
    Immer zuerst Internet (damit Updates ankommen), nur ohne Internet die gespeicherte Kopie. */
-var CACHE = "vaktija-v5";
-var OSNOVA = ["./", "index.html", "vaktija.js", "slike/logo.png", "lib/mqtt.min.js", "prijevod-veza.js", "slike/blende.webp"];
+var CACHE = "vaktija-v6";
+var OSNOVA = ["./", "index.html", "vaktija.js", "slike/logo.png", "slike/logo-klein.png", "slike/logo-mittel.png", "lib/mqtt-tv.min.js", "prijevod-veza.js"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(OSNOVA); }).then(function () { return self.skipWaiting(); }));

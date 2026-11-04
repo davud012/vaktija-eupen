@@ -229,7 +229,7 @@
   body.svijetlo .he-vrh > .he-lijevo { display: flex; align-items: center; }
   /* Veliki logo kao vodeni žig / Großes Logo als Wasserzeichen */
   body.logo-6 .logo-pozadina { display: block; position: fixed; left: 50%; top: 50%; width: 100vh; height: 100vh; transform: translate(-50%, -50%);
-    background: url("slike/logo.png") center / contain no-repeat; opacity: 0.08; pointer-events: none; }
+    background: url("slike/logo.png") center / contain no-repeat; opacity: 0.14; pointer-events: none; }
 
   body.dizajn-5 .naziv { text-shadow: 0 0.2vh 1vh rgba(0, 0, 0, 0.35); }
   body.dizajn-5 .datum, body.dizajn-5 .sat, body.dizajn-5 .sljedeci { text-shadow: 0 0.2vh 1.2vh rgba(0, 0, 0, 0.5); }
@@ -380,14 +380,6 @@
   .vakat-ekran:not(.vidljiv) *, .hutba-ekran:not(.vidljiv) * { animation: none !important; }
   body.lagano .he-linije { -webkit-mask-image: none; mask-image: none; }
   body.lagano .he-rijec { animation: none; }
-  /* ---------- Blende s logom (prijelaz) / Logo-Blende (Übergang) ---------- */
-  .blende { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; background: #f3ecdc; opacity: 0; visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s; pointer-events: none; }
-  .blende img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .blende.vidljiva { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
-  .blende.odlazi { opacity: 0; visibility: visible; transition: opacity 0.9s ease; }
-  /* Dok traje blenda, animacije ispod čekaju (počnu kad se blenda skloni) / Animationen darunter warten, bis die Blende weg ist */
-  body.blende-traje .overlay *, body.blende-traje .vakat-ekran *, body.blende-traje .hutba-ekran * { animation-play-state: paused !important; }
 </style>
 </head>
 <body>
@@ -453,8 +445,6 @@
 </div>
 
 <div class="veza-tv" id="veza-tv"><i></i><span>Prijevod · Übersetzung …</span></div>
-<div class="blende" id="blende"><img id="blende-slika" alt=""></div>
-
 <div class="hutba-ekran" id="hutba-ekran">
   <div class="he-vrh">
     <div class="he-lijevo"><img class="he-logo" src="slike/logo-klein.png" alt=""><div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div></div>
@@ -467,7 +457,8 @@
 </div>
 
 <script src="vaktija.js"></script>
-<script src="lib/mqtt.min.js"></script>
+<!-- Verzija za stariji preglednik na TV boxu / Version für den älteren Browser auf der TV-Box -->
+<script src="lib/mqtt-tv.min.js"></script>
 <script src="prijevod-veza.js"></script>
 <script>
 (function () {
@@ -630,53 +621,11 @@
   var prikazSutra = false, sutraZaPrikaz = null, sutraDatum = null;
   function nacrtajSve() { if (danas) crtajVakte(danas, prikazSutra ? sutraZaPrikaz : null, sutraDatum); }
 
-  // Blenda s logom: 1) TV prelazi na hutbu, 2) počinje vakat, 3) povratak na vaktiju
-  // Logo-Blende: 1) TV wechselt zur Hutba, 2) ein Gebet beginnt, 3) zurück zur Vaktija
-  // Animirana slika (WebP), ne video: TV preglednik ne smije sam pustiti video, sliku smije.
-  // Animiertes Bild (WebP), kein Video: der TV-Browser darf Videos nicht selbst starten, Bilder schon.
-  var BLENDA_TRAJANJE = 3600, BLENDA_DAT = "slike/blende.webp";
-  var blendaTraje = false, blendaPodaci = null, blendaUrl = null;
-  (function ucitajBlendu() {
-    // Jednom u memoriju (radi i bez interneta) / Einmal in den Speicher (läuft auch offline)
-    try {
-      var x = new XMLHttpRequest();
-      x.open("GET", BLENDA_DAT); x.responseType = "blob";
-      x.onload = function () { if (x.status === 200) blendaPodaci = x.response; };
-      x.send();
-    } catch (e) {}
-  })();
-  function blenda() {
-    if (blendaTraje || BRZINA > 1 || P.blenda === false) return;
-    var b = $("blende"), img = $("blende-slika"), pocela = false;
-    blendaTraje = true;
-    document.body.classList.add("blende-traje");
-    function kraj() {
-      b.className = "blende odlazi";
-      document.body.classList.remove("blende-traje");
-      setTimeout(function () { b.className = "blende"; blendaTraje = false; }, 950);
-    }
-    img.onload = function () {
-      if (pocela) return; pocela = true;
-      b.className = "blende vidljiva";
-      setTimeout(kraj, BLENDA_TRAJANJE);
-    };
-    img.onerror = function () { if (!pocela) { pocela = true; kraj(); } };
-    setTimeout(function () { if (!pocela) { pocela = true; kraj(); } }, 2000);   // ne čekati vječno / nicht ewig warten
-    // Nova adresa svaki put -> animacija počinje ispočetka / Jedes Mal neue Adresse -> Animation beginnt von vorne
-    try {
-      if (blendaUrl) URL.revokeObjectURL(blendaUrl);
-      blendaUrl = blendaPodaci && window.URL ? URL.createObjectURL(blendaPodaci) : null;
-    } catch (e) { blendaUrl = null; }
-    img.src = blendaUrl || (BLENDA_DAT + "?b=" + Date.now());
-  }
-  window.vaktijaBlenda = blenda;
-
   // Ekran vakta / Gebetsbildschirm
   var veAktivan = false, veFaza = "";
   function sakrijVakatEkran() {
     if (!veAktivan) return;
     veAktivan = false; veFaza = "";
-    if (!document.body.classList.contains("hutba-aktivna")) blenda();   // povratak na vaktiju / zurück zur Vaktija
     $("vakat-ekran").className = "vakat-ekran";
     document.body.classList.remove("vakat-aktivan");
     nacrtajSve();                          // kartice ponovo uleću / Karten fliegen wieder herein
@@ -686,7 +635,6 @@
     var info = cilj.info, ve = $("vakat-ekran");
     if (!veAktivan) {
       veAktivan = true;
-      if (s - ezan < EZAN_EKRAN_SEKUNDI) blenda();   // vakat upravo počeo (ne kod ponovnog učitavanja) / Gebet hat gerade begonnen
       document.body.classList.add("vakat-aktivan");
       ve.className = "vakat-ekran vidljiv" + (s - ezan < EZAN_EKRAN_SEKUNDI ? " svjez" : "");
       postavi("ve-arapski", info.ar || "");
@@ -1070,12 +1018,10 @@
     function pokazi() {
       zadnjiPuls = Date.now();
       if (vidljiv) return;
-      blenda();
       vidljiv = true; ekran.classList.add("vidljiv"); document.body.classList.add("hutba-aktivna");
     }
     function sakrij() {
       if (!vidljiv) return;
-      blenda();
       vidljiv = false; ekran.classList.remove("vidljiv"); document.body.classList.remove("hutba-aktivna");
       // Ništa ne ostaje na ekranu / Nichts bleibt gespeichert
       sesija = null;
