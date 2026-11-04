@@ -302,6 +302,53 @@
   .veza-tv.ok i { background: #3dd68c; }
   .veza-tv.skriven { opacity: 0; }
   body.dizajn-5.plavo .nebo { display: none; }
+  /* ================= Logo i boje logotipa / Logo und Logo-Farben =================
+     vaktija.js -> logo: 1..5 (ili ?logo=1..5 za probu / oder ?logo=1..5 zum Testen) */
+  .logo, .logo-pozadina { display: none; }
+  body[class*="logo-"] .logo { display: block; }
+  /* Zelena tema (1, 2, 4, 5) / Grünes Farbschema */
+  body.dizajn-5.plavo.zeleno {
+    --gold: #d9c59c; --gold-soft: rgba(217, 197, 156, 0.18); --muted: rgba(244, 240, 228, 0.72);
+    background: linear-gradient(180deg, #145a33 0%, #0c4426 45%, #062615 100%);
+  }
+  body.zeleno.dizajn-5.raspored-1 .vakat { background: rgba(2, 26, 12, 0.42); }
+  body.zeleno.dizajn-5.raspored-1 .vakat.prosao { background: rgba(2, 26, 12, 0.25); }
+  body.zeleno.dizajn-5.raspored-1 .vakat.sljedeci-vakat { background: rgba(217, 197, 156, 0.22); }
+  body.zeleno.dizajn-5.raspored-1 .dzuma { background: rgba(2, 26, 12, 0.45); }
+  body.zeleno.dizajn-5 .ekran { background: radial-gradient(circle at 50% 50%, #145a33 0%, #031409 75%); }
+  body.zeleno .hutba-ekran { background: linear-gradient(180deg, rgba(2, 22, 10, 0.6) 0%, rgba(2, 22, 10, 0.85) 45%, rgba(2, 22, 10, 0.94) 100%); }
+  /* Svijetla tema (3) / Helles Farbschema */
+  body.dizajn-5.plavo.svijetlo {
+    --gold: #8a7350; --gold-soft: rgba(165, 146, 114, 0.22); --text: #0d3d1c; --muted: rgba(13, 61, 28, 0.66);
+    color: var(--text); background: linear-gradient(180deg, #fbf8ef 0%, #f3ecdc 55%, #e9dfc8 100%);
+  }
+  body.svijetlo.dizajn-5.plavo::before { opacity: 0.16; filter: brightness(0.55) saturate(0.8); }
+  body.svijetlo .naziv { color: #005502; }
+  body.svijetlo.dizajn-5 .naziv, body.svijetlo.dizajn-5 .datum, body.svijetlo.dizajn-5 .sat, body.svijetlo.dizajn-5 .sljedeci { text-shadow: none; }
+  body.svijetlo.dizajn-5.raspored-1 .vakat { background: rgba(255, 255, 255, 0.75); box-shadow: 0 0.4vh 1.5vh rgba(60, 50, 20, 0.08); }
+  body.svijetlo.dizajn-5.raspored-1 .vakat.prosao { background: rgba(255, 255, 255, 0.45); }
+  body.svijetlo.dizajn-5.raspored-1 .vakat.sljedeci-vakat { background: rgba(0, 85, 2, 0.08); border-color: #005502; }
+  body.svijetlo .vakat.sljedeci-vakat .ezan { color: #005502; }
+  body.svijetlo .vakat.sljedeci-vakat::before { box-shadow: 0 0 3vw 0.4vw rgba(0, 85, 2, 0.25); }
+  body.svijetlo.dizajn-5.raspored-1 .dzuma { background: rgba(255, 255, 255, 0.75); }
+  body.svijetlo .napredak { background: rgba(13, 61, 28, 0.12); }
+  body.svijetlo .sljedeci-tekst b, body.svijetlo .dzuma b { color: #005502; }
+  /* 1: logo u zaglavlju lijevo / Logo links im Kopf */
+  body.logo-1 header > div:first-child, body.logo-3 header > div:first-child { display: grid; grid-template-columns: auto 1fr; column-gap: 1.8vw; align-items: center; }
+  body.logo-1 .naslov-blok, body.logo-3 .naslov-blok { display: contents; }
+  body.logo-1 .logo, body.logo-3 .logo { grid-row: 1 / span 3; height: 17vh; width: auto; }
+  body.logo-1 header > div:first-child > :not(.naslov-blok), body.logo-3 header > div:first-child > :not(.naslov-blok),
+  body.logo-1 .naziv, body.logo-3 .naziv { grid-column: 2; }
+  /* 2: veliki logo u sredini gore / großes Logo oben in der Mitte */
+  body.logo-2 .logo { position: absolute; left: 50%; top: 2.5vh; transform: translateX(-50%); height: 19vh; }
+  body.logo-2 .sljedeci { margin-top: 3vh; }
+  /* 4: vodeni žig iza svega / Wasserzeichen hinter allem */
+  body.logo-4 .logo { display: none; }
+  body.logo-4 .logo-pozadina { display: block; position: fixed; left: 50%; top: 47%; width: 78vh; height: 78vh; transform: translate(-50%, -50%);
+    background: url("slike/logo-svijetli.png") center / contain no-repeat; opacity: 0.11; pointer-events: none; }
+  /* 5: logo dolje lijevo kod džume / Logo unten links neben der Džuma */
+  body.logo-5 .logo { height: 16vh; width: auto; margin-left: auto; margin-right: 2.5vw; align-self: center; }
+
   body.dizajn-5 .uzorak, body.dizajn-5 .svjetla { display: none; }
   body.dizajn-5 .nebo { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
   .nebo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -565,9 +612,10 @@
 <div class="primjer" id="primjer">PRIMJER – nisu službena vremena · BEISPIEL – keine offiziellen Zeiten</div>
 
 <div class="overlay">
+  <div class="logo-pozadina" id="logo-pozadina"></div>
   <header>
     <div>
-      <div class="naziv" id="naziv"></div>
+      <div class="naslov-blok"><img class="logo" id="logo" alt=""><div class="naziv" id="naziv"></div></div>
       <div class="datum"><div id="datum-bs"></div><div class="de" id="datum-de"></div></div>
       <div class="hidzra" id="hidzra"></div>
     </div>
@@ -679,6 +727,15 @@
   var FONT = (trazeniFont ? trazeniFont[1] : (P.font || "")).toLowerCase().split(" ")[0];
   if (FONT) document.body.classList.add("font-" + FONT);
   // Leichte Version für schwache Boxen: vaktija.js -> lagano: true (oder ?lagano=1)
+  // Logo: 1-5 raspored (3 = svijetla tema) / Logo: Layout 1-5 (3 = helles Farbschema)
+  var trazeniLogo = /[?&]logo=(\d)/.exec(location.search);
+  var LOGO = trazeniLogo ? +trazeniLogo[1] : (P.logo || 0);
+  if (LOGO >= 1 && LOGO <= 5) {
+    document.body.classList.add("logo-" + LOGO, LOGO === 3 ? "svijetlo" : "zeleno");
+    var lg = document.getElementById("logo");
+    lg.src = LOGO === 3 ? "slike/logo.png" : "slike/logo-svijetli.png";
+    if (LOGO === 5) { var sat = document.querySelector("header .sat"); sat.parentNode.insertBefore(lg, sat); }   // logo kod sata / Logo neben der Uhr
+  }
   var LAGANO = /[?&]lagano=1/.test(location.search) || P.lagano === true;
   if (LAGANO) document.body.classList.add("lagano");
 

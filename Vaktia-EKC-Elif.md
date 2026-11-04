@@ -187,3 +187,9 @@ Tipps von unterwegs:
 - **Update 2026-11-03.6 – Gemini als Übersetzer, Schlüssel bleiben:**
   - Übersetzer-Auswahl jetzt: Google (kostenlos) · Claude Haiku · Claude · **Gemini – nach Sinn, kostenlos**. Gemini nutzt denselben Schlüssel wie die Gemini-Spracherkennung (`hutba-gkljuc`, Modell `gemini-flash-latest`), gleiche Regeln/JSON-Felder wie Claude (Verse aus dem Mushaf, Arabisch + Übersetzung). Fehler → automatisch Google.
   - Gespeicherte Schlüssel (Claude und Gemini) werden nicht mehr gelöscht, wenn man mit leerem Feld „Speichern“ drückt oder den Übersetzer wechselt; beim Zurückwechseln wird der gespeicherte Schlüssel wieder benutzt.
+
+## Logo der Gemeinde (2026-11-04.1)
+- Logo-Dateien: `slike/logo.png` (Original, grüner Halbmond + sandfarbener Stern, freigestellt) und `slike/logo-svijetli.png` (Halbmond hell/creme für dunklen Hintergrund).
+- Einstellung in `vaktija.js`: `logo: 0` (aus, blaues Design) oder 1–5; zum Ansehen ohne Änderung: `?logo=1` … `?logo=5` an die Adresse hängen.
+  - 1 = Logo links neben dem Namen (grünes Design) · 2 = großes Logo oben in der Mitte · 3 = helles Design (Creme, dunkelgrüne Schrift, Original-Logo) · 4 = großes Logo als Wasserzeichen im Hintergrund · 5 = Logo neben der Uhr.
+- Grünes Design: Hintergrund #145a33 → #062615, Akzent sand #d9c59c (aus dem Logo #a59272), Karten dunkelgrün transparent; Gebets- und Hutba-Bildschirm ebenfalls grün.
