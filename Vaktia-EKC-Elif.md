@@ -207,3 +207,4 @@ Tipps von unterwegs:
   - D `?raspored=5&font=montserrat` – Uhr links, 6 Karten 3×2 rechts mit Farbleiste oben, weniger Text
   - E `?raspored=6&font=cormorant` – Tabelle wie ein Takvim
   - Einschalten in vaktija.js: `raspored: N` und `font: "…"`.
+  - **Aktiv auf dem TV (ab Version 2026-11-04.8): `raspored: 7`** = aktuelles Layout (Karten, Schrift, alle Texte wie Layout 1), aber Uhr, Name mit kleinem Logo, Datum (BS · DE), Hidžra und „Sljedeće“ zentriert in der Mitte wie bei C. Zurück zum alten Kopf: `raspored: 1`.

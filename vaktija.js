@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.7 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.8 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Dizajn / Design:
      1 = Zeleno (kartice)        / Grün (Karten)
@@ -17,8 +17,9 @@ var POSTAVKE = {
      1 = kartice dole          / Karten unten
      2 = traka na horizontu    / Leiste am Horizont
      3 = lista desno           / Liste rechts
-     4 = minimalno, sat u sredini / minimal, Uhr in der Mitte */
-  raspored: 1,
+     4 = minimalno, sat u sredini / minimal, Uhr in der Mitte
+     7 = kao 1, sat i podaci u sredini / wie 1, Uhr und Infos in der Mitte */
+  raspored: 7,
 
   /* Font / Schrift: "" (standard), "Montserrat", "Cormorant", "Josefin", "Cinzel", "Outfit" */
   font: "",
