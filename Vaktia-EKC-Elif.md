@@ -248,3 +248,4 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Daraus: `slike/logo.png` (1100 px hoch, Wasserzeichen), `logo-klein.png` (180 px), `logo-mittel.png` (260 px).
 - **App-Symbol für Verknüpfung auf dem Handy:** `slike/apple-touch-icon.png` (iPhone), `slike/ikona-192.png`, `ikona-512.png`, `ikona-512-maskable.png` (Android), `slike/favicon.png` + `favicon.ico` (Browser-Tab). `manifest.webmanifest` („Vaktija Elif“) und `hutba/manifest.webmanifest` („Hutba Elif“), Hintergrund Creme #fbf8ef.
 - **2026-11-04.18:** Countdown in den letzten 15 Min. vor dem Gebet bleibt golden, pulsiert aber nicht mehr (wird nicht mehr größer/kleiner).
+- **2026-11-04.20:** Grüne Ringe (Wellen) auf dem Gebetsbildschirm entfernt, weil der TV dabei ruckelte.
