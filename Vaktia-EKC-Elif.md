@@ -208,3 +208,4 @@ Tipps von unterwegs:
   - E `?raspored=6&font=cormorant` – Tabelle wie ein Takvim
   - Einschalten in vaktija.js: `raspored: N` und `font: "…"`.
   - **Aktiv auf dem TV (ab Version 2026-11-04.8): `raspored: 7`** = aktuelles Layout (Karten, Schrift, alle Texte wie Layout 1), aber Uhr, Name mit kleinem Logo, Datum (BS · DE), Hidžra und „Sljedeće“ zentriert in der Mitte wie bei C. Zurück zum alten Kopf: `raspored: 1`.
+- **Hutba-Handyseite (/hutba/) im hellen Design:** beiger Hintergrund, dunkelgrüne Schrift, Logo auf Anmeldung und oben neben dem Titel, grüne Knöpfe und Mikrofon, weiße Kästen.
