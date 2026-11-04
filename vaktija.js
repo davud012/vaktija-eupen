@@ -3,7 +3,7 @@
    Ovu datoteku mijenjamo jednom godišnje. / Diese Datei wird einmal im Jahr ersetzt.
    ===================================================================== */
 
-/* verzija: 2026-11-04.11 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
+/* verzija: 2026-11-04.12 – bei Änderungen am Design hochzählen, dann lädt der Fernseher neu */
 var POSTAVKE = {
   /* Lagana verzija za slabije uređaje: true = manje efekata (ako slika trza).
      Leichte Version für schwache Boxen: true = weniger Effekte (falls es ruckelt). */
@@ -24,13 +24,15 @@ var POSTAVKE = {
      Das Gebet beginnt X Minuten nach dem Ezan. */
   ikametNakon: 10,
 
-  /* Koliko minuta od ezana se prikazuje ekran vakta (zatim opet glavni ekran).
-     Wie viele Minuten ab dem Ezan der Gebetsbildschirm bleibt (danach wieder Hauptbildschirm). */
-  trajanjeEkranaVakta: { zora: 15, podne: 20, ikindija: 20, aksam: 20, jacija: 20 },
+  /* Koliko minuta od ezana se prikazuje ekran vakta (zatim opet glavni ekran):
+     10 min odbrojavanje do namaza + 10 min "Namaz je počeo" (jacija 15 min).
+     Wie viele Minuten ab dem Ezan der Gebetsbildschirm bleibt (danach wieder Hauptbildschirm):
+     10 Min. Countdown bis zum Gebet + 10 Min. "Das Gebet hat begonnen" (Ischa 15 Min.). */
+  trajanjeEkranaVakta: { zora: 20, podne: 20, ikindija: 20, aksam: 20, jacija: 25 },
 
-  /* Koliko minuta se prikazuje "Namaz je počeo".
-     Wie viele Minuten "Das Gebet hat begonnen" angezeigt wird. */
-  trajanjeNamaza: 10,
+  /* "Namaz je počeo" ostaje do kraja ekrana vakta.
+     "Das Gebet hat begonnen" bleibt bis zum Ende des Gebetsbildschirms. */
+  trajanjeNamaza: 15,
 
   /* Džuma: hutba ljeti (ljetno vrijeme) i zimi (zimsko vrijeme).
      Freitagsgebet: Predigt in der Sommerzeit und in der Winterzeit. */

@@ -219,3 +219,10 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Die Animationen darunter warten, bis die Blende weg ist; Blende blendet in 0,9 s aus.
 - Das Video wird einmal in den Speicher geladen und offline gespeichert. Ausschalten: `blenda: false` in vaktija.js.
 - **Fix 2026-11-04.11:** Bei Akšam (17:11) kam die Blende auf der Box nicht. Grund: Der Android-Browser in Fully Kiosk startet Videos nicht ohne Antippen (Autoplay-Sperre), die Seite hat die Blende dann übersprungen. Jetzt ist die Blende ein **animiertes Bild** (`slike/blende.webp`, 1600 px, 25 Bilder/s, 390 KB), das ohne Sperre abspielt. Das MP4 und das WebM wurden entfernt. Getestet mit eingeschalteter Autoplay-Sperre.
+
+## Version 2026-11-04.12 (Foto vom Samsung-TV in der Moschee)
+- **Kästchen klebten aneinander, Logo direkt am Namen:** Der ältere Browser auf der Box kennt den CSS-Abstand `gap` nicht. Alle Abstände sind jetzt Ränder (`margin`), funktioniert überall.
+- **Logo unscharf/pixelig:** Das 520-px-Logo wurde auf der Box grob verkleinert. Jetzt vorab sauber verkleinerte Logos: `slike/logo-klein.png` (180 px hoch, Kopf und Hutba) und `slike/logo-mittel.png` (260 px, Gebetsbildschirm). Das große Wasserzeichen bleibt `logo.png`.
+- **Zora heißt jetzt Sabah** (Karte, morgen-Ansicht).
+- **Gebetsbildschirm:** ab Ezan 10 Min. Countdown, danach „Namaz je počeo“ 10 Min. (Jacija 15 Min.), dann Hauptbildschirm. Sabah: Ezan 60 Min. vor Sonnenaufgang (z. B. 06:31), Countdown bis 06:41, bis 06:51. `trajanjeEkranaVakta: { zora: 20, podne: 20, ikindija: 20, aksam: 20, jacija: 25 }`, `trajanjeNamaza: 15`. Freitag (Džuma) unverändert.
+- Schwarzer Rand ums Bild am Samsung: Bild der Box ist verkleinert (Zoom/Bildschirmposition der Box bzw. Bildgröße am TV), Einstellung am Gerät, nicht in der Seite.

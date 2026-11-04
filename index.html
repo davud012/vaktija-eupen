@@ -60,7 +60,8 @@
   .sljedeci.uskoro .odbrojavanje { color: var(--gold); display: inline-block; animation: puls-tekst 1.2s ease-in-out infinite; }
   @keyframes puls-tekst { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
-  .ikamet-panel { display: none; align-items: center; gap: 2.5vw; animation: pojava 0.8s ease-out both; }
+  .ikamet-panel > .prsten { margin-right: 2.5vw; }
+  .ikamet-panel { display: none; align-items: center; animation: pojava 0.8s ease-out both; }
   .prsten { position: relative; width: 13vh; height: 13vh; }
   .prsten svg { width: 100%; height: 100%; transform: rotate(-90deg); }
   .prsten circle { fill: none; stroke-width: 6; }
@@ -76,7 +77,9 @@
   @keyframes pojava { from { transform: scale(0.92); opacity: 0; } to { transform: none; opacity: 1; } }
 
   /* ---------- Vakti / Gebetszeiten ---------- */
-  .vakti { flex: 1; display: flex; gap: 1.2vw; align-items: stretch; }
+  .vakti { flex: 1; display: flex; align-items: stretch; }
+  /* Razmak margom, ne "gap" (stari preglednik na boxu) / Abstand per margin, nicht "gap" (alter Browser auf der Box) */
+  .vakti > .vakat + .vakat { margin-left: 1.2vw; }
   .vakat {
     position: relative;
     flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -253,7 +256,8 @@
   /* Sat i podaci u sredini / Uhr und Infos in der Mitte */
   body.dizajn-5.raspored-7 header { flex-direction: column-reverse; align-items: center; text-align: center; }
   body.dizajn-5.raspored-7 header > div:first-child { display: flex !important; flex-direction: column; align-items: center; }
-  body.dizajn-5.raspored-7 .naslov-blok { display: flex !important; align-items: center; gap: 1.2vw; margin-top: 0.6vh; }
+  body.dizajn-5.raspored-7 .naslov-blok { display: flex !important; align-items: center; margin-top: 0.6vh; }
+  body.dizajn-5.raspored-7 .naslov-blok .logo { margin-right: 1.2vw; }
   body.dizajn-5.raspored-7 .logo { height: 8vh; }
   body.dizajn-5.raspored-7 .sat { font-size: 9vw; text-align: center; }
   body.dizajn-5.raspored-7 .naziv { font-size: 2.6vw; }
@@ -296,7 +300,8 @@
   .ve-arapski { font-size: 4.4vw; color: var(--gold); line-height: 1.4; font-family: "Amiri", "Scheherazade New", "Traditional Arabic", serif; }
   .ve-ime { font-size: 8vw; font-weight: 300; line-height: 1.05; letter-spacing: 0.02em; }
   .ve-ime-de { font-size: 2.5vw; color: var(--muted); margin-top: 0.5vh; }
-  .ve-status { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-top: 5vh; min-height: 14vh; }
+  .ve-status > .prsten { margin-right: 2vw; }
+  .ve-status { display: flex; align-items: center; justify-content: center; margin-top: 5vh; min-height: 14vh; }
   .ve-status .prsten { width: 12vh; height: 12vh; }
   .ve-status-tekst { font-size: 2.2vw; line-height: 1.4; text-align: left; }
   .ve-status-tekst.sredina { text-align: center; }
@@ -331,8 +336,9 @@
   .he-vrh { position: absolute; top: 4vh; left: 4vw; right: 4vw; display: flex; align-items: center; justify-content: space-between; }
   .he-naslov { font-size: 2.1vw; line-height: 1.3; text-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.5); }
   .he-naslov .de { color: rgba(251, 248, 241, 0.65); font-size: 0.75em; }
+  .he-uzivo i { margin-right: 0.7vw; }
   .he-uzivo {
-    display: inline-flex; align-items: center; gap: 0.7vw; margin-right: 1.4vw; vertical-align: 0.25em;
+    display: inline-flex; align-items: center; margin-right: 1.4vw; vertical-align: 0.25em;
     font-size: 0.6em; font-weight: 700; letter-spacing: 0.12em; padding: 0.5vh 1vw; border-radius: 3vh;
     background: rgba(229, 72, 77, 0.18); border: 0.12vw solid rgba(229, 72, 77, 0.7); color: #ff8a8d;
   }
@@ -429,7 +435,7 @@
     <circle class="crta" r="96"/><circle class="crta" r="50"/><circle class="crta" r="99"/>
   </g></svg>
   <div class="valovi"><span></span><span></span><span></span></div>
-  <img class="ve-logo" src="slike/logo.png" alt="">
+  <img class="ve-logo" src="slike/logo-mittel.png" alt="">
   <div class="ve-sadrzaj">
     <div class="ve-arapski" id="ve-arapski"></div>
     <div class="ve-ime" id="ve-ime"></div>
@@ -451,7 +457,7 @@
 
 <div class="hutba-ekran" id="hutba-ekran">
   <div class="he-vrh">
-    <div class="he-lijevo"><img class="he-logo" src="slike/logo.png" alt=""><div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div></div>
+    <div class="he-lijevo"><img class="he-logo" src="slike/logo-klein.png" alt=""><div class="he-naslov"><span class="he-uzivo"><i></i>UŽIVO · LIVE</span>Hutba – prijevod <span class="de" id="he-naslov-cilj">· Predigt – Übersetzung</span></div></div>
     <div class="he-sat" id="he-sat"></div>
   </div>
   <div class="he-linije" id="he-linije"><div class="he-traka" id="he-traka"></div>
@@ -466,7 +472,7 @@
 <script>
 (function () {
   var VAKTI = [
-    { kljuc: "zora",     bs: "Zora",          de: "Fadschr",       namazBs: "sabah-namaz",    namazDe: "Fadschr-Gebet", ekran: "Sabah", ar: "صَلَاةُ الْفَجْرِ" },
+    { kljuc: "zora",     bs: "Sabah",         de: "Fadschr",       namazBs: "sabah-namaz",    namazDe: "Fadschr-Gebet", ekran: "Sabah", ar: "صَلَاةُ الْفَجْرِ" },
     { kljuc: "izlazak",  bs: "Izlazak sunca", de: "Sonnenaufgang" },
     { kljuc: "podne",    bs: "Podne",         de: "Dhuhr",         namazBs: "podne-namaz",    namazDe: "Dhuhr-Gebet", ar: "صَلَاةُ الظُّهْرِ" },
     { kljuc: "ikindija", bs: "Ikindija",      de: "Asr",           namazBs: "ikindija-namaz", namazDe: "Asr-Gebet", ar: "صَلَاةُ الْعَصْرِ" },
@@ -496,7 +502,7 @@
   // Dizajn: svijetlo (bež), sat i podaci u sredini, logo kao vodeni žig
   // Design: hell (beige), Uhr und Infos in der Mitte, Logo als Wasserzeichen
   document.body.classList.add("dizajn-5", "raspored-1", "raspored-7", "logo-6", "svijetlo", "plavo");
-  document.getElementById("logo").src = "slike/logo.png";
+  document.getElementById("logo").src = "slike/logo-klein.png";
   var LAGANO = P.lagano !== false;
   if (LAGANO) document.body.classList.add("lagano");
 
