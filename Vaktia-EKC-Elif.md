@@ -251,3 +251,13 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **2026-11-04.20:** Grüne Ringe (Wellen) auf dem Gebetsbildschirm entfernt, weil der TV dabei ruckelte.
 - **2026-11-04.21:** Gebetsbildschirm unten „Sljedeći namaz“ zeigt jetzt die **Ezan-Zeit** (z. B. Sabah sutra u 06:32, Jacija u 19:00), nicht mehr die Gebetszeit (+10 Min.).
 - **Jacija-Regel:** Ezan frühestens 19:00. Ist die Jacija laut Takvim später als 19:00, gilt der Takvim (`jacijaFiksno: { vrijeme: "19:00" }`, ohne Enddatum, gilt also auch für den nächsten Takvim).
+
+## Hutba: Arabisch richtig erkennen (2026-11-06)
+- **Problem:** Die Spracherkennung des Handys kennt nur eine Sprache (Bosnisch). Arabisch kommt deshalb „verhört“ an, z. B. „Hamdo rabbi alim“ statt „Elhamdulillahi rabbil alemin“, und wurde falsch übersetzt.
+- **Neu: unscharfe Erkennung auf dem Handy** (`hutba/index.html` → `NEJASNE`, `nejasneFormule`): Verhörte Wörter werden nach dem Klang (ohne Vokal-Unterschiede, h und doppelte Buchstaben, bis 20 % Abweichung bei langen Formeln) mit über 30 bekannten Formeln verglichen und durch den **genauen arabischen Text** ersetzt. Das läuft vor jedem Übersetzer, also für **Google (kostenlos), Claude Haiku, Claude und Gemini** gleich.
+  - Enthalten u. a.: Elhamdulillahi rabbil alemin, Bismillah, Euzu billahi, Hutba-Eröffnung (Innel-hamde lillahi nahmeduhu …, ve neuzu billahi …, men jehdihillahu …, ešhedu …), La ilahe illallah, La havle …, Inna lillahi …, Allahumme salli …, Ekulu kavli haza …, Subhanehu ve teala, Azze ve dželle, Emma ba'du, Sadekallahul azim, Amin ja rabbel alemin, Salavat (→ ﷺ), Verse 2:201, 33:56, 16:90 (Text aus `kuran.js`).
+  - Neue Formel hinzufügen: in `NEJASNE` eine Zeile `["arabischer Text", "schreibweise 1|schreibweise 2"]` – am besten so geschrieben, wie die Erkennung sie auf dem Handy anzeigt.
+  - Getestet: normaler bosnischer Hutba-Text (auch Wörter wie alim, Alem, Lila, Ila, Rabija) wird **nicht** verändert.
+- **Neue Einstellung „Arabisch in der Hutba“:** Standard **„Nur arabische Schrift, ohne Übersetzung“**. Alternativ „Arabische Schrift + Übersetzung“ (wie vorher). Gilt für alle Übersetzer und auch für Gemini-Spracherkennung (gespeichert als `hutba-arnacin`).
+- KI-Anweisungen (Haiku, Claude, Gemini) ergänzt: weitere verhörte Beispiele, Arabisch immer in arabischer Schrift, je nach Einstellung ohne Übersetzung.
+- **Tipp:** Die Spracherkennung „Gemini“ (Einstellungen → Spracherkennung) hört die Tonaufnahme selbst und erkennt Arabisch direkt, auch Sätze, die nicht in der Liste stehen. Kostenloser Schlüssel von aistudio.google.com.

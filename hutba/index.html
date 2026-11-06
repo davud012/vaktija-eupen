@@ -255,6 +255,13 @@
         </div>
         </div>
 
+        <label for="ar-nacin" data-t="arNacin"></label>
+        <select id="ar-nacin">
+          <option value="samo" data-t="optArSamo"></option>
+          <option value="prijevod" data-t="optArPrijevod"></option>
+        </select>
+        <div class="mali" id="ar-nacin-info"></div>
+
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
         <div class="mali" data-t="odjavaInfo"></div>
         <div class="mali" id="verzija" style="margin-top:14px;opacity:.6"></div>
@@ -298,7 +305,7 @@
       u4: "Ekran mobitela ostaviti upaljen, ne zaključavati.",
       u5: "Kad preglednik pita za mikrofon, izaberite <b>Dozvoli</b> (ako postoji: „pri svakoj posjeti“, ne „samo ovaj put“).",
       tokNaslov: "Prijevod", prazno: "Još ništa",
-      postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac",
+      postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac", arNacin: "Arapski u hutbi", optArSamo: "Samo arapsko pismo, bez prijevoda", optArPrijevod: "Arapsko pismo + prijevod", infoArSamo: "Kad govorite arapski (Elhamdulillah, dova, ajet), na TV-u se piše arapskim pismom i ne prevodi se.", infoArPrijevod: "Arapski se piše arapskim pismom, a odmah iza njega prijevod.",
       optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 5 centi po hutbi. Ajete prepoznaje slabije. Treba Claude ključ.",
       guthaben: "Na Claude računu nema više kredita – prevodi se besplatno preko Google-a. Dopunite kredit na platform.claude.com.",
       optGoogle: "Google – besplatno", optClaude: "Claude – po smislu, uz plaćanje",
@@ -347,7 +354,7 @@
       u4: "Handy-Bildschirm anlassen, nicht sperren.",
       u5: "Wenn der Browser nach dem Mikrofon fragt, <b>Zulassen</b> wählen (falls angeboten: „bei jedem Besuch“, nicht „nur dieses Mal“).",
       tokNaslov: "Übersetzung", prazno: "Noch nichts",
-      postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer",
+      postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer", arNacin: "Arabisch in der Hutba", optArSamo: "Nur arabische Schrift, ohne Übersetzung", optArPrijevod: "Arabische Schrift + Übersetzung", infoArSamo: "Wenn Sie Arabisch sprechen (Elhamdulillah, Dua, Koranvers), steht es auf dem TV in arabischer Schrift und wird nicht übersetzt.", infoArPrijevod: "Arabisches steht in arabischer Schrift, direkt dahinter die Übersetzung.",
       optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 5 Cent pro Hutba. Erkennt Verse schlechter. Braucht einen Claude-Schlüssel.",
       guthaben: "Kein Guthaben mehr auf dem Claude-Konto – es wird kostenlos über Google übersetzt. Guthaben auf platform.claude.com aufladen.",
       optGoogle: "Google – kostenlos", optClaude: "Claude – nach Sinn, kostenpflichtig",
@@ -396,7 +403,7 @@
       u4: "Laissez l'écran du téléphone allumé, ne le verrouillez pas.",
       u5: "Quand le navigateur demande le micro, choisissez <b>Autoriser</b> (si proposé : « à chaque visite », pas « cette fois seulement »).",
       tokNaslov: "Traduction", prazno: "Rien pour l'instant",
-      postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur",
+      postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur", arNacin: "Arabe dans la khutba", optArSamo: "Écriture arabe seulement, sans traduction", optArPrijevod: "Écriture arabe + traduction", infoArSamo: "Quand vous parlez arabe (Elhamdulillah, invocation, verset), il s'affiche en écriture arabe sans traduction.", infoArPrijevod: "L'arabe s'affiche en écriture arabe, suivi directement de la traduction.",
       optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 5 centimes par khutba. Reconnaît moins bien les versets. Nécessite une clé Claude.",
       guthaben: "Plus de crédit sur le compte Claude – la traduction continue gratuitement via Google. Rechargez le crédit sur platform.claude.com.",
       optGoogle: "Google – gratuit", optClaude: "Claude – selon le sens, payant",
@@ -550,6 +557,7 @@
   if (!citaj("hutba-v4")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude-haiku"); pisiTiho("hutba-v4", "da"); }
   $("prevodilac").value = /^(claude(-haiku)?|google|gemini)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
   $("kljuc").value = citaj("hutba-kljuc") || "";
+  $("ar-nacin").value = citaj("hutba-arnacin") === "prijevod" ? "prijevod" : "samo";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
   $("gmodel").value = citaj("hutba-gmodel") || G_MODEL;
@@ -580,6 +588,9 @@
   });
   $("cilj").addEventListener("change", function () { pisi("hutba-cilj", this.value); posaljiStanje(); });
   $("prevodilac").addEventListener("change", function () { pisi("hutba-prevodilac", this.value); prikaziPrevodioca(); });
+  $("ar-nacin").addEventListener("change", function () { pisi("hutba-arnacin", this.value); prikaziPrevodioca(); });
+  // Arapski s prijevodom? (standard: samo arapsko pismo) / Arabisch mit Übersetzung? (Standard: nur arabische Schrift)
+  function arSPrijevodom() { return $("ar-nacin").value === "prijevod"; }
   function prikaziPrevodioca() {
     var gem = $("prepoznavanje").value === "gemini";
     $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI && $("prevodilac").value !== "gemini");
@@ -590,6 +601,7 @@
     $("claude-dio").classList.toggle("skriveno", !cl);
     $("prevodilac-info").textContent = pv === "claude" ? t("infoClaude") : pv === "claude-haiku" ? t("infoHaiku") : pv === "gemini" ? t("infoGeminiP") : t("infoGoogle");
     $("kljuc-stanje").textContent = citaj("hutba-kljuc") ? "  " + t("spremljeno") : "";
+    $("ar-nacin-info").textContent = arSPrijevodom() ? t("infoArPrijevod") : t("infoArSamo");
   }
   $("spremi-kljuc").addEventListener("click", function () {
     // Prazno polje ne briše spremljeni ključ / Leeres Feld löscht den gespeicherten Schlüssel nicht
@@ -931,7 +943,7 @@
   function gemini(b64, r) {
     var iz = izvor(), ck = ciljKod(), model = citaj("hutba-gmodel") || G_MODEL;
     var upute = uputa(iz, ck) + "\n\nIMPORTANT: Here the input is an AUDIO recording of the next part of the sermon, not text. " +
-      "First write down exactly what was said, in the spoken language (field \"original\"; recited Qur'an in Arabic script if you recognize it). " +
+      "First write down exactly what was said, in the spoken language (field \"original\"). Everything the imam says in ARABIC (formulas like Elhamdulillahi rabbil alemin, Bismillah, the opening of the hutba, duas, hadith, recited Qur'an) is written in ARABIC SCRIPT with vowel marks in round brackets - never in Latin letters and never as Bosnian-looking words. " +
       "Then translate it into " + CILJ[ck].ime + " following all rules above (field \"translation\"). " +
       "If the audio contains no speech, return \"-\" in both fields.";
     var tijelo = {
@@ -1011,7 +1023,116 @@
         return ar === "ﷺ" ? "ﷺ" : "(" + ar + ")";
       });
     }, tekst);
-    return spojiArapsko(t3);
+    return spojiArapsko(nejasneFormule(t3));
+  }
+
+  /* =================== Nejasno prepoznati arapski / Unscharf erkanntes Arabisch =================== */
+  // Prepoznavanje čuje arapski "na bosanski" (npr. "hamdo rabbi alim"). Ovdje se takve riječi uporede s poznatim
+  // formulama po zvuku (bez samoglasničkih razlika, h, duplih slova) i zamijene tačnim arapskim tekstom.
+  // Die Erkennung hört Arabisch "auf Bosnisch" (z. B. "hamdo rabbi alim"). Hier werden solche Wörter nach dem Klang
+  // mit bekannten Formeln verglichen (ohne Vokalunterschiede, h, doppelte Buchstaben) und durch den genauen arabischen Text ersetzt.
+  var NEJASNE = [
+    ["ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ", "elhamdulillahi rabbil alemin|hamdu lillahi rabbil alemin|hamdo rabbi alim|hamdu rabbil alemin|elhamdu rabbil alemin|hamdu rabbi alemin|elhamdulillah rabbil alim|hamdu lila rabil alim|hamdo lila rabi alim"],
+    ["ٱلْحَمْدُ لِلَّٰهِ", "elhamdulillah|elhamdu lillah|hamdulillah|elham dulila"],
+    ["بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "bismillahir rahmanir rahim|bismila rahman rahim|mila rahman rahim|bismillahi rahmani rahim"],
+    ["أَعُوذُ بِٱللَّٰهِ مِنَ ٱلشَّيْطَٰنِ ٱلرَّجِيمِ", "euzu billahi mineš šejtanir radžim|euzubillahi mine šejtani radžim|ozu bilahi mina šejtan radžim|euzu bilahi min šejtan radžim"],
+    ["إِنَّ ٱلْحَمْدَ لِلَّٰهِ نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ", "innel hamde lillahi nahmeduhu ve nesteinuhu ve nestagfiruhu|inel hamde lila nahmeduhu ve nestainuhu ve nestagfiruhu"],
+    ["إِنَّ ٱلْحَمْدَ لِلَّٰهِ نَحْمَدُهُ", "innel hamde lillahi nahmeduhu|inel hamde lila nahmeduhu"],
+    ["نَحْمَدُهُ وَنَسْتَعِينُهُ وَنَسْتَغْفِرُهُ", "nahmeduhu ve nesteinuhu ve nestagfiruhu|nahmeduhu ve nestainuhu ve nestagfiruh"],
+    ["وَنَعُوذُ بِٱللَّٰهِ مِنْ شُرُورِ أَنْفُسِنَا وَمِنْ سَيِّئَاتِ أَعْمَالِنَا", "ve neuzu billahi min šururi enfusina ve min sejjiati amalina|ve neuzu bilahi min šururi enfusina ve min sejiati amalina"],
+    ["مَنْ يَهْدِهِ ٱللَّٰهُ فَلَا مُضِلَّ لَهُ", "mejjehdihillahu fela mudille leh|men jehdihillahu fela mudille leh|mejehdihilahu fela mudile leh"],
+    ["وَمَنْ يُضْلِلْ فَلَا هَادِيَ لَهُ", "ve mejjudlil fela hadije leh|ve men judlil fela hadije leh|ve mejudlil fela hadije leh"],
+    ["وَأَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ", "ve ešhedu en la ilahe illallahu vahdehu la šerike leh|ešhedu en la ilahe illallahu vahdehu la šerike leh"],
+    ["وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ", "ve ešhedu enne muhammeden abduhu ve resuluhu|ešhedu enne muhammeden abduhu ve resuluh"],
+    ["أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ", "ešhedu en la ilahe illallah|ešhedu en la ilahe ilalah"],
+    ["لَا إِلَٰهَ إِلَّا ٱللَّٰهُ", "la ilahe illallah|la ilahe ilallahu"],
+    ["لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّٰهِ", "la havle ve la kuvvete illa billah|la havle vela kuvete ila bilah"],
+    ["إِنَّا لِلَّٰهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "inna lillahi ve inna ilejhi radžiun|ina lilahi ve ina ilejhi radžiun"],
+    ["ٱللَّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ", "allahumme salli ala muhammedin ve ala ali muhammed|allahume sali ala muhamedin ve ala ali muhamed"],
+    ["أَقُولُ قَوْلِي هَٰذَا وَأَسْتَغْفِرُ ٱللَّٰهَ لِي وَلَكُمْ", "ekulu kavli haza ve estagfirullahe li ve lekum|ekulu kavli haza ve estagfirulahe li ve lekum"],
+    ["آمِينَ يَا رَبَّ ٱلْعَٰلَمِينَ", "amin ja rabbel alemin|amin ja rabbil alemin"],
+    ["صَدَقَ ٱللَّٰهُ ٱلْعَظِيمُ", "sadekallahul azim|sadakallahul azim"],
+    ["بَارَكَ ٱللَّٰهُ فِيكُمْ", "barekallahu fikum|barakallahu fikum"],
+    ["سُبْحَانَهُ وَتَعَالَىٰ", "subhanehu ve teala|subhanehu ve tealla"],
+    ["تَبَارَكَ وَتَعَالَىٰ", "tebareke ve teala"],
+    ["عَزَّ وَجَلَّ", "azze ve dželle"],
+    ["جَلَّ جَلَالُهُ", "dželle dželaluhu"],
+    ["أَيُّهَا ٱلْمُؤْمِنُونَ", "ejjuhel muminun|ejuhal muminun"],
+    ["أَمَّا بَعْدُ", "emma badu"],
+    ["سُبْحَانَ ٱللَّٰهِ", "subhanallah"],
+    ["أَسْتَغْفِرُ ٱللَّٰهَ", "estagfirullah"],
+    ["ٱللَّٰهُ أَكْبَرُ", "allahu ekber"],
+    ["ﷺ", "sallallahu alejhi ve sellem|salallahu alejhi vesellem|salla alejhi ve sellem"],
+    [{ sura: 2, from: 201, to: 201 }, "rabbena atina fid dunja haseneten ve fil ahireti haseneten ve kina azaben nar|rabena atina fi dunja hasenetan ve fil ahireti hasenetan ve kina azabe nar"],
+    [{ sura: 33, from: 56, to: 56 }, "innallahe ve melaiketehu jusallune alen nebijj ja ejjuhellezine amenu sallu alejhi ve sellimu teslima"],
+    [{ sura: 16, from: 90, to: 90 }, "innallahe jemuru bil adli vel ihsani ve itaizil kurba ve jenha anil fahšai vel munkeri vel bagji jeizukum leallekum tezekkerun"]
+  ];
+  // Kostur riječi po zvuku / Klang-Gerüst eines Wortes
+  function kostur(x) {
+    return String(x).toLowerCase()
+      .replace(/d[zž]/g, "z").replace(/[čć]/g, "c").replace(/š/g, "s").replace(/ž/g, "z").replace(/đ/g, "dj")
+      .replace(/[áàâäā]/g, "a").replace(/[éèêëē]/g, "e").replace(/[íìîïī]/g, "i").replace(/[óòôöō]/g, "o").replace(/[úùûüū]/g, "u")
+      .replace(/w/g, "v").replace(/y/g, "j").replace(/q/g, "k").replace(/x/g, "ks")
+      .replace(/[^a-z]/g, "").replace(/e/g, "a").replace(/o/g, "u").replace(/h/g, "").replace(/(.)\1+/g, "$1");
+  }
+  // Razlika dvije riječi (Levenshtein), prekida kad pređe max / Abstand zweier Wörter, bricht ab über max
+  function razlika(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    var pr = [], i, j;
+    for (j = 0; j <= b.length; j++) pr[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      var tr = [i], min = i;
+      for (j = 1; j <= b.length; j++) {
+        tr[j] = Math.min(pr[j] + 1, tr[j - 1] + 1, pr[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+        if (tr[j] < min) min = tr[j];
+      }
+      if (min > max) return max + 1;
+      pr = tr;
+    }
+    return pr[b.length];
+  }
+  var NEJ = null;
+  function pripremiNejasne() {
+    NEJ = [];
+    NEJASNE.forEach(function (f) {
+      f[1].split("|").forEach(function (v) {
+        var k = kostur(v);
+        // dozvoljena greška: duge formule 20 %, srednje 1 slovo, kratke tačno / erlaubter Fehler: lang 20 %, mittel 1 Buchstabe, kurz genau
+        NEJ.push({ ar: f[0], k: k, n: v.split(/\s+/).length, dop: k.length >= 14 ? Math.floor(k.length * 0.2) : k.length >= 9 ? 1 : 0 });
+      });
+    });
+    NEJ.sort(function (a, b) { return b.k.length - a.k.length; });
+  }
+  function nejasneFormule(tekst) {
+    if (!NEJ) pripremiNejasne();
+    return tekst.split(AR_BLOK).map(function (dio, i) { return i % 2 === 1 || !/[A-Za-z]/.test(dio) ? dio : nejasnoDio(dio); }).join("");
+  }
+  function nejasnoDio(dio) {
+    var re = /[A-Za-zÀ-ž'’-]+/g, m, rijeci = [];
+    while ((m = re.exec(dio))) rijeci.push({ s: m.index, e: m.index + m[0].length, k: kostur(m[0]) });
+    var zauzeto = {}, zamjene = [];
+    NEJ.forEach(function (f) {
+      for (var i = 0; i < rijeci.length; i++) {
+        var naj = null;
+        for (var n = Math.max(1, f.n - 2); n <= f.n + 2 && i + n <= rijeci.length; n++) {
+          var w = "", slobodno = true;
+          for (var q = i; q < i + n; q++) { if (zauzeto[q]) { slobodno = false; break; } w += rijeci[q].k; }
+          if (!slobodno) break;
+          w = w.replace(/(.)\1+/g, "$1");
+          var d = razlika(w, f.k, f.dop);
+          if (d <= f.dop && (!naj || d < naj.d)) naj = { n: n, d: d };
+        }
+        if (!naj) continue;
+        var ar = f.ar;
+        if (typeof ar === "object") { ar = tekstAjeta(ar, ciljKod()); if (!ar) continue; }
+        else if (ar !== "ﷺ") ar = "(" + ar + ")";
+        for (q = i; q < i + naj.n; q++) zauzeto[q] = 1;
+        zamjene.push({ s: rijeci[i].s, e: rijeci[i + naj.n - 1].e, ar: ar });
+        i += naj.n - 1;
+      }
+    });
+    zamjene.sort(function (a, b) { return b.s - a.s; }).forEach(function (z) { dio = dio.slice(0, z.s) + z.ar + dio.slice(z.e); });
+    return dio;
   }
   // Više arapskih dijelova jedan za drugim -> jedna zagrada / Mehrere arabische Teile hintereinander -> eine Klammer
   function spojiArapsko(x) {
@@ -1031,14 +1152,18 @@
   // Arabisch in der bosnischen Hutba: arabische Schrift in Klammern, Quelle, dann direkt die Übersetzung
   function ARAPSKA_PRAVILA(ci, cilj) {
     return [
-      "- ARABIC inside the Bosnian sermon: whenever the imam says something in Arabic (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum), write exactly that Arabic in ARABIC SCRIPT with vowel marks in round brackets and write its " + cilj + " translation DIRECTLY after the closing bracket - nothing in between, no words like \"that means\", no quotation marks. Example into German: \"Bismillahir-rahmanir-rahim\" -> \"(بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) Im Namen Allahs, des Allerbarmers, des Barmherzigen.\" Do not transliterate Arabic into Latin letters.",
+      arSPrijevodom() ?
+      "- ARABIC inside the Bosnian sermon: whenever the imam says something in Arabic (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum), write exactly that Arabic in ARABIC SCRIPT with vowel marks in round brackets and write its " + cilj + " translation DIRECTLY after the closing bracket - nothing in between, no words like \"that means\", no quotation marks. Example into German: \"Bismillahir-rahmanir-rahim\" -> \"(بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ) Im Namen Allahs, des Allerbarmers, des Barmherzigen.\" Do not transliterate Arabic into Latin letters." :
+      "- ARABIC inside the Bosnian sermon: whenever the imam says something in Arabic (a dua, a hadith, a formula such as Bismillah, Elhamdulillah, Subhanallah, Allahu ekber, Inšallah, Es-selamu alejkum, the opening of the hutba), write exactly that Arabic in ARABIC SCRIPT with vowel marks in round brackets and do NOT translate it: no translation after it, no explanation, no Latin transliteration. The rest of the sentence (the Bosnian words) is translated normally. Example into German: \"Draga braćo, elhamdulillahi rabbil alemin, danas ćemo govoriti o sabru.\" -> \"Liebe Brüder, (ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ) heute sprechen wir über die Geduld.\"",
       "- QUR'AN VERSES: when the imam recites or quotes a verse of the Qur'an in Arabic (the speech recognizer often writes the Arabic as garbled Latin letters, e.g. \"elif lam mim\", \"kul huvallahu ehad\", \"ja ejjuhellezine amenu\"), identify the verse. Do NOT write the Arabic yourself. Put the marker [Q1] at that place in \"translation\" (a second verse quotation in the same segment gets [Q2], and so on) and add an entry to \"verses\": {\"sura\": sura number, \"from\": first verse number, \"to\": last verse number, \"meaning\": the " + cilj + " translation of the meaning of the COMPLETE verse(s)}. Always give the complete verse(s): if the imam recites only part of a verse, still give that verse number and the meaning of the whole verse. The exact Arabic text, the source and your meaning are inserted automatically at the marker - do not write the meaning into \"translation\" yourself. Example: \"Allah kaže: inna ma'al usri jusra\" -> translation \"Allah sagt: [Q1]\", verses [{\"sura\": 94, \"from\": 6, \"to\": 6, \"meaning\": \"Gewiss, mit der Schwierigkeit kommt Erleichterung.\"}].",
       "- Only add a verse when you are confident which verse it is (the words match clearly, or the imam names the sura and verse). If the imam is clearly reciting Qur'an but you cannot identify the verse with confidence, write " + ci.rec + " and no entry in \"verses\" - never guess a verse. If the earlier context already shows the same verse (the recitation was split across segments), do not add it again.",
-      "- The speech recognizer only knows Bosnian/Croatian, so Arabic often comes out as Bosnian-looking words. Use the context to recognize it, e.g. \"mila Rahman Rahim\" = Bismillahir-rahmanir-rahim; \"sa veselim\" / \"salala alej vesellem\" after Poslanik = sallallahu alejhi ve sellem (ﷺ); \"usro\", \"jusro\", \"usri jusra\", \"fe inne meal usri\" after \"Allah kaže\" = fe inne me'al-usri jusra (Ash-Sharh 94:5-6); \"elham dulila\" = Elhamdulillah. Never translate such misheard words literally (e.g. never \"mit Fröhlichen\" for \"sa veselim\"). Words next to Arabic that make no sense in Bosnian (e.g. \"Kajesu Fatih\" before Elhamdulillah) are misheard Arabic: if you can identify the Arabic, write it in Arabic script with its translation; otherwise leave those words out - never translate nonsense.",
+      "- The speech recognizer only knows Bosnian/Croatian, so Arabic often comes out as Bosnian-looking words. Use the context to recognize it, e.g. \"mila Rahman Rahim\" = Bismillahir-rahmanir-rahim; \"sa veselim\" / \"salala alej vesellem\" after Poslanik = sallallahu alejhi ve sellem (ﷺ); \"usro\", \"jusro\", \"usri jusra\", \"fe inne meal usri\" after \"Allah kaže\" = fe inne me'al-usri jusra (Ash-Sharh 94:5-6); \"elham dulila\" = Elhamdulillah; \"hamdo rabbi alim\", \"hamdu rabil alemin\", \"hamdu lila rabil alim\" = Elhamdulillahi rabbil alemin; \"inel hamde lila nahmeduhu\" = Innel-hamde lillahi nahmeduhu (opening of the hutba); \"ešhedu en la ilahe ilalah\" = Ešhedu en la ilahe illallah. Never translate such misheard words literally (e.g. never \"mit Fröhlichen\" for \"sa veselim\"). Words next to Arabic that make no sense in Bosnian (e.g. \"Kajesu Fatih\" before Elhamdulillah) are misheard Arabic: if you can identify the Arabic, write it in Arabic script with its translation; otherwise leave those words out - never translate nonsense.",
       "- Bosnian (non-Arabic) paraphrases of a verse (\"Allah u Kur'anu kaže: ...\" followed by Bosnian words) are translated normally; do not add a verse entry for them.",
-      "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\", and put the " + cilj + " translation of each block into \"arabic_meanings\" (same order). Do not write that meaning into \"translation\" - it is inserted after the marker automatically. Example: \"Draga braćo i sestre, [1].\" with [1] = ٱلْحَمْدُ لِلَّٰهِ -> translation \"Liebe Brüder und Schwestern, [1].\", arabic_meanings [\"Alles Lob gebührt Allah.\"].",
-      "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, followed by ONE translation. Never split it into separate brackets and never mix Latin words into it.",
-      "- For a hadith or dua in Arabic: write the Arabic wording you heard, then its translation; if you cannot make out the Arabic words at all, write " + ci.ar + "."
+      arSPrijevodom() ?
+      "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\", and put the " + cilj + " translation of each block into \"arabic_meanings\" (same order). Do not write that meaning into \"translation\" - it is inserted after the marker automatically. Example: \"Draga braćo i sestre, [1].\" with [1] = ٱلْحَمْدُ لِلَّٰهِ -> translation \"Liebe Brüder und Schwestern, [1].\", arabic_meanings [\"Alles Lob gebührt Allah.\"]." :
+      "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\". Do NOT translate these blocks and do not write their meaning anywhere in \"translation\" (\"arabic_meanings\" may stay empty). Example: \"Draga braćo i sestre, [1].\" -> translation \"Liebe Brüder und Schwestern, [1].\"",
+      "- Several Arabic phrases one after another form ONE Arabic block in ONE pair of brackets, followed by ONE translation (only when translations are wanted). Never split it into separate brackets and never mix Latin words into it.",
+      "- For a hadith or dua in Arabic: write the Arabic wording you heard, then its translation only when translations are wanted (see above); if you cannot make out the Arabic words at all, write " + ci.ar + "."
     ];
   }
   function uputa(iz, ck) {
@@ -1091,7 +1216,7 @@
     var c = claude(), iz = izvor(), ck = ciljKod();
     var gm = !c && $("prevodilac").value === "gemini" && citaj("hutba-gkljuc");
     if (iz.g === "bs") r.bs = arapskeFormule(r.bs);
-    var posao, samoAr = samoArapski(r.bs) && (iz.g !== "bs" || ck === "ar");
+    var posao, samoAr = samoArapski(r.bs) && (iz.g !== "bs" || ck === "ar" || !arSPrijevodom());
     r.put = samoAr ? "arapski" : c ? "Claude" : gm ? "Gemini" : "Google";
     if (samoAr) posao = Promise.resolve(r.bs.replace(/\s+\)/g, ")").replace(/\s*[.,;:!?]+\s*$/, ""));                 // samo arapski: prikazati takav / nur Arabisch: so zeigen
     else posao = c ? prevediClaude(c, r, iz, ck) : gm ? prevediGemini(r, iz, ck) : prevediGoogle(r.bs, iz.g, ck);
@@ -1224,7 +1349,7 @@
     (ajeti || []).forEach(function (a, k) {
       var oznaka = "[Q" + (k + 1) + "]", blok = tekstAjeta(a, ck);
       if (!blok) blok = CILJ[ck].rec;
-      else if (ck !== "ar" && a.meaning) blok += " " + String(a.meaning).trim();
+      else if (ck !== "ar" && a.meaning && arSPrijevodom()) blok += " " + String(a.meaning).trim();
       if (prijevod.indexOf(oznaka) >= 0) prijevod = prijevod.split(oznaka).join(blok);
       else prijevod = prijevod + " " + blok;
     });
@@ -1284,7 +1409,7 @@
       return "[" + blokovi.length + "]";
     });
     var sadrzaj = kontekst(r) + "New segment (" + iz.ime + "):\n" + seg +
-      (blokovi.length ? "\n\nArabic blocks (already in Arabic script - keep the markers, translate them into arabic_meanings):\n" +
+      (blokovi.length ? "\n\nArabic blocks (already in Arabic script - keep the markers" + (arSPrijevodom() ? ", translate them into arabic_meanings" : ", do NOT translate them") + "):\n" +
         blokovi.map(function (b, k) { return "[" + (k + 1) + "] = " + b.slice(1, -1).split(/\s+·\s+/)[0]; }).join("\n") : "");
     return posalji(sadrzaj).then(function (tekst) {
       var prijevod = tekst, ajeti = [], znacenja = [];
@@ -1292,7 +1417,7 @@
       prijevod = umetniAjete(prijevod, ajeti, ck);
       blokovi.forEach(function (b, k) {
         var oznaka = "[" + (k + 1) + "]";
-        if (ck !== "ar" && znacenja[k]) b = b + " " + String(znacenja[k]).trim();
+        if (ck !== "ar" && znacenja[k] && arSPrijevodom()) b = b + " " + String(znacenja[k]).trim();
         if (prijevod.indexOf(oznaka) >= 0) prijevod = prijevod.split(oznaka).join(b);
         else prijevod = naPocetku[k] ? b + " " + prijevod : prijevod + " " + b;
       });
@@ -1310,7 +1435,7 @@
       var dijeloviAr = tekst.split(AR_BLOK);
       return Promise.all(dijeloviAr.map(function (d, i) {
         if (i % 2 === 1) {
-          if (sl !== "bs" || tl === "ar" || d === "ﷺ") return Promise.resolve(d);
+          if (sl !== "bs" || tl === "ar" || d === "ﷺ" || !arSPrijevodom()) return Promise.resolve(d);
           var ar = d.slice(1, -1).split(/\s+·\s+/)[0].replace(/﴿[^﴾]*﴾/g, " ");
           return prevediGoogleCisto(ar, "ar", tl).then(function (z) { return d + " " + z; }, function () { return d; });
         }
