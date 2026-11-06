@@ -261,3 +261,18 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **Neue Einstellung „Arabisch in der Hutba“:** Standard **„Nur arabische Schrift, ohne Übersetzung“**. Alternativ „Arabische Schrift + Übersetzung“ (wie vorher). Gilt für alle Übersetzer und auch für Gemini-Spracherkennung (gespeichert als `hutba-arnacin`).
 - KI-Anweisungen (Haiku, Claude, Gemini) ergänzt: weitere verhörte Beispiele, Arabisch immer in arabischer Schrift, je nach Einstellung ohne Übersetzung.
 - **Tipp:** Die Spracherkennung „Gemini“ (Einstellungen → Spracherkennung) hört die Tonaufnahme selbst und erkennt Arabisch direkt, auch Sätze, die nicht in der Liste stehen. Kostenloser Schlüssel von aistudio.google.com.
+
+## Hutba: Taste „Arapski / Kur'an“ (2026-11-06, vor der Džuma)
+- **Ursache, warum Arabisch nicht ging:** Die Spracherkennung des Handys (Chrome/Safari) kann **immer nur eine Sprache gleichzeitig**. Auf Bosnisch eingestellt, hört sie Arabisch als bosnische Wörter („u rahmet ula“) oder schreibt bei einer Sure gar nichts. Bosnisch und Arabisch automatisch gemischt erkennt nur eine KI, die den Ton selbst hört (Gemini-Spracherkennung).
+- **Lösung:** Während das Mikrofon läuft, gibt es unter dem Mikrofon die goldene Taste **„Arapski / Kur'an“**. Vor dem Rezitieren antippen, dann hört das Handy Arabisch (ar-SA). Danach wieder antippen, und es hört wieder Bosnisch.
+  - Was auf Arabisch erkannt wird, wird im gespeicherten Mushaf (`kuran.js`, ganzer Koran) gesucht. Gefundene Verse erscheinen als **exakter Mushaf-Text mit Quelle** (z. B. Sure Al-Ikhlas 112:1-2), danach die Übersetzung.
+  - Euzu und Bismillah vor dem Vers werden erkannt und exakt geschrieben.
+  - Bei fortlaufender Rezitation wird der nächste Vers bevorzugt (auch die wiederholten Verse in Ar-Rahman).
+  - Ein langer Vers, der in mehreren Atemzügen gelesen wird, erscheint nur einmal (4 Min. Sperre pro Vers).
+  - Arabisch, das kein Vers ist (Hadith, Dua), erscheint so, wie es erkannt wurde, in arabischer Schrift mit Übersetzung.
+  - Wenn man vergisst zurückzuschalten: Haiku, Claude und Gemini merken, wenn der „arabische“ Text keinen Sinn ergibt (also eigentlich Bosnisch war). Der Satz wird dann verworfen, und es wird automatisch auf Bosnisch zurückgeschaltet.
+  - Suche: Text ohne Vokalzeichen, Alif und Hamza. Kandidaten über 4-Buchstaben-Stücke, dann genauer Vergleich. Treffer bis 30 % Abweichung, kurze Stücke bis 22 %. Der Index wird 3 s nach dem Laden im Hintergrund aufgebaut. Test: 85–89 % Treffer bei 12 % zufälligen Buchstabenfehlern; Hadithe und Duas werden nicht als Vers erkannt.
+- **Selam** (Esselamu alejkum ve rahmetullahi ve berekatuhu, auch „Assalamu alaikum … u rahmet ula …“), ve alejkumu selam: in die Formel-Liste aufgenommen. „ve/va/wa/u“ gelten beim Vergleich als dasselbe Wort, j = i.
+- **Fehler behoben:** War „Gesprochene Sprache: Arabisch“ eingestellt, wurde gar nicht übersetzt.
+- **Standard jetzt wieder „Arabische Schrift + Übersetzung“** (Wunsch des Nutzers: Arabisch auch übersetzen). Einmalig für alle Handys umgestellt (`hutba-v5`), die Einstellung kann weiter geändert werden.
+- Später möglich: die deutsche Koran-Übersetzung aus dem PDF des Nutzers (german.pdf) fest einbauen. Dann kommt die Bedeutung jedes Verses aus der Übersetzung statt von der KI bzw. Google.
