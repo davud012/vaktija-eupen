@@ -1380,7 +1380,7 @@
       .replace(/d[zž]/g, "dz").replace(/[čć]/g, "c").replace(/š/g, "s").replace(/ž/g, "z").replace(/đ/g, "dj")
       .replace(/[áàâäā]/g, "a").replace(/[éèêëē]/g, "e").replace(/[íìîïī]/g, "i").replace(/[óòôöō]/g, "o").replace(/[úùûüū]/g, "u")
       .replace(/^[ae](l|n|s|t|r|z|d|sh)[\s'’-]+/, "")
-      .replace(/w/g, "v").replace(/y/g, "j").replace(/q/g, "k").replace(/x/g, "ks")
+      .replace(/w/g, "v").replace(/y/g, "i").replace(/j/g, "i").replace(/q/g, "k").replace(/x/g, "ks")
       .replace(/[^a-z]/g, "").replace(/e/g, "a").replace(/o/g, "u").replace(/(.)\1+/g, "$1");
   }
   var SN = null;
@@ -1412,18 +1412,61 @@
     for (var i = 0; i + 1 < w.length; i++) {
       var rijec = w[i].t.toLowerCase();
       var jeSura = /^(sura|sure|suri|suru|surom|surah|surat|suret|šura|zura)$/.test(rijec), jeAna = rijec === "ana";
-      if (!jeSura && !jeAna) continue;
+      // pogrešno čuto "suri" ("uri", "turi", "ure" …) – samo ako iza slijedi ime sure / falsch gehörtes "suri" – nur wenn ein Sure-Name folgt
+      var slicna = !jeSura && !jeAna && /^(s|š|z|t|c)?ur[aeiu]$|^(s|š|z)?urom$/.test(rijec);
+      if (!jeSura && !jeAna && !slicna) continue;
       var naj = null;
       for (var n = 1; n <= 3 && i + n < w.length; n++) {
         var x = nadjiSuru(w.slice(i + 1, i + 1 + n).map(function (y) { return y.t; }).join(" "));
         if (x && (!naj || x.d < naj.d)) { naj = x; naj.n = n; }
       }
-      if (!naj) continue;
-      zamjene.push({ s: jeAna ? w[i].s : w[i + 1].s, e: w[i + naj.n].e, t: (jeAna ? "sura " : "") + naj.ime });
+      if (!naj || ((jeAna || slicna) && naj.d > 1)) continue;
+      if (slicna) {
+        var oblik = /om$/.test(rijec) ? "surom" : "sur" + rijec.slice(-1);
+        if (/^[A-ZŠŽ]/.test(w[i].t)) oblik = oblik.charAt(0).toUpperCase() + oblik.slice(1);
+        zamjene.push({ s: w[i].s, e: w[i + naj.n].e, t: oblik + " " + naj.ime });
+      } else zamjene.push({ s: jeAna ? w[i].s : w[i + 1].s, e: w[i + naj.n].e, t: (jeAna ? "sura " : "") + naj.ime });
       i += naj.n;
     }
     zamjene.reverse().forEach(function (z) { tekst = tekst.slice(0, z.s) + z.t + tekst.slice(z.e); });
     return tekst;
+  }
+
+  /* =================== ﷺ iza imena Poslanika / ﷺ nach dem Namen des Propheten =================== */
+  // Iza "Muhammed" uvijek ﷺ. Prepoznavanje salavat često napiše kao "a e i", "sala lahu …" – to se briše.
+  // Iza "Poslanik / Resulullah / Vjerovjesnik" ﷺ dolazi kad iza slijedi salavat (i kad je pogrešno napisan).
+  // Nach "Muhammed" immer ﷺ. Die Erkennung schreibt den Salavat oft als "a e i", "sala lahu …" – das wird gelöscht.
+  // Nach "Poslanik / Resulullah / Vjerovjesnik" kommt ﷺ, wenn danach ein Salavat folgt (auch falsch geschrieben).
+  var IME_MUHAMMED = /^(muhamm?ed|muhamm?eda|muhamm?edu|muhamm?edom|muhamm?ede|mohamm?ed[a-z]*|muhamm?ad[a-z]*)$/i;
+  var IME_POSLANIK = /^(poslanik|poslanika|poslaniku|poslanikom|resulull?ah[a-z]*|vjerovjesnik|vjerovjesnika|vjerovjesniku|vjerovjesnikom|pejgamber|pejgambera|pejgamberu)$/i;
+  var SALAVAT_K = ["salalau", "sala", "salal", "lau", "alai", "alaii", "salam", "vasalam", "salalaualai", "alaivasalam", "salalaualaivasalam", "salalaualaiisalam", "salalahu"];
+  function salavatRijec(w) {
+    var k = kosturRijeci(w);
+    if (!k) return false;
+    if (k === "v") return true;
+    for (var i = 0; i < SALAVAT_K.length; i++) if (razlika(k, SALAVAT_K[i], SALAVAT_K[i].length >= 5 ? 1 : 0) <= (SALAVAT_K[i].length >= 5 ? 1 : 0)) return true;
+    return false;
+  }
+  function kratkiOstatak(w) { return /^([aeiouvs]|la|al|el|sa|se|ve|va|wa|le|li|ej|aj)$/i.test(w); }
+  function dodajSalavat(tekst) {
+    var re = /[A-Za-zÀ-ž'’-]+|ﷺ/g, m, w = [];
+    while ((m = re.exec(tekst))) w.push({ s: m.index, e: m.index + m[0].length, t: m[0] });
+    var zamjene = [];
+    for (var i = 0; i < w.length; i++) {
+      var jeM = IME_MUHAMMED.test(w[i].t), jeP = IME_POSLANIK.test(w[i].t);
+      if (!jeM && !jeP) continue;
+      if (i > 0 && /^(sura|sure|suri|suru|surom)$/i.test(w[i - 1].t)) continue;      // sura Muhammed
+      if (w[i + 1] && w[i + 1].t === "ﷺ") { i++; continue; }                            // već ima / schon vorhanden
+      // salavat iza imena (i pogrešno napisan) / Salavat nach dem Namen (auch falsch geschrieben)
+      var j = i + 1, posebna = 0;
+      while (j < w.length && j - i <= 7 && w[j].t !== "ﷺ" && (salavatRijec(w[j].t) || kratkiOstatak(w[j].t))) { if (salavatRijec(w[j].t) && kosturRijeci(w[j].t) !== "v") posebna++; j++; }
+      var duz = j - i - 1, jeSalavat = posebna >= 1 || duz >= 2;
+      if (jeSalavat) zamjene.push({ s: w[i + 1].s, e: w[j - 1].e, t: "ﷺ" });
+      else if (jeM) zamjene.push({ s: w[i].e, e: w[i].e, t: " ﷺ" });
+      if (jeSalavat) i = j - 1;
+    }
+    zamjene.reverse().forEach(function (z) { tekst = tekst.slice(0, z.s) + z.t + tekst.slice(z.e); });
+    return tekst.replace(/\s*,\s*ﷺ\s*,/g, " ﷺ").replace(/ﷺ(\s*ﷺ)+/g, "ﷺ");
   }
 
   // Više arapskih dijelova jedan za drugim -> jedna zagrada / Mehrere arabische Teile hintereinander -> eine Klammer
@@ -1533,7 +1576,12 @@
       r.bs = r.bs.trim();
       if (r.arBezAjeta && !arSPrijevodom()) provjeriArapski(r);
     }
-    if (iz.g === "bs") r.bs = arapskeFormule(ispraviSure(r.bs));
+    if (iz.g === "bs") {
+      r.bs = dodajSalavat(arapskeFormule(ispraviSure(r.bs)));
+      // ﷺ na kraju prethodnog dijela -> ne ponavljati na početku ovog / ﷺ am Ende des vorigen Teils -> am Anfang nicht wiederholen
+      var preth = recenice.filter(function (x) { return x.id < r.id && x.bs; }).slice(-1)[0];
+      if (preth && /ﷺ[\s.,;:!?]*$/.test(preth.bs)) r.bs = r.bs.replace(/^\s*ﷺ[\s,]*/, "");
+    }
     // Kad je govor na arapskom (Postavke), arapski se prevodi / Bei arabischer Sprache (Einstellungen) wird Arabisch übersetzt
     var posao, samoAr = iz.g === "ar" ? ck === "ar" : samoArapski(r.bs) && (iz.g !== "bs" || ck === "ar" || !arSPrijevodom());
     r.put = (r.put ? r.put + " · " : "") + (samoAr ? "arapski" : c ? "Claude" : gm ? "Gemini" : "Google");
