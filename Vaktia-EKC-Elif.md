@@ -293,3 +293,13 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Getestet: „sura na kraju“, „sura koja govori“, „Ana je došla“, „popiti kafu“ bleiben unverändert.
 - **Nachtrag (06.11.):** Die Spracherkennung schreibt den Salavat oft nur als „a e i“. Darum jetzt: **Nach „Muhammed“ (auch Muhammeda/-u/-om) kommt immer ﷺ**. Kurzer Buchstabensalat bzw. Salavat-Reste direkt danach (a, e, i, ve, sala, lahu, alejhi, selam …) werden entfernt, sobald es mindestens zwei solche Stücke oder ein Salavat-Wort sind. Ein einzelnes „i“ (und) bleibt stehen. Nach Poslanik/Resulullah/Vjerovjesnik kommt ﷺ, wenn dahinter ein Salavat folgt. Nicht bei „sura Muhammed“. Steht ﷺ schon am Ende des vorigen Teils, wird es am Anfang des nächsten nicht wiederholt.
 - **„uri“ statt „suri“:** Ein Wort wie uri/ure/uru/turi/zuri **direkt vor einem Sure-Namen** wird zu suri/sure/suru („u uri Merjem“ → „u suri Merjem“). Beim Namensvergleich gilt j = i (Meriem = Merjem).
+
+## Džuma auf dem TV (geprüft 2026-11-06)
+- Ablauf am Freitag (Einstellung `dzuma` in `vaktija.js`: hutbaZimi 13:00, hutbaLjeti 14:00, trajanje 40):
+  - Zur normalen Podne-Zeit passiert nichts.
+  - Bis 13:00 zeigt das Dashboard „Sljedeće: Džuma – hutba za …“.
+  - **Um 13:00** erscheint die Folie „Džuma – Hutba je počela · bitte Handys lautlos stellen“ **ohne Countdown**.
+  - **Um 13:40** geht es zurück zum Dashboard mit allen Vakten.
+- Die Hutba-Übersetzung liegt während dieser Zeit über der Folie. Wird sie beendet, ist die Folie bis 13:40 wieder da.
+- **Neu:** Läuft die Übersetzung um 13:40 noch, beendet der Fernseher sie trotzdem und zeigt das Dashboard. Diese Hutba-Sitzung wird danach ignoriert. Eine neu gestartete Hutba wird wieder angezeigt. Gilt nur freitags.
+- Wichtig: Der Fernseher lädt nur neu, wenn sich `vaktija.js` ändert. Die Änderung in `index.html` wurde am 06.11. um 12:50 bewusst ohne Versionssprung hochgeladen, damit der TV während der Džuma nicht neu lädt. Aktiv wird sie beim nächsten Versionssprung oder Neustart der Box.

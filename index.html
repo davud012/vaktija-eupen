@@ -865,7 +865,7 @@
     var HP = P.hutbaPrijevod, ekran = $("hutba-ekran"), linije = $("he-linije");
     var TEST = /[?&]test=hutba/.test(location.search);
     if (!HP || !HP.ukljuceno) return;
-    var sesija = null, zadnjiPuls = 0, vidljiv = false, jezik = "de";
+    var sesija = null, zadnjiPuls = 0, vidljiv = false, jezik = "de", blokirana = null;
     var JEZICI = {
       de: ["Predigt – Übersetzung", "Automatische Übersetzung – kann Fehler enthalten"],
       fr: ["Sermon – traduction", "Traduction automatique – peut contenir des erreurs"],
@@ -1039,6 +1039,7 @@
       sesija = s; ocisti();
     }
     function naPoruku(tema, m, zadrzano) {
+      if (blokirana && m && m.s === blokirana) return;   // hutba završena na kraju džume / Predigt am Ende des Freitagsgebets beendet
       if (tema === "stanje") {
         if (!m.aktivno) { sakrij(); return; }
         // Sačuvana poruka sa servera se ne prikazuje – čeka se živi signal mobitela (svakih 5 s).
@@ -1069,6 +1070,15 @@
         $("he-sat").textContent = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
         // Mobitel se ne javlja 25 s -> nazad na vaktiju / Handy meldet sich 25 s nicht -> zurück zu den Gebetszeiten
         if (!TEST && Date.now() - zadnjiPuls > 25000) sakrij();
+        // Džuma: na kraju (npr. 13:40) uvijek nazad na vaktiju, i ako prijevod još traje
+        // Freitagsgebet: am Ende (z. B. 13:40) immer zurück zum Dashboard, auch wenn die Übersetzung noch läuft
+        if (danas && danas.petak) {
+          var s0 = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+          for (var q = 0; q < danas.namazi.length; q++) {
+            var nz = danas.namazi[q];
+            if (nz.dzuma && s0 >= nz.kraj * 60 && s0 < nz.kraj * 60 + 600) { blokirana = sesija; sakrij(); }
+          }
+        }
       }
     }, 1000);
 
