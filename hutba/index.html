@@ -267,8 +267,8 @@
 
         <label for="ar-nacin" data-t="arNacin"></label>
         <select id="ar-nacin">
-          <option value="prijevod" data-t="optArPrijevod"></option>
           <option value="samo" data-t="optArSamo"></option>
+          <option value="prijevod" data-t="optArPrijevod"></option>
         </select>
         <div class="mali" id="ar-nacin-info"></div>
 
@@ -567,8 +567,8 @@
   if (!citaj("hutba-v4")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude-haiku"); pisiTiho("hutba-v4", "da"); }
   $("prevodilac").value = /^(claude(-haiku)?|google|gemini)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
   $("kljuc").value = citaj("hutba-kljuc") || "";
-  if (!citaj("hutba-v5")) { pisiTiho("hutba-arnacin", "prijevod"); pisiTiho("hutba-v5", "da"); }
-  $("ar-nacin").value = citaj("hutba-arnacin") === "samo" ? "samo" : "prijevod";
+  if (!citaj("hutba-v6")) { pisiTiho("hutba-arnacin", "samo"); pisiTiho("hutba-v6", "da"); }
+  $("ar-nacin").value = citaj("hutba-arnacin") === "prijevod" ? "prijevod" : "samo";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
   $("gmodel").value = citaj("hutba-gmodel") || G_MODEL;
@@ -634,7 +634,8 @@
   function postaviArapski(da) {
     if (arapskiRezim === da) return;
     arapskiRezim = da;
-    if (da) kuranIndeks();
+    if (da) { kuranIndeks(); arSesija = []; }
+    else setTimeout(zavrsiArSesiju, 2500);   // zadnji arapski dio još stiže / der letzte arabische Teil kommt noch
     if (cekaR) { clearTimeout(cekaTimer); var x = cekaR; cekaR = null; x.konacno = true; prevedi(x); }
     prikaziArDugme();
     if (snima && slusa && prepoznavanje) { try { prepoznavanje.stop(); } catch (e) {} }
@@ -649,13 +650,13 @@
   // Indeks Mushafa pripremiti unaprijed (da dugme ne zastane) / Mushaf-Index vorab vorbereiten (damit der Knopf nicht hängt)
   (function pripremi(n) { setTimeout(function () { try { if (!kuranIndeks() && n < 20) pripremi(n + 1); } catch (e) {} }, 3000); })(0);
   var CILJ = {
-    de: { ime: "German", sura: "Sure", rec: "[Rezitation auf Arabisch]", ar: "[Arabisch]" },
-    fr: { ime: "French", sura: "Sourate", rec: "[Récitation en arabe]", ar: "[Arabe]" },
-    nl: { ime: "Dutch", sura: "Soera", rec: "[Recitatie in het Arabisch]", ar: "[Arabisch]" },
-    en: { ime: "English", sura: "Surah", rec: "[Recitation in Arabic]", ar: "[Arabic]" },
-    tr: { ime: "Turkish", sura: "Sure", rec: "[Arapça tilavet]", ar: "[Arapça]" },
-    ar: { ime: "Arabic", sura: "سورة", rec: "[تلاوة]", ar: "[بالعربية]" },
-    bs: { ime: "Bosnian", sura: "sura", rec: "[Učenje na arapskom]", ar: "[Na arapskom]" }
+    de: { ime: "German", sura: "Sure", rec: "[Rezitation auf Arabisch]", ar: "[Arabisch]" , v1: "Vers", vN: "Verse" },
+    fr: { ime: "French", sura: "Sourate", rec: "[Récitation en arabe]", ar: "[Arabe]" , v1: "verset", vN: "versets" },
+    nl: { ime: "Dutch", sura: "Soera", rec: "[Recitatie in het Arabisch]", ar: "[Arabisch]" , v1: "vers", vN: "verzen" },
+    en: { ime: "English", sura: "Surah", rec: "[Recitation in Arabic]", ar: "[Arabic]" , v1: "verse", vN: "verses" },
+    tr: { ime: "Turkish", sura: "Sure", rec: "[Arapça tilavet]", ar: "[Arapça]" , v1: "ayet", vN: "ayetler" },
+    ar: { ime: "Arabic", sura: "سورة", rec: "[تلاوة]", ar: "[بالعربية]" , v1: "الآية", vN: "الآيات" },
+    bs: { ime: "Bosnian", sura: "sura", rec: "[Učenje na arapskom]", ar: "[Na arapskom]" , v1: "ajet", vN: "ajeti" }
   };
   if (!IZVOR[$("jezik").value]) $("jezik").value = "bs-BA";
   if (!CILJ[$("cilj").value]) $("cilj").value = "de";
@@ -726,7 +727,8 @@
     audioStop();
     if (budnost) { try { budnost.release(); } catch (e) {} budnost = null; }
     $("mikrofon").classList.remove("ukljucen");
-    arapskiRezim = false; prikaziArDugme();
+    if (arapskiRezim) { arapskiRezim = false; setTimeout(zavrsiArSesiju, 300); }
+    prikaziArDugme();
     postaviStatus(kljucStatusa || "micOff");
     postaviVrijeme("ponovo");
     prikaziTVDugme();
@@ -1295,6 +1297,55 @@
     }
     return { bloka: bloka.length ? "(" + bloka.join(" ") + ")" : "", ostatak: w.join(" ") };
   }
+  // "Sadakallahul-azim" na kraju / am Ende
+  function odvojiKraj(tekst) {
+    var w = String(tekst).split(/\s+/).filter(Boolean), cilj = arNorm("صدق الله العظيم");
+    for (var n = 2; n <= 4 && n <= w.length; n++) {
+      var x = arNorm(w.slice(w.length - n).join(""));
+      if (x.length >= cilj.length - 2 && razlika(x, cilj, 2) <= 2) return { da: true, bloka: "(صَدَقَ ٱللَّٰهُ ٱلْعَظِيمُ)", ostatak: w.slice(0, w.length - n).join(" ") };
+    }
+    return { da: false, bloka: "", ostatak: w.join(" ") };
+  }
+  // Arapski bez ajeta: je li to uopće arapski? (samo sa Claude ključem) – ako nije, nazad na bosanski
+  // Arabisch ohne Vers: ist das überhaupt Arabisch? (nur mit Claude-Schlüssel) – wenn nicht, zurück zur normalen Sprache
+  function provjeriArapski(r) {
+    var c = claude();
+    if (!c) return;
+    c.messages.create({
+      model: "claude-haiku-5-5", max_tokens: 5,
+      system: "You check speech recognition output during a Friday sermon. The imam switched the recognizer to Arabic to recite Qur'an or say a dua. Answer only \"da\" if the text is meaningful Arabic (Qur'an, dua, hadith, an Islamic formula - small recognition errors are fine), or \"ne\" if it is noise or another language (for example Bosnian) written in Arabic letters. One word only.",
+      messages: [{ role: "user", content: r.bs }]
+    }).then(function (o) {
+      var x = (o.content || []).map(function (b) { return b.text || ""; }).join("").trim().toLowerCase();
+      if (/^ne\b/.test(x)) {
+        ukloni(r);
+        if (arapskiRezim && r.ar) { postaviArapski(false); upozori(function () { return t("arNazad"); }, true); }
+      }
+    }).catch(function () {});
+  }
+  // Na kraju učenja: koja sura i koji ajeti / Am Ende der Rezitation: welche Sure und welche Verse
+  var arSesija = [];
+  function opisAjeta(lista, ck) {
+    var K = window.KURAN, ci = CILJ[ck], grupe = [];
+    lista.forEach(function (a) {
+      var z = grupe[grupe.length - 1];
+      if (z && z.s === a.s && a.od <= z.ddo + 1 && a.ddo >= z.od - 1) { z.od = Math.min(z.od, a.od); z.ddo = Math.max(z.ddo, a.ddo); }
+      else grupe.push({ s: a.s, od: a.od, ddo: a.ddo });
+    });
+    var br = ck === "ar" ? arBroj : String, sura = ci.sura.charAt(0).toUpperCase() + ci.sura.slice(1);
+    return grupe.map(function (g) {
+      return sura + " " + ((K && K.n[g.s - 1]) || g.s) + ", " + (g.od === g.ddo ? ci.v1 + " " + br(g.od) : ci.vN + " " + br(g.od) + "–" + br(g.ddo));
+    }).join(" · ");
+  }
+  function zavrsiArSesiju() {
+    if (cekaR && cekaR.ar) { clearTimeout(cekaTimer); var x = cekaR; cekaR = null; x.konacno = true; prevedi(x); }
+    if (!arSesija.length) return;
+    var opis = opisAjeta(arSesija, ciljKod());
+    arSesija = [];
+    var r = novaRecenica();
+    r.bs = opis; r.de = opis; r.gotovo = true; r.konacno = true; r.put = "sažetak";
+    prikaziTok(); posaljiRecenicu(r);
+  }
   // Isti ajet se ne prikazuje dvaput za redom (dugi ajet se uči u više daha)
   // Derselbe Vers wird nicht zweimal hintereinander gezeigt (lange Verse werden in mehreren Atemzügen rezitiert)
   var prikazaniAjeti = {};
@@ -1332,6 +1383,7 @@
       "- QUR'AN VERSES: when the imam recites or quotes a verse of the Qur'an in Arabic (the speech recognizer often writes the Arabic as garbled Latin letters, e.g. \"elif lam mim\", \"kul huvallahu ehad\", \"ja ejjuhellezine amenu\"), identify the verse. Do NOT write the Arabic yourself. Put the marker [Q1] at that place in \"translation\" (a second verse quotation in the same segment gets [Q2], and so on) and add an entry to \"verses\": {\"sura\": sura number, \"from\": first verse number, \"to\": last verse number, \"meaning\": the " + cilj + " translation of the meaning of the COMPLETE verse(s)}. Always give the complete verse(s): if the imam recites only part of a verse, still give that verse number and the meaning of the whole verse. The exact Arabic text, the source and your meaning are inserted automatically at the marker - do not write the meaning into \"translation\" yourself. Example: \"Allah kaže: inna ma'al usri jusra\" -> translation \"Allah sagt: [Q1]\", verses [{\"sura\": 94, \"from\": 6, \"to\": 6, \"meaning\": \"Gewiss, mit der Schwierigkeit kommt Erleichterung.\"}].",
       "- Only add a verse when you are confident which verse it is (the words match clearly, or the imam names the sura and verse). If the imam is clearly reciting Qur'an but you cannot identify the verse with confidence, write " + ci.rec + " and no entry in \"verses\" - never guess a verse. If the earlier context already shows the same verse (the recitation was split across segments), do not add it again.",
       "- The speech recognizer only knows Bosnian/Croatian, so Arabic often comes out as Bosnian-looking words. Use the context to recognize it, e.g. \"mila Rahman Rahim\" = Bismillahir-rahmanir-rahim; \"sa veselim\" / \"salala alej vesellem\" after Poslanik = sallallahu alejhi ve sellem (ﷺ); \"usro\", \"jusro\", \"usri jusra\", \"fe inne meal usri\" after \"Allah kaže\" = fe inne me'al-usri jusra (Ash-Sharh 94:5-6); \"elham dulila\" = Elhamdulillah; \"hamdo rabbi alim\", \"hamdu rabil alemin\", \"hamdu lila rabil alim\" = Elhamdulillahi rabbil alemin; \"inel hamde lila nahmeduhu\" = Innel-hamde lillahi nahmeduhu (opening of the hutba); \"ešhedu en la ilahe ilalah\" = Ešhedu en la ilahe illallah. Never translate such misheard words literally (e.g. never \"mit Fröhlichen\" for \"sa veselim\"). Words next to Arabic that make no sense in Bosnian (e.g. \"Kajesu Fatih\" before Elhamdulillah) are misheard Arabic: if you can identify the Arabic, write it in Arabic script with its translation; otherwise leave those words out - never translate nonsense.",
+      "- The words \"sura\" (chapter of the Qur'an) and \"ajet\" (verse) are often misheard by the speech recognizer, e.g. as \"Ana\", \"sure\", \"ajat\", \"a jet\". When such a word stands where a sura or verse is meant (before a sura name like Jasin, El-Bekare, El-Fatiha, En-Nas, El-Kehf, or next to a number), translate it as the word for sura / verse - never as a person's name like \"Ana\".",
       "- Bosnian (non-Arabic) paraphrases of a verse (\"Allah u Kur'anu kaže: ...\" followed by Bosnian words) are translated normally; do not add a verse entry for them.",
       arSPrijevodom() ?
       "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\", and put the " + cilj + " translation of each block into \"arabic_meanings\" (same order). Do not write that meaning into \"translation\" - it is inserted after the marker automatically. Example: \"Draga braćo i sestre, [1].\" with [1] = ٱلْحَمْدُ لِلَّٰهِ -> translation \"Liebe Brüder und Schwestern, [1].\", arabic_meanings [\"Alles Lob gebührt Allah.\"]." :
@@ -1393,20 +1445,25 @@
     // Arabische Erkennung: Vers aus dem Mushaf (genauer Text) oder der arabische Text in Klammern
     if (r.ar && !r.arGotov) {
       r.arGotov = true;
-      var uvod = odvojiUvod(r.bs);
-      r.bs = uvod.ostatak;
+      var uvod = odvojiUvod(r.bs), kraj = odvojiKraj(uvod.ostatak);
+      r.bs = kraj.ostatak;
       var aj = r.bs ? nadjiAjet(r.bs) : null;
+      if (aj) arSesija.push({ s: aj.sura, od: aj.from, ddo: aj.to });
+      // "Sadakallahul azim" = kraj učenja: nazad na bosanski / Ende der Rezitation: zurück
+      if (kraj.da) setTimeout(function () { postaviArapski(false); }, 300);
       if (aj) {
         var nov = noviAjeti(aj);
-        if (!nov && !uvod.bloka) { ukloni(r); return; }          // isti ajet se još uči / derselbe Vers wird noch rezitiert
-        var blokA = nov ? tekstAjeta(nov, ck) : "";
-        r.bs = uvod.bloka + (nov ? " " + (blokA || "(" + r.bs.trim() + ")") : "");
+        if (!nov && !uvod.bloka && !kraj.bloka) { ukloni(r); return; }          // isti ajet se još uči / derselbe Vers wird noch rezitiert
+        var blokA = nov ? tekstAjeta(nov, ck, true) : "";          // izvor dolazi na kraju učenja / Quelle kommt am Ende der Rezitation
+        r.bs = uvod.bloka + (nov ? " " + (blokA || "(" + r.bs.trim() + ")") : "") + (kraj.bloka ? " " + kraj.bloka : "");
         if (nov) r.put = "ajet " + nov.sura + ":" + nov.from + (nov.to > nov.from ? "-" + nov.to : "") + " (" + aj.d + " %)";
-      } else if (r.bs) {
-        r.bs = uvod.bloka + " (" + r.bs.replace(/[()]/g, "").trim() + ")";
-        r.arBezAjeta = !uvod.bloka;
-      } else r.bs = uvod.bloka;
+      } else if (r.bs && (r.bs.split(/\s+/).length > 1 || uvod.bloka || kraj.bloka)) {
+        r.bs = uvod.bloka + " (" + r.bs.replace(/[()]/g, "").trim() + ")" + (kraj.bloka ? " " + kraj.bloka : "");
+        r.arBezAjeta = !uvod.bloka && !kraj.bloka;
+      } else if (uvod.bloka || kraj.bloka) r.bs = uvod.bloka + " " + kraj.bloka;
+      else { ukloni(r); return; }          // samo jedna riječ (npr. "Ana") – izostaviti / nur ein Wort – weglassen
       r.bs = r.bs.trim();
+      if (r.arBezAjeta && !arSPrijevodom()) provjeriArapski(r);
     }
     if (iz.g === "bs") r.bs = arapskeFormule(r.bs);
     // Kad je govor na arapskom (Postavke), arapski se prevodi / Bei arabischer Sprache (Einstellungen) wird Arabisch übersetzt
@@ -1535,13 +1592,14 @@
   }
   // Ajet iz Mushafa (tačan tekst iz kuran.js, ne od AI) / Vers aus dem Mushaf (genauer Text aus kuran.js, nicht von der KI)
   function arBroj(n) { return String(n).replace(/[0-9]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".charAt(+d); }); }
-  function tekstAjeta(a, ck) {
+  function tekstAjeta(a, ck, bezIzvora) {
     var K = window.KURAN, s = a && +a.sura, od = a && +a.from, ddo = a && +(a.to || a.from);
     if (!K || !(s >= 1 && s <= 114)) return "";
     var sura = K.a[s - 1];
     if (!(od >= 1 && ddo >= od && ddo <= sura.length && ddo - od < 12)) return "";
     var dijelovi = [];
-    for (var i = od; i <= ddo; i++) dijelovi.push(sura[i - 1] + (ddo > od ? " ﴿" + arBroj(i) + "﴾" : ""));
+    for (var i = od; i <= ddo; i++) dijelovi.push(sura[i - 1] + " ﴿" + arBroj(i) + "﴾");   // broj ajeta kao u Mushafu / Versnummer wie im Mushaf
+    if (bezIzvora) return "(" + dijelovi.join(" ") + ")";
     return "(" + dijelovi.join(" ") + " · " + CILJ[ck].sura + " " + K.n[s - 1] + " " + s + ":" + od + (ddo > od ? "-" + ddo : "") + ")";
   }
   function umetniAjete(prijevod, ajeti, ck) {

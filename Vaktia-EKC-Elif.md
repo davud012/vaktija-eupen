@@ -276,3 +276,12 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - **Fehler behoben:** War „Gesprochene Sprache: Arabisch“ eingestellt, wurde gar nicht übersetzt.
 - **Standard jetzt wieder „Arabische Schrift + Übersetzung“** (Wunsch des Nutzers: Arabisch auch übersetzen). Einmalig für alle Handys umgestellt (`hutba-v5`), die Einstellung kann weiter geändert werden.
 - Später möglich: die deutsche Koran-Übersetzung aus dem PDF des Nutzers (german.pdf) fest einbauen. Dann kommt die Bedeutung jedes Verses aus der Übersetzung statt von der KI bzw. Google.
+
+## Hutba: Arabisch ohne Übersetzung, Versnummern, Sure am Ende (2026-11-06, mittags)
+- **Wunsch:** Arabisches wird **nicht übersetzt**, weil der Imam selbst übersetzt. Standard wieder „Nur arabische Schrift“ (einmalig umgestellt: `hutba-v6`).
+- **Versnummer wie im Mushaf** hinter jedem Vers: ﴿١﴾, ﴿٢﴾ … (auch bei einem einzelnen Vers).
+- **Quelle erst am Ende:** Während der Rezitation stehen nur die Verse. Wenn die Taste zurück auf Bosnisch getippt wird, erscheint nach ca. 2,5 s eine eigene Zeile, z. B. **„Sure Al-Ikhlas, Verse 1–4 · Sure Ash-Sharh, Verse 5–6“**. Aufeinanderfolgende Verse werden zusammengefasst, Sure-Namen aus `kuran.js`, Wörter in der Zielsprache (Vers/Verse, verset/versets, ajet/ajeti …).
+- **„Sadakallahul-azim“ (صدق الله العظيم)** am Ende der Rezitation wird erkannt, exakt geschrieben und schaltet automatisch zurück auf Bosnisch (mit Sure-Zeile).
+- Ein einzelnes arabisches Wort ohne Vers (z. B. أنا „Ana“, wenn „sura“ falsch gehört wird) wird nicht angezeigt.
+- Mit Claude-Schlüssel prüft Haiku arabische Teile ohne Vers kurz: Ist das gar kein Arabisch (z. B. Bosnisch, falsch erkannt), wird der Satz entfernt und zurückgeschaltet.
+- KI-Anweisung ergänzt: „sura“ und „ajet“ werden oft falsch gehört (z. B. „Ana“). Vor einem Sure-Namen oder einer Zahl als Sure/Vers übersetzen, nie als Name.
