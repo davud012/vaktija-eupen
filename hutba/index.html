@@ -1033,7 +1033,7 @@
     [/\b(e?u[zs]u\s*bil+ahi\s*mine?[\s-]*[sš]+[\s-]*[sš]?ej[tț]an[ie]?r?[\s-]*r?ra?d[zž]?im)\b/gi, "أَعُوذُ بِٱللَّٰهِ مِنَ ٱلشَّيْطَٰنِ ٱلرَّجِيمِ"],
     [/\b(bi?smi?l+ah?i?r?[\s-]*(r?rahmani?r?[\s-]*)?r?rahim|bismil+ah|(bi?s+[\s-]*)?mil+[ae]h?[\s-]*(i?r[\s-]*)?(r?[ae]?h?man[ie]?r?[\s-]*)?r?r?ah?im[ae]?)\b/gi, "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"],
     // Salavat iza "Poslanik/Muhammed", kako ga prepoznavanje čuje (npr. "sa veselim") / Segensformel nach "Poslanik/Muhammed", wie die Erkennung sie hört
-    [/((?:poslanik|muhamme?d|resulul+ah|vjerovjesnik|alejhisselam)[a-zčćžšđ]*,?)\s+(?:s[ae]l+[ae]?\s*l+?[ae]hu\s*|s[ae]l+[ae]l+[ae]\s+|sa\s+|sala\s+)?(?:a?l[ae]j?h?i?\s*)?v[ae]\s*s[ae]l+[ie]m[a-z]*/gi, "$1 ﷺ"],
+    [/((?:poslanik|muhamme?d|resulul+ah|vjerovjesnik|alejhisselam)[a-zčćžšđ]*,?)\s+(?:s[ae]l+[ae]?\s*l+?[ae]hu\s*|s[ae]l+[ae]l+[ae]\s+|sa\s+|sala\s+)?(?:a?l[ae]j?h?i?\s*)?[vw][ae]\s*s+[ae]l+[aei]m[a-z]*/gi, "$1 ﷺ"],
     [/\b(s?al+al+ahu?\s*['’]?a?l[ae]j?hi\s*(ve|wa)\s*s[ae]l+[ae]m|s\.?\s*a\.?\s*v\.?\s*s\.?|a\.s\.)(?=[\s,.!?]|$)/gi, "ﷺ"],
     [/\b((el|al|a)[\s-]*hamd[ouai]?[\s-]*(li|bi)?[\s-]*l+ah?[ie]?|hamd[ouai]?[\s-]*(li|bi)[\s-]*l+ah?[ie]?)([\s-]*r[ae]b+[ie]?l?[\s-]*['’]?[ae]?l[ae]min[ae]?)?\b/gi, null],
     [/\b[wv][ae]s*[\s-]*s?s[ae]l[ae]tu?\s*[wv][ae]s*[\s-]*s?s[ae]l[ae]mu?\s*['’]?al[ae]\s*(r[ae]sul[iu]?l+ah[ie]?|e?[sš]+e?r[ae]f[ie]l[\s-]*enbija(i)?\s*v?e?l?[\s-]*murselin)\b/gi, null],
@@ -1064,7 +1064,8 @@
         return ar === "ﷺ" ? "ﷺ" : "(" + ar + ")";
       });
     }, tekst);
-    return spojiArapsko(nejasneFormule(t3));
+    // "Poslanik, ﷺ, je rekao" -> "Poslanik ﷺ je rekao"
+    return spojiArapsko(nejasneFormule(t3)).replace(/\s*,\s*ﷺ\s*,/g, " ﷺ");
   }
 
   /* =================== Nejasno prepoznati arapski / Unscharf erkanntes Arabisch =================== */
@@ -1109,7 +1110,7 @@
     ["سُبْحَانَ ٱللَّٰهِ", "subhanallah"],
     ["أَسْتَغْفِرُ ٱللَّٰهَ", "estagfirullah"],
     ["ٱللَّٰهُ أَكْبَرُ", "allahu ekber"],
-    ["ﷺ", "sallallahu alejhi ve sellem|salallahu alejhi vesellem|salla alejhi ve sellem"],
+    ["ﷺ", "sallallahu alejhi ve sellem|salallahu alejhi vesellem|salla alejhi ve sellem|sallallahu alaihi wa sallam|salalahu alejhi ve selam|sala lahu alejhi ve selem|salallahu alejhi selem|sallallahu alejhi vesselem|salallahu alejhi sallam|sallallahu alejhi wasallam"],
     [{ sura: 2, from: 201, to: 201 }, "rabbena atina fid dunja haseneten ve fil ahireti haseneten ve kina azaben nar|rabena atina fi dunja hasenetan ve fil ahireti hasenetan ve kina azabe nar"],
     [{ sura: 33, from: 56, to: 56 }, "innallahe ve melaiketehu jusallune alen nebijj ja ejjuhellezine amenu sallu alejhi ve sellimu teslima"],
     [{ sura: 16, from: 90, to: 90 }, "innallahe jemuru bil adli vel ihsani ve itaizil kurba ve jenha anil fahšai vel munkeri vel bagji jeizukum leallekum tezekkerun"]
@@ -1359,6 +1360,72 @@
     return { sura: a.sura, from: od, to: ddo };
   }
 
+  /* =================== Imena sura u bosanskom govoru / Sure-Namen in bosnischer Rede =================== */
+  // Prepoznavanje ne zna imena sura (npr. "sura Kaf" -> "sura kafa"). Iza riječi "sura" (ili pogrešno čutog "Ana")
+  // traži se najbliže ime sure i upisuje tačno. / Die Erkennung kennt die Sure-Namen nicht ("sura Kaf" -> "sura kafa").
+  // Nach dem Wort "sura" (oder falsch gehörtem "Ana") wird der nächste Sure-Name gesucht und richtig eingesetzt.
+  var SURE_BS = ("El-Fatiha|El-Bekare|Ali Imran|En-Nisa|El-Maide|El-En'am|El-A'raf|El-Enfal|Et-Tevbe|Junus|Hud|Jusuf|Er-Ra'd|Ibrahim|" +
+    "El-Hidžr|En-Nahl|El-Isra|El-Kehf|Merjem|Ta-Ha|El-Enbija|El-Hadždž|El-Mu'minun|En-Nur|El-Furkan|Eš-Šu'ara|En-Neml|El-Kasas|" +
+    "El-Ankebut|Er-Rum|Lukman|Es-Sedžda|El-Ahzab|Sebe'|Fatir|Ja-Sin|Es-Saffat|Sad|Ez-Zumer|Gafir|Fussilet|Eš-Šura|Ez-Zuhruf|Ed-Duhan|" +
+    "El-Džasije|El-Ahkaf|Muhammed|El-Feth|El-Hudžurat|Kaf|Ez-Zarijat|Et-Tur|En-Nedžm|El-Kamer|Er-Rahman|El-Vakia|El-Hadid|El-Mudžadele|" +
+    "El-Hašr|El-Mumtehine|Es-Saff|El-Džumua|El-Munafikun|Et-Tegabun|Et-Talak|Et-Tahrim|El-Mulk|El-Kalem|El-Hakka|El-Mearidž|Nuh|" +
+    "El-Džinn|El-Muzzemmil|El-Muddessir|El-Kijame|El-Insan|El-Murselat|En-Nebe'|En-Nazi'at|Abese|Et-Tekvir|El-Infitar|El-Mutaffifin|" +
+    "El-Inšikak|El-Burudž|Et-Tarik|El-A'la|El-Gašije|El-Fedžr|El-Beled|Eš-Šems|El-Lejl|Ed-Duha|Eš-Šerh|Et-Tin|El-Alek|El-Kadr|" +
+    "El-Bejjine|Ez-Zilzal|El-Adijat|El-Kari'a|Et-Tekasur|El-Asr|El-Humeze|El-Fil|Kurejš|El-Maun|El-Kevser|El-Kafirun|En-Nasr|" +
+    "El-Mesed|El-Ihlas|El-Felek|En-Nas").split("|");
+  var SURE_DOD = [[40, "El-Mu'min"], [94, "El-Inširah"], [111, "Tebbet"], [112, "Ikhlas"], [36, "Jasin"], [36, "Yasin"], [50, "Qaf"],
+    [2, "Bakara"], [113, "Falak"], [1, "Fatihe"], [18, "Kahf"], [67, "Tebareke"], [55, "Rahman"], [56, "Vakija"], [62, "Džuma"]];
+  function kosturImena(x) {
+    return String(x).toLowerCase()
+      .replace(/d[zž]/g, "dz").replace(/[čć]/g, "c").replace(/š/g, "s").replace(/ž/g, "z").replace(/đ/g, "dj")
+      .replace(/[áàâäā]/g, "a").replace(/[éèêëē]/g, "e").replace(/[íìîïī]/g, "i").replace(/[óòôöō]/g, "o").replace(/[úùûüū]/g, "u")
+      .replace(/^[ae](l|n|s|t|r|z|d|sh)[\s'’-]+/, "")
+      .replace(/w/g, "v").replace(/y/g, "j").replace(/q/g, "k").replace(/x/g, "ks")
+      .replace(/[^a-z]/g, "").replace(/e/g, "a").replace(/o/g, "u").replace(/(.)\1+/g, "$1");
+  }
+  var SN = null;
+  function pripremiSure() {
+    SN = []; SN.bezKurana = !window.KURAN;
+    function dodaj(br, ime) { var k = kosturImena(ime); if (k.length >= 2) SN.push({ br: br, ime: SURE_BS[br - 1], k: k }); }
+    SURE_BS.forEach(function (ime, i) { dodaj(i + 1, ime); });
+    SURE_DOD.forEach(function (x) { dodaj(x[0], x[1]); });
+    if (window.KURAN) window.KURAN.n.forEach(function (ime, i) { dodaj(i + 1, ime); });
+  }
+  function nadjiSuru(tekst) {
+    var k = kosturImena(tekst), naj = null;
+    if (k.length < 3) return null;
+    var varijante = [k];
+    if (/^(al|an|as|at|ar|az|ad)/.test(k) && k.length > 5) varijante.push(k.slice(2));
+    SN.forEach(function (s) {
+      var dop = s.k.length <= 6 ? 1 : s.k.length <= 9 ? 2 : 3;
+      varijante.forEach(function (x) {
+        var d = razlika(x, s.k, dop), dl = Math.abs(x.length - s.k.length);
+        if (d <= dop && (!naj || d < naj.d || (d === naj.d && dl < naj.dl))) naj = { br: s.br, ime: s.ime, d: d, dl: dl };
+      });
+    });
+    return naj;
+  }
+  function ispraviSure(tekst) {
+    if (!SN || (SN.bezKurana && window.KURAN)) pripremiSure();
+    var re = /[A-Za-zÀ-ž'’-]+/g, m, w = [], zamjene = [];
+    while ((m = re.exec(tekst))) w.push({ s: m.index, e: m.index + m[0].length, t: m[0] });
+    for (var i = 0; i + 1 < w.length; i++) {
+      var rijec = w[i].t.toLowerCase();
+      var jeSura = /^(sura|sure|suri|suru|surom|surah|surat|suret|šura|zura)$/.test(rijec), jeAna = rijec === "ana";
+      if (!jeSura && !jeAna) continue;
+      var naj = null;
+      for (var n = 1; n <= 3 && i + n < w.length; n++) {
+        var x = nadjiSuru(w.slice(i + 1, i + 1 + n).map(function (y) { return y.t; }).join(" "));
+        if (x && (!naj || x.d < naj.d)) { naj = x; naj.n = n; }
+      }
+      if (!naj) continue;
+      zamjene.push({ s: jeAna ? w[i].s : w[i + 1].s, e: w[i + naj.n].e, t: (jeAna ? "sura " : "") + naj.ime });
+      i += naj.n;
+    }
+    zamjene.reverse().forEach(function (z) { tekst = tekst.slice(0, z.s) + z.t + tekst.slice(z.e); });
+    return tekst;
+  }
+
   // Više arapskih dijelova jedan za drugim -> jedna zagrada / Mehrere arabische Teile hintereinander -> eine Klammer
   function spojiArapsko(x) {
     var prije;
@@ -1384,6 +1451,7 @@
       "- Only add a verse when you are confident which verse it is (the words match clearly, or the imam names the sura and verse). If the imam is clearly reciting Qur'an but you cannot identify the verse with confidence, write " + ci.rec + " and no entry in \"verses\" - never guess a verse. If the earlier context already shows the same verse (the recitation was split across segments), do not add it again.",
       "- The speech recognizer only knows Bosnian/Croatian, so Arabic often comes out as Bosnian-looking words. Use the context to recognize it, e.g. \"mila Rahman Rahim\" = Bismillahir-rahmanir-rahim; \"sa veselim\" / \"salala alej vesellem\" after Poslanik = sallallahu alejhi ve sellem (ﷺ); \"usro\", \"jusro\", \"usri jusra\", \"fe inne meal usri\" after \"Allah kaže\" = fe inne me'al-usri jusra (Ash-Sharh 94:5-6); \"elham dulila\" = Elhamdulillah; \"hamdo rabbi alim\", \"hamdu rabil alemin\", \"hamdu lila rabil alim\" = Elhamdulillahi rabbil alemin; \"inel hamde lila nahmeduhu\" = Innel-hamde lillahi nahmeduhu (opening of the hutba); \"ešhedu en la ilahe ilalah\" = Ešhedu en la ilahe illallah. Never translate such misheard words literally (e.g. never \"mit Fröhlichen\" for \"sa veselim\"). Words next to Arabic that make no sense in Bosnian (e.g. \"Kajesu Fatih\" before Elhamdulillah) are misheard Arabic: if you can identify the Arabic, write it in Arabic script with its translation; otherwise leave those words out - never translate nonsense.",
       "- The words \"sura\" (chapter of the Qur'an) and \"ajet\" (verse) are often misheard by the speech recognizer, e.g. as \"Ana\", \"sure\", \"ajat\", \"a jet\". When such a word stands where a sura or verse is meant (before a sura name like Jasin, El-Bekare, El-Fatiha, En-Nas, El-Kehf, or next to a number), translate it as the word for sura / verse - never as a person's name like \"Ana\".",
+      "- SURA NAMES: the imam names suras in Bosnian, e.g. \"sura Kaf\", \"sura El-Fatiha\", \"sura En-Nas\", \"u suri Ja-Sin\". The speech recognizer does not know these names (and often drops or mishears the word \"sura\") and writes similar-sounding Bosnian words instead, e.g. \"kafa\"/\"kafu\" for Kaf, \"nas\" for En-Nas. If a word sounds like a sura name and the context is about the Qur'an (sura, ajet, Allah kaže, Kur'an, učiti), translate it as the sura with its usual name in " + cilj + " (German: \"Sure Qaf\", \"Sure Al-Fatiha\", \"Sure An-Nas\", \"Sure Ya-Sin\") - never as coffee or as a person's name. Bosnian sura names in order 1-114: " + SURE_BS.join(", ") + ".",
       "- Bosnian (non-Arabic) paraphrases of a verse (\"Allah u Kur'anu kaže: ...\" followed by Bosnian words) are translated normally; do not add a verse entry for them.",
       arSPrijevodom() ?
       "- Markers like [1] or [2] in the segment stand for Arabic text that is already written in Arabic script (listed under \"Arabic blocks\"). Keep every marker exactly once, unchanged, at the matching place in \"translation\", and put the " + cilj + " translation of each block into \"arabic_meanings\" (same order). Do not write that meaning into \"translation\" - it is inserted after the marker automatically. Example: \"Draga braćo i sestre, [1].\" with [1] = ٱلْحَمْدُ لِلَّٰهِ -> translation \"Liebe Brüder und Schwestern, [1].\", arabic_meanings [\"Alles Lob gebührt Allah.\"]." :
@@ -1465,7 +1533,7 @@
       r.bs = r.bs.trim();
       if (r.arBezAjeta && !arSPrijevodom()) provjeriArapski(r);
     }
-    if (iz.g === "bs") r.bs = arapskeFormule(r.bs);
+    if (iz.g === "bs") r.bs = arapskeFormule(ispraviSure(r.bs));
     // Kad je govor na arapskom (Postavke), arapski se prevodi / Bei arabischer Sprache (Einstellungen) wird Arabisch übersetzt
     var posao, samoAr = iz.g === "ar" ? ck === "ar" : samoArapski(r.bs) && (iz.g !== "bs" || ck === "ar" || !arSPrijevodom());
     r.put = (r.put ? r.put + " · " : "") + (samoAr ? "arapski" : c ? "Claude" : gm ? "Gemini" : "Google");

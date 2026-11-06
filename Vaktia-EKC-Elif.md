@@ -285,3 +285,9 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Ein einzelnes arabisches Wort ohne Vers (z. B. أنا „Ana“, wenn „sura“ falsch gehört wird) wird nicht angezeigt.
 - Mit Claude-Schlüssel prüft Haiku arabische Teile ohne Vers kurz: Ist das gar kein Arabisch (z. B. Bosnisch, falsch erkannt), wird der Satz entfernt und zurückgeschaltet.
 - KI-Anweisung ergänzt: „sura“ und „ajet“ werden oft falsch gehört (z. B. „Ana“). Vor einem Sure-Namen oder einer Zahl als Sure/Vers übersetzen, nie als Name.
+
+## Hutba: ﷺ und Sure-Namen auf Bosnisch (2026-11-06)
+- **ﷺ hinter dem Namen:** Mehr Schreibweisen der Spracherkennung werden erkannt (wa sallam, vesselem, ve selam, sala lahu …, auch nur „alejhi ve sellem“ nach Muhammed/Poslanik/Resulullah). Ergebnis z. B. „Muhammed ﷺ je rekao“. Die Schrift Amiri auf dem TV enthält das Zeichen (geprüft).
+- **Sure-Namen:** Liste aller 114 Suren auf Bosnisch (`SURE_BS`, z. B. El-Fatiha, Kaf, En-Nas, Ja-Sin) plus Varianten (Qaf, Yasin, Ikhlas, Tebbet …) und die Namen aus `kuran.js`. Nach dem Wort „sura/suri/suru/sure“ (oder dem falsch gehörten „Ana“) wird der ähnlichste Name gesucht und richtig geschrieben: „u suri kafa kaže“ → „u suri Kaf kaže“, „Ana Kaf“ → „sura Kaf“.
+- Ohne das Wort „sura“ (wenn die Erkennung es verschluckt) entscheidet Haiku nach dem Zusammenhang. Die KI-Anweisung enthält dafür die Namensliste und den Hinweis „nie Kaffee, nie Personenname“.
+- Getestet: „sura na kraju“, „sura koja govori“, „Ana je došla“, „popiti kafu“ bleiben unverändert.
