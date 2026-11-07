@@ -360,3 +360,6 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
   - **Arabische Formeln sind keine Verse** (`FORMULE_AR`): Elhamdulillahi rabbil alemin, Elhamdulillah, La ilahe illallah, Subhanallah, Allahu ekber, Estagfirullah, Inna lillahi …, Hasbunallah …, La havle …, Salavat (→ ﷺ), Radijallahu anhu, Selam, Amin, Mašallah, Inšallah, Subhanehu ve teala, Barekallahu fikum, Džezakallahu hajran. Sie erscheinen als Formel ohne Sure-Angabe. Das gilt für Gemini und den Arabisch-Modus.
   - **429 „pro Minute“:** kurz warten (2,5 s, dann 5 s) und dasselbe Modell nochmal. Nur bei Tageskontingent wird das Modell gewechselt.
   - Sekundenanzeige erst ab 6 s Wartezeit („Höre zu… (7 s)“). Tonstücke höchstens 15 s.
+
+### Nachtrag: Gebetsbildschirm – nur ein Quadrat
+Das zweite, um 45° gedrehte Quadrat im Hintergrund-Ornament (`index.html`, `.ve-ornament`) wurde entfernt; es bleibt ein Quadrat mit den Kreisen. Version 2026-11-07.23.
