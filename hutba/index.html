@@ -353,8 +353,8 @@
       ios2: "Postavke → Safari → <b>Mikrofon</b> → Pitaj ili Dozvoli.", ios3: "Za test: u Postavkama izabrati jezik govora <b>Deutsch</b> – ako to radi, problem je samo u jeziku.",
       nemaNeta: "Nema interneta za prepoznavanje govora … pokušava ponovo.",
       kljucNe: "Claude ključ ne radi – koristi se Google.",
-      prepoznavanje: "Prepoznavanje govora", optAuto: "Preglednik – besplatno (Chrome, Safari)", optGemini: "Gemini – radi u svakom pregledniku",
-      infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Radi u svakom pregledniku (i Chrome/Google na iPhoneu). Gemini odmah i prevodi po smislu. Treba Gemini ključ (aistudio.google.com).",
+      prepoznavanje: "Prepoznavanje govora", optAuto: "Preglednik – besplatno (Chrome, Safari)", optGemini: "Gemini – čuje bosanski i arapski zajedno (bez dugmeta)",
+      infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Gemini sam sluša zvuk i razumije bosanski i arapski u isto vrijeme – bez dugmeta. Prevodi prevodilac ispod (npr. Haiku). Tekst dolazi oko 5–15 s kasnije. Treba Gemini ključ (besplatno: aistudio.google.com).",
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
       gNe: "Gemini greška", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
@@ -402,8 +402,8 @@
       ios2: "Einstellungen → Safari → <b>Mikrofon</b> → Fragen oder Erlauben.", ios3: "Zum Test: in den Einstellungen als gesprochene Sprache <b>Deutsch</b> wählen – geht das, liegt es nur an der Sprache.",
       nemaNeta: "Kein Internet für die Spracherkennung … neuer Versuch.",
       kljucNe: "Claude-Schlüssel ungültig – es wird Google verwendet.",
-      prepoznavanje: "Spracherkennung", optAuto: "Browser – kostenlos (Chrome, Safari)", optGemini: "Gemini – geht in jedem Browser",
-      infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Geht in jedem Browser (auch Chrome/Google auf dem iPhone). Gemini übersetzt gleich mit, nach Sinn. Braucht einen Gemini-Schlüssel (aistudio.google.com).",
+      prepoznavanje: "Spracherkennung", optAuto: "Browser – kostenlos (Chrome, Safari)", optGemini: "Gemini – hört Bosnisch und Arabisch zusammen (ohne Taste)",
+      infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Gemini hört den Ton selbst und versteht Bosnisch und Arabisch gleichzeitig – ohne Taste. Übersetzt wird mit dem Übersetzer unten (z. B. Haiku). Der Text kommt ca. 5–15 s später. Braucht einen Gemini-Schlüssel (kostenlos: aistudio.google.com).",
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
       gNe: "Gemini-Fehler", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
@@ -451,8 +451,8 @@
       ios2: "Réglages → Safari → <b>Micro</b> → Demander ou Autoriser.", ios3: "Pour tester : choisir <b>Deutsch</b> comme langue parlée dans les paramètres – si cela marche, le problème vient seulement de la langue.",
       nemaNeta: "Pas d'Internet pour la reconnaissance vocale … nouvel essai.",
       kljucNe: "Clé Claude invalide – Google est utilisé.",
-      prepoznavanje: "Reconnaissance vocale", optAuto: "Navigateur – gratuit (Chrome, Safari)", optGemini: "Gemini – fonctionne dans tout navigateur",
-      infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Fonctionne dans tout navigateur (aussi Chrome/Google sur iPhone). Gemini traduit en même temps, selon le sens. Nécessite une clé Gemini (aistudio.google.com).",
+      prepoznavanje: "Reconnaissance vocale", optAuto: "Navigateur – gratuit (Chrome, Safari)", optGemini: "Gemini – entend le bosnien et l'arabe ensemble (sans bouton)",
+      infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Gemini écoute le son lui-même et comprend le bosnien et l'arabe en même temps – sans bouton. La traduction se fait avec le traducteur ci-dessous (p. ex. Haiku). Le texte arrive env. 5–15 s plus tard. Nécessite une clé Gemini (gratuite : aistudio.google.com).",
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
       gNe: "Erreur Gemini", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
@@ -616,7 +616,7 @@
   function prikaziPrevodioca() {
     var gem = $("prepoznavanje").value === "gemini";
     $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI && $("prevodilac").value !== "gemini");
-    $("prevodilac-dio").classList.toggle("skriveno", gem);
+    $("prevodilac-dio").classList.toggle("skriveno", false);   // Gemini samo sluša, prevodilac se bira / Gemini hört nur, Übersetzer wählbar
     $("prepoznavanje-info").textContent = gem ? t("infoGemini") : t("infoAuto");
     $("gkljuc-stanje").textContent = citaj("hutba-gkljuc") ? "  " + t("spremljeno") : "";
     var pv = $("prevodilac").value, cl = /^claude/.test(pv);
@@ -753,6 +753,7 @@
     if (budnost) { try { budnost.release(); } catch (e) {} budnost = null; }
     $("mikrofon").classList.remove("ukljucen");
     if (arapskiRezim) { arapskiRezim = false; setTimeout(zavrsiArSesiju, 300); }
+    else setTimeout(function () { if (arSesija.length) zavrsiArSesiju(); else if (arSazetakCeka) { ukloni(arSazetakCeka); arSazetakCeka = null; } }, 4000);
     prikaziArDugme();
     postaviStatus(kljucStatusa || "micOff");
     postaviVrijeme("ponovo");
@@ -943,8 +944,8 @@
   }
 
   /* =================== Gemini: snimanje zvuka / Tonaufnahme =================== */
-  // Snima zvuk, reže na pauzama (5–14 s) i šalje Geminiju: on prepiše i prevede.
-  // Nimmt den Ton auf, schneidet an Sprechpausen (5–14 s) und schickt ihn an Gemini: es schreibt mit und übersetzt.
+  // Snima zvuk, reže na pauzama (4–12 s) i šalje Geminiju: on prepiše bosanski i arapski.
+  // Nimmt den Ton auf, schneidet an Sprechpausen (4–12 s) und schickt ihn an Gemini: es schreibt Bosnisch und Arabisch mit.
   var aCtx = null, aTok = null, aIzvor = null, aProc = null, aDijelovi = [], aDuzina = 0, aTisina = 0, aGlas = false, aSum = 0.003, aPauza = true;
   var CILJNI_HZ = 16000;
   function audioStart() {
@@ -974,7 +975,7 @@
         aDijelovi.push(mali); aDuzina += n;
         if (govor) { aGlas = true; aTisina = 0; } else aTisina += n;
         var sek = aDuzina / CILJNI_HZ, tisinaSek = aTisina / CILJNI_HZ;
-        if ((sek >= 5 && tisinaSek >= 0.6) || sek >= 14) audioPosalji();
+        if ((sek >= 4 && tisinaSek >= 0.6) || sek >= 12) audioPosalji();
         else if (!aGlas && sek >= 3) { aDijelovi = []; aDuzina = 0; aTisina = 0; aPauza = true; }   // samo tišina = pauza / nur Stille = Pause
       };
       aIzvor.connect(aProc); aProc.connect(aCtx.destination);
@@ -994,6 +995,7 @@
     var dijelovi = aDijelovi, duzina = aDuzina, glas = aGlas;
     aDijelovi = []; aDuzina = 0; aTisina = 0; aGlas = false;
     if (!glas) return;
+    if (arSesija.length && !arSazetakCeka) arSazetakCeka = novaRecenica();   // mjesto za izvor učenja / Platz für die Quelle der Rezitation
     var r = novaRecenica(); r.p = aPauza; aPauza = false; r.bs = t("slusam"); prikaziTok(); posaljiRecenicu(r);
     gemini(wavBase64(dijelovi, duzina), r);
   }
@@ -1009,26 +1011,26 @@
     for (var i = 0; i < bajtovi.length; i += 0x8000) bin += String.fromCharCode.apply(null, bajtovi.subarray(i, i + 0x8000));
     return btoa(bin);
   }
-  function gemini(b64, r) {
-    var iz = izvor(), ck = ciljKod(), model = citaj("hutba-gmodel") || G_MODEL;
-    var upute = uputa(iz, ck) + "\n\nIMPORTANT: Here the input is an AUDIO recording of the next part of the sermon, not text. " +
-      "First write down exactly what was said, in the spoken language (field \"original\"). Everything the imam says in ARABIC (formulas like Elhamdulillahi rabbil alemin, Bismillah, the opening of the hutba, duas, hadith, recited Qur'an) is written in ARABIC SCRIPT with vowel marks in round brackets - never in Latin letters and never as Bosnian-looking words. " +
-      "Then translate it into " + CILJ[ck].ime + " following all rules above (field \"translation\"). " +
-      "If the audio contains no speech, return \"-\" in both fields.";
+  // Gemini samo SLUŠA: piše bosanski i arapski zajedno (arapski arapskim pismom). Prevodi se kao i inače
+  // (Haiku/Claude/Google), ajeti tačno iz Mushafa, izvor na kraju učenja.
+  // Gemini HÖRT nur zu: schreibt Bosnisch und Arabisch zusammen auf (Arabisch in arabischer Schrift). Übersetzt wird wie sonst
+  // (Haiku/Claude/Google), Verse genau aus dem Mushaf, Quelle am Ende der Rezitation.
+  var G_LITE = "gemini-flash-lite-latest", gModelSesije = null;
+  function gemini(b64, r, pokusaj) {
+    var model = citaj("hutba-gmodel") || gModelSesije || G_MODEL;
+    var prije = recenice.filter(function (x) { return x.id < r.id && x.gem && x.bs; }).slice(-3).map(function (x) { return x.bs; }).join(" ");
+    var upute = "You are the speech-to-text system for the Friday sermon (hutba) in a Bosnian mosque. The imam speaks Bosnian and, in between, Arabic: Qur'an recitation, duas, hadith and formulas (Bismillah, Elhamdulillah, Euzu billahi, sallallahu alejhi ve sellem, Esselamu alejkum ...). " +
+      "Transcribe EXACTLY what is said in this audio, nothing else: no translation, no summary, no comments. " +
+      "Bosnian: Latin script, correct Bosnian spelling (č ć š ž đ dž) and punctuation. Islamic words that the imam says in Bosnian stay in Bosnian spelling (sura, ajet, hutba, džuma, dova, Poslanik, Muhammed, sura El-Fatiha, sura Kaf, sura Ja-Sin). " +
+      "Arabic: ARABIC SCRIPT inside round brackets, e.g. (بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ). For Qur'an recitation write the exact words of the verses. Never write Arabic in Latin letters. " +
+      "If there is no speech, return \"-\".";
     var tijelo = {
       systemInstruction: { parts: [{ text: upute }] },
       contents: [{ role: "user", parts: [
         { inlineData: { mimeType: "audio/wav", data: b64 } },
-        { text: kontekst(r) + "Write down and translate this audio segment." }
+        { text: (prije ? "Previous transcript (context only, do not repeat it): " + prije + "\n\n" : "") + "Transcribe this audio." }
       ] }],
-      generationConfig: {
-        temperature: 0.2,
-        responseMimeType: "application/json",
-        responseSchema: { type: "OBJECT", properties: {
-          original: { type: "STRING" }, translation: { type: "STRING" },
-          verses: { type: "ARRAY", items: { type: "OBJECT", properties: { sura: { type: "INTEGER" }, from: { type: "INTEGER" }, to: { type: "INTEGER" }, meaning: { type: "STRING" } }, required: ["sura", "from", "to", "meaning"] } }
-        }, required: ["original", "translation", "verses"] }
-      }
+      generationConfig: { temperature: 0, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] } }
     };
     fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(citaj("hutba-gkljuc") || ""), {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(tijelo)
@@ -1037,21 +1039,66 @@
     }).then(function (d) {
       var tekst = (((d.candidates || [])[0] || {}).content || {}).parts;
       tekst = (tekst || []).map(function (p) { return p.text || ""; }).join("");
-      var j = JSON.parse(tekst);
-      var orig = String(j.original || "").trim(), pr = String(j.translation || "").trim();
-      if (!orig || orig === "-" || !pr || pr === "-") { ukloni(r); return; }
-      if (iz.g === "bs") pr = umetniAjete(pr, j.verses || [], ck);
-      pr = ocistiIzlaz(pr);
-      if (/^¶/.test(pr)) { r.p = true; pr = pr.replace(/^¶\s*/, ""); }
-      r.bs = orig; r.de = pr; r.gotovo = true;
+      var orig = tekst;
+      try { var j = JSON.parse(tekst); if (j && typeof j.text === "string") orig = j.text; } catch (e2) {}
+      orig = String(orig || "").trim();
+      if (!orig || /^[-–.…\s]*$/.test(orig)) { ukloni(r); return; }
       if (upozorenjeFn && upozorenjeFn.gemini) upozori(null);
-      prikaziTok(); posaljiRecenicu(r);
+      r.bs = zagradiArapski(orig); r.gem = true; r.konacno = true;
+      prevedi(r);
     }).catch(function (e) {
+      // Kontingent potrošen -> Flash-Lite (veći besplatni kontingent) / Kontingent aufgebraucht -> Flash-Lite (größeres Gratis-Kontingent)
+      if (!pokusaj && /^429/.test(String((e && e.message) || "")) && !citaj("hutba-gmodel") && model !== G_LITE) { gModelSesije = G_LITE; gemini(b64, r, 1); return; }
       var poruka = String((e && e.message) || e).slice(0, 160);
       var fn = function () { return "<b>" + t("gNe") + "</b>" + kodHtml(esc(poruka)); }; fn.gemini = true;
       upozori(fn);
       ukloni(r);
     });
+  }
+  // Arapski bez zagrade -> u zagradu / Arabisch ohne Klammer -> in Klammern
+  function zagradiArapski(x) {
+    return String(x).split(/(\([^()]*\))/).map(function (d, i) {
+      if (i % 2 === 1) return d;
+      return d.replace(/[؀-ۿﭐ-﷿ﹰ-﻿][؀-ۿﭐ-﷿ﹰ-﻿\s]*[؀-ۿﭐ-﷿ﹰ-﻿]|[؀-ۿﭐ-﷿]/g, function (m) { return m === "ﷺ" ? m : "(" + m + ")"; });
+    }).join("");
+  }
+  // Arapski dijelovi iz Geminija: ajet tačno iz Mushafa, izvor ispod zadnjeg ajeta kad se učenje završi
+  // Arabische Teile von Gemini: Vers genau aus dem Mushaf, Quelle unter dem letzten Vers, wenn die Rezitation endet
+  var arSazetakCeka = null;
+  function arapskiBlokoviGemini(r, ck) {
+    var imaAjet = false, zadnjiPoz = -1, zadnjiBlok = "", dijelovi = r.bs.split(/(\([^()]*[؀-ۿ][^()]*\))/);
+    for (var i = 1; i < dijelovi.length; i += 2) {
+      var ar = dijelovi[i].slice(1, -1), uvod = odvojiUvod(ar), kraj = odvojiKraj(uvod.ostatak), ost = kraj.ostatak;
+      var aj = ost ? nadjiAjet(ost) : null, b = [];
+      if (uvod.bloka) b.push(uvod.bloka);
+      if (aj) {
+        imaAjet = true;
+        arSesija.push({ s: aj.sura, od: aj.from, ddo: aj.to });
+        var nov = noviAjeti(aj);
+        if (nov) { zadnjiBlok = tekstAjeta(nov, ck, true); b.push(zadnjiBlok); zadnjiPoz = i; }
+      } else if (ost) b.push("(" + ost + ")");
+      if (kraj.bloka) b.push(kraj.bloka);
+      dijelovi[i] = b.join(" ");
+    }
+    var rs = arSazetakCeka, opis;
+    arSazetakCeka = null;
+    var poslije = zadnjiPoz >= 0 ? dijelovi.slice(zadnjiPoz + 1).join("") : "";
+    if (imaAjet && zadnjiBlok && /[A-Za-zČĆŠŽĐčćšžđ]{2,}/.test(poslije) && arSesija.length) {
+      // učenje završeno u ovom dijelu (iza ajeta bosanski): izvor odmah ispod ajeta
+      // Rezitation endet in diesem Teil (nach dem Vers Bosnisch): Quelle direkt unter dem Vers
+      opis = opisAjeta(arSesija, ck); arSesija = [];
+      dijelovi[zadnjiPoz] = dijelovi[zadnjiPoz].split(zadnjiBlok).join(zadnjiBlok.replace(/\)$/, " · " + opis + ")"));
+      if (rs) ukloni(rs);
+    } else if (!imaAjet && arSesija.length) {
+      // učenje završeno u prethodnom dijelu: izvor kao vlastiti red (na rezervisanom mjestu prije ovog dijela)
+      // Rezitation endete im vorigen Teil: Quelle als eigene Zeile (auf dem reservierten Platz vor diesem Teil)
+      opis = opisAjeta(arSesija, ck); arSesija = [];
+      var z = rs && rs.id < r.id ? rs : novaRecenica();
+      if (rs && z !== rs) ukloni(rs);
+      z.bs = opis; z.de = opis; z.gotovo = true; z.konacno = true; z.put = "sažetak";
+      prikaziTok(); posaljiRecenicu(z);
+    } else if (rs) ukloni(rs);
+    return dijelovi.join("").replace(/\s+/g, " ").trim();
   }
 
   /* =================== Arapske formule / Arabische Formeln =================== */
@@ -1376,7 +1423,8 @@
     if (!arSesija.length) return;
     var opis = opisAjeta(arSesija, ciljKod());
     arSesija = [];
-    var r = novaRecenica();
+    var r = arSazetakCeka || novaRecenica();
+    arSazetakCeka = null;
     r.bs = opis; r.de = opis; r.gotovo = true; r.konacno = true; r.put = "sažetak";
     prikaziTok(); posaljiRecenicu(r);
   }
@@ -1438,6 +1486,9 @@
     });
     return naj;
   }
+  function vanArapskog(tekst, fn) {
+    return String(tekst).split(/(\([^()]*[\u0600-\u06FF][^()]*\))/).map(function (d, i) { return i % 2 === 1 ? d : fn(d); }).join("");
+  }
   function ispraviSure(tekst) {
     if (!SN || (SN.bezKurana && window.KURAN)) pripremiSure();
     var re = /[A-Za-zÀ-ž'’-]+/g, m, w = [], zamjene = [];
@@ -1454,6 +1505,8 @@
         if (x && (!naj || x.d < naj.d)) { naj = x; naj.n = n; }
       }
       if (!naj || ((jeAna || slicna) && naj.d > 1)) continue;
+      // već tačno napisano (veliko slovo, npr. "El-Inširah") – ostaviti kako je imam rekao / schon richtig geschrieben – so lassen
+      if (jeSura && naj.d === 0 && /^[A-ZČĆŠŽĐ]/.test(w[i + 1].t)) { i += naj.n; continue; }
       if (slicna) {
         var oblik = /om$/.test(rijec) ? "surom" : "sur" + rijec.slice(-1);
         if (/^[A-ZŠŽ]/.test(w[i].t)) oblik = oblik.charAt(0).toUpperCase() + oblik.slice(1);
@@ -1671,6 +1724,11 @@
     var gm = !c && $("prevodilac").value === "gemini" && citaj("hutba-gkljuc");
     // Arapsko prepoznavanje: ajet iz Mushafa (tačan tekst) ili arapski tekst u zagradi
     // Arabische Erkennung: Vers aus dem Mushaf (genauer Text) oder der arabische Text in Klammern
+    if (r.gem && !r.gemGotov) {
+      r.gemGotov = true;
+      r.bs = arapskiBlokoviGemini(r, ck);
+      if (!r.bs) { ukloni(r); return; }
+    }
     if (r.ar && !r.arGotov) {
       r.arGotov = true;
       var uvod = odvojiUvod(r.bs), kraj = odvojiKraj(uvod.ostatak);
@@ -1703,7 +1761,8 @@
       if (r.arBezAjeta && !arSPrijevodom()) provjeriArapski(r);
     }
     if (iz.g === "bs") {
-      r.bs = dodajSalavat(arapskeFormule(ispraviSure(r.bs)));
+      // samo izvan arapskih zagrada (tamo je i izvor ajeta) / nur außerhalb arabischer Klammern (dort steht auch die Vers-Quelle)
+      r.bs = vanArapskog(arapskeFormule(vanArapskog(r.bs, ispraviSure)), dodajSalavat);
       // ﷺ na kraju prethodnog dijela -> ne ponavljati na početku ovog / ﷺ am Ende des vorigen Teils -> am Anfang nicht wiederholen
       var preth = recenice.filter(function (x) { return x.id < r.id && x.bs; }).slice(-1)[0];
       if (preth && /ﷺ[\s.,;:!?]*$/.test(preth.bs)) r.bs = r.bs.replace(/^\s*ﷺ[\s,]*/, "");
