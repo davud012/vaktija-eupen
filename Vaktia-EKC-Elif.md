@@ -345,3 +345,10 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
   - **Zeitgrenze 30 s** pro Tonstück. Danach erscheint die Fehlermeldung oben und 20 s lang in der Liste.
   - Wartende Zeilen zeigen die Sekunden („Höre zu… 7 s“).
   - Neue Taste **„Gemini testen“** in den Einstellungen. Sie schickt eine kurze Testfrage und zeigt Ergebnis, Dauer und Modell bzw. den genauen Fehler.
+- **Nachtrag 2 (07.11.):** Auf dem iPhone kam „400 Request contains an invalid argument“. Jetzt probiert die Seite bei 400 automatisch einfachere Anfragen. Die funktionierende Stufe merkt sie sich für die Sitzung (`gNacin`):
+  - 0 = volle Anfrage (ohne Nachdenken + JSON-Format + Systemanweisung),
+  - 1 = ohne „thinkingBudget“,
+  - 2 = ohne JSON-Format (Antwort als reiner Text),
+  - 3 = Anweisung im Text statt `systemInstruction`.
+  - Danach wird einmal das andere Modell versucht (Flash-Lite ↔ Flash).
+  - Fehlermeldungen zeigen jetzt Googles Details sowie Modell und Stufe, z. B. „(gemini-flash-lite-latest, 3)“. Die Test-Taste zeigt die Stufe ebenfalls.

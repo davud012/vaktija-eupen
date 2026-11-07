@@ -598,12 +598,12 @@
     el.textContent = "… " + model;
     (function probaj(pokusaj) {
       model = citaj("hutba-gmodel") || gModelSesije || G_MODEL;
-      geminiZahtjev(model, { contents: [{ role: "user", parts: [{ text: "Reply with the single word OK." }] }], generationConfig: { temperature: 0 } }, 20000).then(function (d) {
+      geminiZahtjev(model, geminiTijelo([{ text: "Reply with the single word OK." }], "You are a test.", null), 20000).then(function (d) {
         var x = ((((d.candidates || [])[0] || {}).content || {}).parts || []).map(function (p) { return p.text || ""; }).join("").trim();
-        el.textContent = "✓ " + t("gTestOk") + " – " + ((Date.now() - start) / 1000).toFixed(1) + " s · " + model + " · „" + x.slice(0, 20) + "“";
+        el.textContent = "✓ " + t("gTestOk") + " – " + ((Date.now() - start) / 1000).toFixed(1) + " s · " + model + " · " + gNacin + " · „" + x.slice(0, 20) + "“";
       }).catch(function (e) {
-        if (geminiPonovo(e, model, pokusaj)) { probaj(pokusaj + 1); return; }
-        el.textContent = "✗ " + t("gNe") + " (" + model + "): " + String((e && e.message) || e).slice(0, 200);
+        if (geminiPonovo(e, model, pokusaj, 3)) { probaj(pokusaj + 1); return; }
+        el.textContent = "✗ " + t("gNe") + " (" + model + ", " + gNacin + "): " + String((e && e.message) || e).slice(0, 300);
       });
     })(0);
   });
@@ -1033,18 +1033,21 @@
   // (Haiku/Claude/Google), ajeti tačno iz Mushafa, izvor na kraju učenja.
   // Gemini HÖRT nur zu: schreibt Bosnisch und Arabisch zusammen auf (Arabisch in arabischer Schrift). Übersetzt wird wie sonst
   // (Haiku/Claude/Google), Verse genau aus dem Mushaf, Quelle am Ende der Rezitation.
-  var G_LITE = "gemini-flash-lite-latest", G_FLASH = "gemini-flash-latest", gModelSesije = null, gBezMisli = true;
+  // gNacin: 0 = puni zahtjev, 1 = bez "razmišljanja", 2 = bez JSON-oblika, 3 = uputa u tekstu (bez systemInstruction)
+  // gNacin: 0 = volle Anfrage, 1 = ohne "Nachdenken", 2 = ohne JSON-Format, 3 = Anweisung im Text (ohne systemInstruction)
+  var G_LITE = "gemini-flash-lite-latest", G_FLASH = "gemini-flash-latest", gModelSesije = null, gNacin = 0;
   // Zahtjev Geminiju sa vremenskim ograničenjem; bez "razmišljanja" (brže) / Anfrage an Gemini mit Zeitgrenze; ohne "Nachdenken" (schneller)
   function geminiZahtjev(model, tijelo, ms) {
-    if (gBezMisli) tijelo.generationConfig.thinkingConfig = { thinkingBudget: 0 };
-    else delete tijelo.generationConfig.thinkingConfig;
     var ctrl = window.AbortController ? new AbortController() : null, tajmer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms);
     return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(citaj("hutba-gkljuc") || ""), {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(tijelo), signal: ctrl ? ctrl.signal : undefined
     }).then(function (o) {
       return o.json().then(function (d) {
         clearTimeout(tajmer);
-        if (!o.ok) throw new Error(o.status + " " + ((d.error && d.error.message) || ""));
+        if (!o.ok) {
+          var det = d.error && d.error.details ? " | " + JSON.stringify(d.error.details).slice(0, 220) : "";
+          throw new Error(o.status + " " + ((d.error && d.error.message) || "") + det);
+        }
         return d;
       });
     }, function (e) {
@@ -1053,12 +1056,22 @@
     });
   }
   // Greška -> drugi pokušaj? (bez razmišljanja ne ide / kontingent / model ne postoji) / Fehler -> zweiter Versuch?
-  function geminiPonovo(e, model, pokusaj) {
+  function geminiPonovo(e, model, pokusaj, maxNacin) {
     var m = String((e && e.message) || "");
-    if (pokusaj >= 2) return false;
-    if (/^400/.test(m) && /think/i.test(m) && gBezMisli) { gBezMisli = false; return true; }
-    if (!citaj("hutba-gmodel") && /^(429|404)/.test(m)) { gModelSesije = model === G_LITE ? G_FLASH : G_LITE; return true; }
+    if (pokusaj >= 6) return false;
+    if (/^400/.test(m) && gNacin < maxNacin) { gNacin++; return true; }
+    if (!citaj("hutba-gmodel") && (/^(429|404)/.test(m) || (/^400/.test(m) && !gModelSesije))) { gModelSesije = model === G_LITE ? G_FLASH : G_LITE; return true; }
     return false;
+  }
+  function geminiTijelo(dijeloviKorisnika, upute, shema) {
+    var gc = { temperature: 0 };
+    if (gNacin < 1) gc.thinkingConfig = { thinkingBudget: 0 };
+    if (gNacin < 2 && shema) { gc.responseMimeType = "application/json"; gc.responseSchema = shema; }
+    var dijelovi = dijeloviKorisnika.slice();
+    if (upute && gNacin >= 3) dijelovi.push({ text: "INSTRUCTIONS: " + upute });
+    var tijelo = { contents: [{ role: "user", parts: dijelovi }], generationConfig: gc };
+    if (upute && gNacin < 3) tijelo.systemInstruction = { parts: [{ text: upute }] };
+    return tijelo;
   }
   function gemini(b64, r, pokusaj) {
     pokusaj = pokusaj || 0;
@@ -1077,14 +1090,11 @@
       "Bosnian: Latin script, correct Bosnian spelling (č ć š ž đ dž) and punctuation. Islamic words that the imam says in Bosnian stay in Bosnian spelling (sura, ajet, hutba, džuma, dova, Poslanik, Muhammed, sura El-Fatiha, sura Kaf, sura Ja-Sin). " +
       "Arabic: ARABIC SCRIPT inside round brackets, e.g. (بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ). For Qur'an recitation write the exact words of the verses. Never write Arabic in Latin letters. " +
       "If there is no speech, return \"-\".";
-    var tijelo = {
-      systemInstruction: { parts: [{ text: upute }] },
-      contents: [{ role: "user", parts: [
+    var tijelo = geminiTijelo([
         { inlineData: { mimeType: "audio/wav", data: b64 } },
-        { text: (prije ? "Previous transcript (context only, do not repeat it): " + prije + "\n\n" : "") + "Transcribe this audio." }
-      ] }],
-      generationConfig: { temperature: 0, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] } }
-    };
+        { text: (prije ? "Previous transcript (context only, do not repeat it): " + prije + "\n\n" : "") + "Transcribe this audio." + (gNacin >= 2 ? " Reply with the transcript only." : "") }
+      ], upute, { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] });
+    var nacinSad = gNacin;
     geminiZahtjev(model, tijelo, 30000).then(function (d) {
       var tekst = (((d.candidates || [])[0] || {}).content || {}).parts;
       tekst = (tekst || []).filter(function (p) { return !p.thought; }).map(function (p) { return p.text || ""; }).join("");
@@ -1097,9 +1107,9 @@
       r.bs = zagradiArapski(orig); r.gem = true; r.konacno = true;
       prevedi(r);
     }).catch(function (e) {
-      if (geminiPonovo(e, model, pokusaj)) { gemini(b64, r, pokusaj + 1); return; }
+      if (nacinSad < gNacin || geminiPonovo(e, model, pokusaj, 3)) { gemini(b64, r, pokusaj + 1); return; }
       r.gGotov = true; clearInterval(r.gTajmer);
-      var poruka = String((e && e.message) || e).slice(0, 200);
+      var poruka = String((e && e.message) || e).slice(0, 300) + " (" + model + ", " + gNacin + ")";
       var fn = function () { return "<b>" + t("gNe") + "</b>" + kodHtml(esc(poruka)); }; fn.gemini = true;
       upozori(fn);
       // greška ostaje 20 s vidljiva u listi (samo na mobitelu) / Fehler bleibt 20 s in der Liste sichtbar (nur am Handy)
