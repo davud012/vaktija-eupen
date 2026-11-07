@@ -338,3 +338,10 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
   - **Kontingent kostenlos:** Google nennt keine festen Zahlen (siehe aistudio.google.com/rate-limit). Berichtet werden für Flash teils nur ~20 Anfragen/Tag, für Flash-Lite ~500–1500/Tag. Eine Hutba braucht ca. 150–250 Anfragen. Wenn es nicht reicht: in AI Studio die Abrechnung aktivieren, das kostet wenige Cent pro Hutba.
 - Sure-Namen-Korrektur und ﷺ wirken nur noch **außerhalb** arabischer Klammern, damit die Quellenangabe nicht verändert wird. Ein richtig geschriebener Sure-Name mit großem Anfangsbuchstaben (z. B. „El-Inširah“) bleibt, wie der Imam ihn gesagt hat.
 - Getestet mit simuliertem Mikrofon und simulierten Gemini-Antworten. Echte Gemini-Aufrufe sind in dieser Umgebung gesperrt und **nicht getestet**.
+- **Nachtrag (07.11.):** Auf dem iPhone blieben alle Zeilen bei „Höre zu…“ stehen. Gemini antwortete nicht oder sehr langsam, wahrscheinlich weil das große Modell vorher „nachdenkt“. Änderungen:
+  - Standardmodell jetzt **`gemini-flash-lite-latest`**. Das reicht, weil Gemini nur mitschreibt, und es ist schneller und hat mehr Gratis-Kontingent.
+  - „Nachdenken“ ist aus (`thinkingBudget: 0`). Lehnt ein Modell das ab (400 „thinking“), kommt automatisch ein zweiter Versuch ohne diese Einstellung.
+  - Bei 429/404 wird zwischen Flash-Lite und Flash gewechselt.
+  - **Zeitgrenze 30 s** pro Tonstück. Danach erscheint die Fehlermeldung oben und 20 s lang in der Liste.
+  - Wartende Zeilen zeigen die Sekunden („Höre zu… 7 s“).
+  - Neue Taste **„Gemini testen“** in den Einstellungen. Sie schickt eine kurze Testfrage und zeigt Ergebnis, Dauer und Modell bzw. den genauen Fehler.
