@@ -272,6 +272,13 @@
         </select>
         <div class="mali" id="ar-nacin-info"></div>
 
+        <label for="ar-auto" data-t="arAutoNaslov"></label>
+        <select id="ar-auto">
+          <option value="da" data-t="optArAutoDa"></option>
+          <option value="ne" data-t="optArAutoNe"></option>
+        </select>
+        <div class="mali" data-t="infoArAuto"></div>
+
         <button class="dugme sporedno" id="odjava" type="button" style="margin-top:22px" data-t="odjava"></button>
         <div class="mali" data-t="odjavaInfo"></div>
         <div class="mali" id="verzija" style="margin-top:14px;opacity:.6"></div>
@@ -315,7 +322,7 @@
       u4: "Ekran mobitela ostaviti upaljen, ne zaključavati.",
       u5: "Kad preglednik pita za mikrofon, izaberite <b>Dozvoli</b> (ako postoji: „pri svakoj posjeti“, ne „samo ovaj put“).",
       tokNaslov: "Prijevod", prazno: "Još ništa",
-      postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac", arDugme: "Arapski / Kur'an", arDugmeSub: "Dodirnite prije nego što počnete učiti na arapskom", arDugmeNa: "Sada: ARAPSKI", arDugmeNaSub: "Dodirnite kad nastavite na bosanskom", arNazad: "Nije bio arapski – nazad na bosanski.", arNema: "Ovaj telefon nema arapsko prepoznavanje govora. Postavke telefona → Jezik → dodajte arapski (ili koristite Gemini).", arNacin: "Arapski u hutbi", optArSamo: "Samo arapsko pismo, bez prijevoda", optArPrijevod: "Arapsko pismo + prijevod", infoArSamo: "Kad govorite arapski (Elhamdulillah, dova, ajet), na TV-u se piše arapskim pismom i ne prevodi se.", infoArPrijevod: "Arapski se piše arapskim pismom, a odmah iza njega prijevod.",
+      postavke: "Postavke", jezikGovora: "Jezik govora", prijevodNa: "Prijevod na", prevodilac: "Prevodilac", arAutoNaslov: "Arapski prepoznati automatski", optArAutoDa: "Da – telefon sam prelazi na arapski", optArAutoNe: "Ne – samo dugmetom", infoArAuto: "Kad kažete „Euzu billahi …“, telefon sam prelazi na arapski. Nazad na bosanski: kad se ajet završi i ne nastavlja, na kraju sure ili kod „Sadakallahul azim“. Dugme i dalje radi.", arDugmeAuto: "Sada: ARAPSKI (automatski)", arDugme: "Arapski / Kur'an", arDugmeSub: "Dodirnite prije nego što počnete učiti na arapskom", arDugmeNa: "Sada: ARAPSKI", arDugmeNaSub: "Dodirnite kad nastavite na bosanskom", arNazad: "Nije bio arapski – nazad na bosanski.", arNema: "Ovaj telefon nema arapsko prepoznavanje govora. Postavke telefona → Jezik → dodajte arapski (ili koristite Gemini).", arNacin: "Arapski u hutbi", optArSamo: "Samo arapsko pismo, bez prijevoda", optArPrijevod: "Arapsko pismo + prijevod", infoArSamo: "Kad govorite arapski (Elhamdulillah, dova, ajet), na TV-u se piše arapskim pismom i ne prevodi se.", infoArPrijevod: "Arapski se piše arapskim pismom, a odmah iza njega prijevod.",
       optHaiku: "Claude Haiku – po smislu, vrlo jeftino", infoHaiku: "Prevodi po smislu, oko 5 centi po hutbi. Ajete prepoznaje slabije. Treba Claude ključ.",
       guthaben: "Na Claude računu nema više kredita – prevodi se besplatno preko Google-a. Dopunite kredit na platform.claude.com.",
       optGoogle: "Google – besplatno", optClaude: "Claude – po smislu, uz plaćanje",
@@ -364,7 +371,7 @@
       u4: "Handy-Bildschirm anlassen, nicht sperren.",
       u5: "Wenn der Browser nach dem Mikrofon fragt, <b>Zulassen</b> wählen (falls angeboten: „bei jedem Besuch“, nicht „nur dieses Mal“).",
       tokNaslov: "Übersetzung", prazno: "Noch nichts",
-      postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer", arDugme: "Arabisch / Koran", arDugmeSub: "Vor dem Rezitieren auf Arabisch tippen", arDugmeNa: "Jetzt: ARABISCH", arDugmeNaSub: "Tippen, wenn Sie wieder normal weitersprechen", arNazad: "Das war kein Arabisch – zurück zur normalen Sprache.", arNema: "Dieses Handy hat keine arabische Spracherkennung. Handy-Einstellungen → Sprache → Arabisch hinzufügen (oder Gemini verwenden).", arNacin: "Arabisch in der Hutba", optArSamo: "Nur arabische Schrift, ohne Übersetzung", optArPrijevod: "Arabische Schrift + Übersetzung", infoArSamo: "Wenn Sie Arabisch sprechen (Elhamdulillah, Dua, Koranvers), steht es auf dem TV in arabischer Schrift und wird nicht übersetzt.", infoArPrijevod: "Arabisches steht in arabischer Schrift, direkt dahinter die Übersetzung.",
+      postavke: "Einstellungen", jezikGovora: "Gesprochene Sprache", prijevodNa: "Übersetzen in", prevodilac: "Übersetzer", arAutoNaslov: "Arabisch automatisch erkennen", optArAutoDa: "Ja – Handy wechselt selbst auf Arabisch", optArAutoNe: "Nein – nur mit der Taste", infoArAuto: "Bei „Euzu billahi …“ wechselt das Handy selbst auf Arabisch. Zurück auf Bosnisch: wenn der Vers zu Ende ist und nicht weitergeht, am Ende der Sure oder bei „Sadakallahul azim“. Die Taste geht weiterhin.", arDugmeAuto: "Jetzt: ARABISCH (automatisch)", arDugme: "Arabisch / Koran", arDugmeSub: "Vor dem Rezitieren auf Arabisch tippen", arDugmeNa: "Jetzt: ARABISCH", arDugmeNaSub: "Tippen, wenn Sie wieder normal weitersprechen", arNazad: "Das war kein Arabisch – zurück zur normalen Sprache.", arNema: "Dieses Handy hat keine arabische Spracherkennung. Handy-Einstellungen → Sprache → Arabisch hinzufügen (oder Gemini verwenden).", arNacin: "Arabisch in der Hutba", optArSamo: "Nur arabische Schrift, ohne Übersetzung", optArPrijevod: "Arabische Schrift + Übersetzung", infoArSamo: "Wenn Sie Arabisch sprechen (Elhamdulillah, Dua, Koranvers), steht es auf dem TV in arabischer Schrift und wird nicht übersetzt.", infoArPrijevod: "Arabisches steht in arabischer Schrift, direkt dahinter die Übersetzung.",
       optHaiku: "Claude Haiku – nach Sinn, sehr günstig", infoHaiku: "Übersetzt nach Sinn, ca. 5 Cent pro Hutba. Erkennt Verse schlechter. Braucht einen Claude-Schlüssel.",
       guthaben: "Kein Guthaben mehr auf dem Claude-Konto – es wird kostenlos über Google übersetzt. Guthaben auf platform.claude.com aufladen.",
       optGoogle: "Google – kostenlos", optClaude: "Claude – nach Sinn, kostenpflichtig",
@@ -413,7 +420,7 @@
       u4: "Laissez l'écran du téléphone allumé, ne le verrouillez pas.",
       u5: "Quand le navigateur demande le micro, choisissez <b>Autoriser</b> (si proposé : « à chaque visite », pas « cette fois seulement »).",
       tokNaslov: "Traduction", prazno: "Rien pour l'instant",
-      postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur", arDugme: "Arabe / Coran", arDugmeSub: "Toucher avant de réciter en arabe", arDugmeNa: "Maintenant : ARABE", arDugmeNaSub: "Toucher pour revenir à la langue normale", arNazad: "Ce n'était pas de l'arabe – retour à la langue normale.", arNema: "Ce téléphone n'a pas de reconnaissance vocale arabe. Paramètres → Langue → ajouter l'arabe (ou utiliser Gemini).", arNacin: "Arabe dans la khutba", optArSamo: "Écriture arabe seulement, sans traduction", optArPrijevod: "Écriture arabe + traduction", infoArSamo: "Quand vous parlez arabe (Elhamdulillah, invocation, verset), il s'affiche en écriture arabe sans traduction.", infoArPrijevod: "L'arabe s'affiche en écriture arabe, suivi directement de la traduction.",
+      postavke: "Paramètres", jezikGovora: "Langue parlée", prijevodNa: "Traduire en", prevodilac: "Traducteur", arAutoNaslov: "Reconnaître l'arabe automatiquement", optArAutoDa: "Oui – le téléphone passe seul à l'arabe", optArAutoNe: "Non – seulement avec le bouton", infoArAuto: "Avec « Euzu billahi … », le téléphone passe seul à l'arabe. Retour : à la fin du verset s'il ne continue pas, à la fin de la sourate ou avec « Sadakallahul azim ». Le bouton fonctionne toujours.", arDugmeAuto: "Maintenant : ARABE (automatique)", arDugme: "Arabe / Coran", arDugmeSub: "Toucher avant de réciter en arabe", arDugmeNa: "Maintenant : ARABE", arDugmeNaSub: "Toucher pour revenir à la langue normale", arNazad: "Ce n'était pas de l'arabe – retour à la langue normale.", arNema: "Ce téléphone n'a pas de reconnaissance vocale arabe. Paramètres → Langue → ajouter l'arabe (ou utiliser Gemini).", arNacin: "Arabe dans la khutba", optArSamo: "Écriture arabe seulement, sans traduction", optArPrijevod: "Écriture arabe + traduction", infoArSamo: "Quand vous parlez arabe (Elhamdulillah, invocation, verset), il s'affiche en écriture arabe sans traduction.", infoArPrijevod: "L'arabe s'affiche en écriture arabe, suivi directement de la traduction.",
       optHaiku: "Claude Haiku – selon le sens, très bon marché", infoHaiku: "Traduit selon le sens, env. 5 centimes par khutba. Reconnaît moins bien les versets. Nécessite une clé Claude.",
       guthaben: "Plus de crédit sur le compte Claude – la traduction continue gratuitement via Google. Rechargez le crédit sur platform.claude.com.",
       optGoogle: "Google – gratuit", optClaude: "Claude – selon le sens, payant",
@@ -569,6 +576,7 @@
   $("kljuc").value = citaj("hutba-kljuc") || "";
   if (!citaj("hutba-v6")) { pisiTiho("hutba-arnacin", "samo"); pisiTiho("hutba-v6", "da"); }
   $("ar-nacin").value = citaj("hutba-arnacin") === "prijevod" ? "prijevod" : "samo";
+  $("ar-auto").value = citaj("hutba-arauto") === "ne" ? "ne" : "da";
   $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
   $("gmodel").value = citaj("hutba-gmodel") || G_MODEL;
@@ -600,6 +608,7 @@
   $("cilj").addEventListener("change", function () { pisi("hutba-cilj", this.value); posaljiStanje(); });
   $("prevodilac").addEventListener("change", function () { pisi("hutba-prevodilac", this.value); prikaziPrevodioca(); });
   $("ar-nacin").addEventListener("change", function () { pisi("hutba-arnacin", this.value); prikaziPrevodioca(); });
+  $("ar-auto").addEventListener("change", function () { pisi("hutba-arauto", this.value); });
   // Arapski s prijevodom? (standard: samo arapsko pismo) / Arabisch mit Übersetzung? (Standard: nur arabische Schrift)
   function arSPrijevodom() { return $("ar-nacin").value === "prijevod"; }
   function prikaziPrevodioca() {
@@ -631,20 +640,29 @@
   // Dugme "Arapski": prepoznavanje govora prelazi na arapski (Kur'an, dova), pa nazad
   // Knopf "Arabisch": die Spracherkennung wechselt auf Arabisch (Koran, Dua) und zurück
   var arapskiRezim = false;
-  function postaviArapski(da) {
+  function postaviArapski(da, auto, odbaci) {
     if (arapskiRezim === da) return;
     arapskiRezim = da;
-    if (da) { kuranIndeks(); arSesija = []; }
-    else setTimeout(zavrsiArSesiju, 2500);   // zadnji arapski dio još stiže / der letzte arabische Teil kommt noch
+    if (da) { kuranIndeks(); arSesija = []; arAuto = !!auto; arAktivnost = arZadnjiAjet = Date.now(); arCekaNastavak = null; arZadnjaProvjera = ""; }
+    else {
+      if (arAuto) arAutoKraj = Date.now();
+      arAuto = false; arCekaNastavak = null;
+      setTimeout(zavrsiArSesiju, 2500);   // zadnji arapski dio još stiže / der letzte arabische Teil kommt noch
+    }
     if (cekaR) { clearTimeout(cekaTimer); var x = cekaR; cekaR = null; x.konacno = true; prevedi(x); }
     prikaziArDugme();
-    if (snima && slusa && prepoznavanje) { try { prepoznavanje.stop(); } catch (e) {} }
+    if (snima && slusa && prepoznavanje) {
+      // odbaci: ono što je arapski prepoznavač upravo čuo nije bio arapski – ne prikazati
+      // odbaci: was der arabische Erkenner gerade gehört hat, war kein Arabisch – nicht anzeigen
+      if (odbaci) { prepoznavanje.odbaci = true; try { prepoznavanje.abort(); } catch (e) {} }
+      else { try { prepoznavanje.stop(); } catch (e) {} }
+    }
   }
   function prikaziArDugme() {
     var vidljiv = snima && slusa && $("jezik").value !== "ar-SA";
     $("ar-dugme").classList.toggle("skriveno", !vidljiv);
     $("ar-dugme").classList.toggle("ukljucen", arapskiRezim);
-    $("ar-tekst").innerHTML = arapskiRezim ? t("arDugmeNa") + "<small>" + t("arDugmeNaSub") + "</small>" : t("arDugme") + "<small>" + t("arDugmeSub") + "</small>";
+    $("ar-tekst").innerHTML = arapskiRezim ? (arAuto ? t("arDugmeAuto") : t("arDugmeNa")) + "<small>" + t("arDugmeNaSub") + "</small>" : t("arDugme") + "<small>" + t("arDugmeSub") + "</small>";
   }
   $("ar-dugme").addEventListener("click", function () { postaviArapski(!arapskiRezim); });
   // Indeks Mushafa pripremiti unaprijed (da dugme ne zastane) / Mushaf-Index vorab vorbereiten (damit der Knopf nicht hängt)
@@ -817,6 +835,7 @@
     // Kratki komadići (1-3 riječi bez tačke) čekaju sljedeći dio – sami se ne mogu dobro prevesti
     // Kurze Stücke (1-3 Wörter ohne Punkt) warten auf den nächsten Teil – allein lassen sie sich nicht gut übersetzen
     function predaj(tekst) {
+      if (r.odbaci) { if (trenutna) { ukloni(trenutna); trenutna = null; } return; }
       var s1 = trenutna || nova(); trenutna = null;
       if (cekaR && !!cekaR.ar !== !!s1.ar) { clearTimeout(cekaTimer); var stari = cekaR; cekaR = null; stari.konacno = true; prevedi(stari); }
       if (cekaR) {
@@ -866,6 +885,7 @@
           predato = 0; zadnjiInterim = "";
           if (ostatak) predaj(ostatak);
           else if (trenutna) { ukloni(trenutna); trenutna = null; }
+          if (ostatak) { if (!arR) provjeriUlaz(ostatak); else { arAktivnost = Date.now(); arZadnjaProvjera = ""; } }
         } else {
           privremeno += (privremeno ? " " : "") + tx;
         }
@@ -876,6 +896,7 @@
         if (dio) {
           if (!trenutna) trenutna = nova();
           trenutna.bs = dio;
+          if (!arR) provjeriUlaz(dio); else provjeriNastavak(dio);
           prikaziTok();
           if (Date.now() - zadnjiPrivremeni > 700) { zadnjiPrivremeni = Date.now(); posaljiRecenicu(trenutna); }
         }
@@ -896,7 +917,7 @@
     r.onend = function () {
       // Mikrofon ostaje uključen: odmah ponovo slušati / Mikrofon bleibt an: sofort weiter zuhören
       zadnjaKonacna = ""; clearInterval(mirnoTimer); zadnjiInterim = ""; predato = 0;
-      if (trenutna && trenutna.bs && !trenutna.konacno) { trenutna.konacno = true; prevedi(trenutna); }
+      if (trenutna && trenutna.bs && !trenutna.konacno) { if (r.odbaci) ukloni(trenutna); else { trenutna.konacno = true; prevedi(trenutna); } }
       trenutna = null;
       if (snima && slusa && prepoznavanje === r) {
         setTimeout(function () { if (snima && slusa && prepoznavanje === r) { try { slusaj(); } catch (e) {} } }, 250);
@@ -1275,13 +1296,17 @@
     }
     if (prvi < 0) return null;
     zadnjiAjetId = naj.od + zadnji;
-    return { sura: I.s[naj.od + prvi], from: I.v[naj.od + prvi], to: I.v[naj.od + zadnji], d: Math.round(100 * naj.d / q.length) };
+    var idZ = naj.od + zadnji, doKraja = naj.end >= naj.granice[zadnji + 1] - 4;   // proučen do kraja ajeta / bis zum Versende rezitiert
+    return { sura: I.s[naj.od + prvi], from: I.v[naj.od + prvi], to: I.v[idZ], d: Math.round(100 * naj.d / q.length),
+      id: idZ, krajAjeta: doKraja, krajSure: doKraja && I.v[idZ] === window.KURAN.a[I.s[idZ] - 1].length };
   }
   // Euzu i Bismillah ispred ajeta: tačan tekst, ajet se traži u ostatku
   // Euzu und Bismillah vor dem Vers: genauer Text, der Vers wird im Rest gesucht
   var UVODI = [
     ["أعوذ بالله من الشيطان الرجيم", "أَعُوذُ بِٱللَّٰهِ مِنَ ٱلشَّيْطَٰنِ ٱلرَّجِيمِ"],
-    ["بسم الله الرحمن الرحيم", "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ"]
+    ["بسم الله الرحمن الرحيم", "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ"],
+    // ostatak Euzu nakon automatskog prelaska (već prikazan) – samo ukloniti / Rest von Euzu nach dem automatischen Wechsel (schon gezeigt) – nur entfernen
+    ["بالله من الشيطان الرجيم", ""], ["من الشيطان الرجيم", ""], ["الشيطان الرجيم", ""], ["الرجيم", ""]
   ];
   function odvojiUvod(tekst) {
     var w = String(tekst).replace(/[()]/g, " ").split(/\s+/).filter(Boolean), bloka = [], nasao = true;
@@ -1292,7 +1317,8 @@
         for (var n = n0 - 1; n <= n0 + 1 && !nasao; n++) {
           if (n < 1 || n > w.length) continue;
           var x = arNorm(w.slice(0, n).join(""));
-          if (x.length >= cilj.length - 2 && razlika(x, cilj, 2) <= 2) { bloka.push(UVODI[u][1]); w = w.slice(n); nasao = true; }
+          var dopU = cilj.length < 8 ? 0 : 2;
+          if (x.length >= cilj.length - dopU && razlika(x, cilj, dopU) <= dopU) { if (UVODI[u][1]) bloka.push(UVODI[u][1]); w = w.slice(n); nasao = true; }
         }
       }
     }
@@ -1469,6 +1495,90 @@
     return tekst.replace(/\s*,\s*ﷺ\s*,/g, " ﷺ").replace(/ﷺ(\s*ﷺ)+/g, "ﷺ");
   }
 
+  /* =================== Arapski automatski / Arabisch automatisch =================== */
+  // Prepoznavanje govora zna samo jedan jezik. Zato telefon sam prelazi na arapski kad čuje "Euzu billahi …"
+  // (ili Bismillah odmah nakon učenja), a nazad na bosanski: kad se ajet završi i ne nastavlja se, na kraju sure,
+  // kod "Sadakallahul azim", ili kad se ne čuje arapski. Dugme i dalje radi (tada bez automatskog povratka).
+  // Die Spracherkennung kennt nur eine Sprache. Darum wechselt das Handy selbst auf Arabisch, wenn es "Euzu billahi …" hört
+  // (oder Bismillah direkt nach einer Rezitation), und zurück auf Bosnisch: wenn der Vers zu Ende ist und nicht weitergeht,
+  // am Ende der Sure, bei "Sadakallahul azim" oder wenn kein Arabisch mehr kommt. Die Taste geht weiterhin (dann ohne Automatik).
+  var arAuto = false, arAktivnost = 0, arZadnjiAjet = 0, arCekaNastavak = null, arAutoKraj = 0, arZadnjaProvjera = "";
+  function autoArapski() { return $("ar-auto").value !== "ne" && $("jezik").value === "bs-BA"; }
+  var ULAZ_EUZU = ["euzu billahi", "euzubillahi", "ozu bilahi", "auzu bilahi", "šejtanir radžim", "šejtani radžim", "šejtan radžim", "mineš šejtanir"];
+  var ULAZ_BISMILLAH = ["bismillahir rahmanir rahim", "bismila rahman rahim", "bismillahi rahmani rahim", "mila rahman rahim"];
+  var ULAZ_K = null;
+  function imaFrazu(tekst, kljucevi) {
+    var w = String(tekst).split(/\s+/).filter(Boolean).slice(-10).map(kosturRijeci);
+    for (var i = 0; i < w.length; i++) for (var n = 1; n <= 4 && i + n <= w.length; n++) {
+      var x = w.slice(i, i + n).join("").replace(/(.)\1+/g, "$1");
+      for (var j = 0; j < kljucevi.length; j++) {
+        var dop = Math.max(1, Math.floor(kljucevi[j].length * 0.2));
+        if (Math.abs(x.length - kljucevi[j].length) <= dop && razlika(x, kljucevi[j], dop) <= dop) return true;
+      }
+    }
+    return false;
+  }
+  // Bosanski govor: treba li preći na arapski? / Bosnische Rede: auf Arabisch wechseln?
+  function provjeriUlaz(tekst) {
+    if (arapskiRezim || !snima || !autoArapski()) return;
+    if (!ULAZ_K) {
+      var k = function (v) { return v.split(/\s+/).map(kosturRijeci).join("").replace(/(.)\1+/g, "$1"); };
+      ULAZ_K = { e: ULAZ_EUZU.map(k), b: ULAZ_BISMILLAH.map(k) };
+    }
+    if (imaFrazu(tekst, ULAZ_K.e) || (Date.now() - arAutoKraj < 12000 && imaFrazu(tekst, ULAZ_K.b))) postaviArapski(true, true);
+  }
+  // Koliko riječi postoji u Kur'anu (arapski ili ne?) / Wie viele Wörter gibt es im Koran (Arabisch oder nicht?)
+  var RJECNIK = null;
+  function arapskiUdio(tekst) {
+    if (!RJECNIK) {
+      if (!window.KURAN) return null;
+      RJECNIK = {};
+      window.KURAN.a.forEach(function (s) { s.forEach(function (v) { v.split(/\s+/).forEach(function (w) { var k = arNorm(w); if (k) RJECNIK[k] = 1; }); }); });
+      ["صلى", "وسلم", "عليه", "اللهم", "سيدنا", "محمد", "امين", "اجمعين"].forEach(function (w) { RJECNIK[arNorm(w)] = 1; });
+    }
+    var n = 0, da = 0;
+    String(tekst).split(/\s+/).forEach(function (w) {
+      var lat = /[A-Za-z]{2,}/.test(w);
+      if (!lat && w.replace(/[^ء-ي]/g, "").length < 3) return;
+      n++;
+      if (!lat && RJECNIK[arNorm(w)]) da++;
+    });
+    return { n: n, udio: n ? da / n : 1 };
+  }
+  // Nastavlja li se učenje? (sljedeći ajet, bilo koji ajet, ili barem pravi arapski)
+  // Geht die Rezitation weiter? (nächster Vers, irgendein Vers oder wenigstens echtes Arabisch)
+  function nastavljaKuran(tekst) {
+    var I = kuranIndeks();
+    if (!I) return true;
+    var q = arNorm(tekst);
+    if (arCekaNastavak) for (var k = 1; k <= 2; k++) {
+      var id = arCekaNastavak.id + k, t = I.t[id];
+      if (!t || I.s[id] !== I.s[arCekaNastavak.id]) break;
+      if (poravnaj(q, t.slice(0, q.length + 8)).d <= q.length * 0.4) return true;
+    }
+    var spremi = zadnjiAjetId, a = nadjiAjet(tekst);
+    zadnjiAjetId = spremi;
+    if (a) return true;
+    var u = arapskiUdio(tekst);
+    return !u || u.n < 3 || u.udio >= 0.5;
+  }
+  // Arapski govor (automatski): tokom govora provjeriti / Arabische Rede (automatisch): während des Sprechens prüfen
+  function provjeriNastavak(dio) {
+    if (!arapskiRezim || !arAuto) return;
+    arAktivnost = Date.now();
+    var qn = arNorm(dio);
+    if (qn.length < (arCekaNastavak ? 10 : 15) || qn.length < arZadnjaProvjera.length + 5) return;
+    arZadnjaProvjera = qn;
+    if (!nastavljaKuran(dio)) postaviArapski(false, false, true);   // nije arapski -> odmah nazad / kein Arabisch -> sofort zurück
+  }
+  setInterval(function () {
+    if (!arapskiRezim || !arAuto) return;
+    var sad = Date.now();
+    // ajet završen i ništa dalje (5 s), ništa arapsko (8 s), ili 30 s bez ajeta -> nazad
+    // Vers zu Ende und nichts mehr (5 s), nichts Arabisches (8 s) oder 30 s ohne Vers -> zurück
+    if ((arCekaNastavak && sad - arAktivnost > 5000) || sad - arAktivnost > 8000 || sad - arZadnjiAjet > 30000) postaviArapski(false);
+  }, 1000);
+
   // Više arapskih dijelova jedan za drugim -> jedna zagrada / Mehrere arabische Teile hintereinander -> eine Klammer
   function spojiArapsko(x) {
     var prije;
@@ -1559,7 +1669,16 @@
       var uvod = odvojiUvod(r.bs), kraj = odvojiKraj(uvod.ostatak);
       r.bs = kraj.ostatak;
       var aj = r.bs ? nadjiAjet(r.bs) : null;
-      if (aj) arSesija.push({ s: aj.sura, od: aj.from, ddo: aj.to });
+      if (aj) { arSesija.push({ s: aj.sura, od: aj.from, ddo: aj.to }); arZadnjiAjet = arAktivnost = Date.now(); }
+      if (arAuto && arapskiRezim) {
+        // kraj sure -> nazad; ajet do kraja -> čeka se nastavak / Ende der Sure -> zurück; Vers zu Ende -> auf Fortsetzung warten
+        if (aj && aj.krajSure) setTimeout(function () { if (arAuto) postaviArapski(false); }, 300);
+        else if (aj) arCekaNastavak = aj.krajAjeta ? { id: aj.id } : null;
+        if (!aj && !kraj.da && !uvod.bloka && r.bs) {
+          var udio = arapskiUdio(r.bs);
+          if (udio && udio.n >= 3 && udio.udio < 0.35) { ukloni(r); postaviArapski(false); return; }   // nije arapski / kein Arabisch
+        }
+      }
       // "Sadakallahul azim" = kraj učenja: nazad na bosanski / Ende der Rezitation: zurück
       if (kraj.da) setTimeout(function () { postaviArapski(false); }, 300);
       if (aj) {

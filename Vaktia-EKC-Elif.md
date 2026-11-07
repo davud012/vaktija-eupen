@@ -303,3 +303,24 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 - Die Hutba-Übersetzung liegt während dieser Zeit über der Folie. Wird sie beendet, ist die Folie bis 13:40 wieder da.
 - **Neu:** Läuft die Übersetzung um 13:40 noch, beendet der Fernseher sie trotzdem und zeigt das Dashboard. Diese Hutba-Sitzung wird danach ignoriert. Eine neu gestartete Hutba wird wieder angezeigt. Gilt nur freitags.
 - Wichtig: Der Fernseher lädt nur neu, wenn sich `vaktija.js` ändert. Die Änderung in `index.html` wurde am 06.11. um 12:50 bewusst ohne Versionssprung hochgeladen, damit der TV während der Džuma nicht neu lädt. Aktiv wird sie beim nächsten Versionssprung oder Neustart der Box.
+
+## Hutba: Arabisch automatisch (2026-11-07)
+- Wunsch: ohne Taste Bosnisch und Arabisch sprechen.
+- Die Handy-Spracherkennung kann nur eine Sprache gleichzeitig. Deshalb wechselt das Handy jetzt **selbst** an typischen Stellen. Einstellung „Arabisch automatisch erkennen“ (Standard: Ja, `hutba-arauto`).
+- **Auf Arabisch:**
+  - wenn „Euzu billahi …“ / „… šejtanir radžim“ erkannt wird, schon während des Sprechens,
+  - bei Bismillah, aber nur bis 12 s nach einer automatischen Rezitation (nächste Sure).
+- **Zurück auf Bosnisch:**
+  - wenn ein Vers zu Ende rezitiert ist und danach kein Koran bzw. kein echtes Arabisch kommt. Das Gehörte wird verworfen, es gehen ca. 1–2 s verloren.
+  - 5 s nach einem vollständigen Vers ohne weitere Rezitation,
+  - am Ende einer Sure,
+  - bei „Sadakallahul azim“,
+  - nach 8 s ohne arabisches Ergebnis,
+  - nach 30 s ohne erkannten Vers.
+  - Nach jedem Zurückschalten erscheint die Sure-Zeile.
+- „Echtes Arabisch“ wird so geprüft: Gilt der Text als Vers aus dem Mushaf, oder stehen mindestens 50 % der Wörter (ab 3 Buchstaben) im Wortschatz des Korans? Ist der Anteil unter 35 % (bei einem fertigen Satz), wird der Satz verworfen. Mit Claude-Schlüssel prüft zusätzlich Haiku.
+- Reste von Euzu am Anfang nach dem Umschalten (… الشيطان الرجيم) werden entfernt und nicht als Vers erkannt.
+- Die Taste geht weiterhin. Von Hand eingeschaltet, gibt es kein automatisches Zurückschalten (nur „Sadakallahul azim“ und die Haiku-Prüfung).
+- Arabisch **ohne** Euzu (Formeln, kurzer Vers mitten im Satz) wird wie bisher im Bosnisch-Modus behandelt (Formel-Liste, Haiku erkennt Verse).
+- Vollautomatisch überall ginge nur mit der Spracherkennung „Gemini“ (hört den Ton selbst). Dafür braucht es einen Gemini-Schlüssel, und der Text kommt ca. 10 s später.
+- Getestet mit simulierter Spracherkennung: Euzu → Ash-Sharh 5–6 → bosnischer „Unsinn“ → sofort zurück; Euzu → Al-Ikhlas komplett → Sure-Ende → zurück; Bismillah → Al-Falaq 1–2 → 5 s Stille → zurück; Taste → bleibt; Bismillah ohne Rezitation → bleibt Bosnisch.
