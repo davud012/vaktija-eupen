@@ -352,3 +352,11 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
   - 3 = Anweisung im Text statt `systemInstruction`.
   - Danach wird einmal das andere Modell versucht (Flash-Lite ↔ Flash).
   - Fehlermeldungen zeigen jetzt Googles Details sowie Modell und Stufe, z. B. „(gemini-flash-lite-latest, 3)“. Die Test-Taste zeigt die Stufe ebenfalls.
+- **Nachtrag 3 (07.11.):** Gemini lief, war aber „wackelig“: Es erfand Text bei Stille oder Rauschen (Euzu, Bismillah, ganze Verse wie An-Nisa 103, bosnische Sätze), „Elhamdulillahi rabbil alemin“ wurde als „Sure Al-Fatiha, Vers 2“ angezeigt, und die Sekundenanzeige wirkte wie Zählen. Änderungen:
+  - **Strenge Anweisung:** nur klar Gesprochenes, nichts erfinden, ergänzen oder fortsetzen, keine Verse oder Formeln hinzufügen. Bei Stille oder Rauschen kommt leerer Text. Die Beispiel-Formeln und der vorherige Text werden nicht mehr mitgeschickt, weil sie zum Erfinden verleitet haben.
+  - **Weniger als 1 s echte Sprache** in einem Tonstück → wird gar nicht an Gemini geschickt. Das spart auch Kontingent.
+  - **„Mehr Text als Sprache“:** Würde der Text deutlich länger zum Sprechen brauchen als die gemessene Sprechzeit (Lateinisch ≈ 16 Buchstaben/s, Arabisch ≈ 14 Buchstaben/s; Grenze: mehr als 3 × Sprechzeit + 2 s), gilt er als erfunden. Er wird weggelassen, am Handy steht kurz „⚠ Gemini hat mehr geschrieben als gesprochen wurde – weggelassen“.
+  - **Wiederholung:** Derselbe Text wie in einem der letzten 4 Stücke wird weggelassen.
+  - **Arabische Formeln sind keine Verse** (`FORMULE_AR`): Elhamdulillahi rabbil alemin, Elhamdulillah, La ilahe illallah, Subhanallah, Allahu ekber, Estagfirullah, Inna lillahi …, Hasbunallah …, La havle …, Salavat (→ ﷺ), Radijallahu anhu, Selam, Amin, Mašallah, Inšallah, Subhanehu ve teala, Barekallahu fikum, Džezakallahu hajran. Sie erscheinen als Formel ohne Sure-Angabe. Das gilt für Gemini und den Arabisch-Modus.
+  - **429 „pro Minute“:** kurz warten (2,5 s, dann 5 s) und dasselbe Modell nochmal. Nur bei Tageskontingent wird das Modell gewechselt.
+  - Sekundenanzeige erst ab 6 s Wartezeit („Höre zu… (7 s)“). Tonstücke höchstens 15 s.
