@@ -302,7 +302,7 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
   - **Um 13:40** geht es zurück zum Dashboard mit allen Vakten.
 - Die Hutba-Übersetzung liegt während dieser Zeit über der Folie. Wird sie beendet, ist die Folie bis 13:40 wieder da.
 - **Neu:** Läuft die Übersetzung um 13:40 noch, beendet der Fernseher sie trotzdem und zeigt das Dashboard. Diese Hutba-Sitzung wird danach ignoriert. Eine neu gestartete Hutba wird wieder angezeigt. Gilt nur freitags.
-- Wichtig: Der Fernseher lädt nur neu, wenn sich `vaktija.js` ändert. Die Änderung in `index.html` wurde am 06.11. um 12:50 bewusst ohne Versionssprung hochgeladen, damit der TV während der Džuma nicht neu lädt. Aktiv wird sie beim nächsten Versionssprung oder Neustart der Box.
+- Wichtig: Der Fernseher lädt nur neu, wenn sich `vaktija.js` ändert. Die Änderung in `index.html` wurde am 06.11. um 12:50 bewusst ohne Versionssprung hochgeladen, damit der TV während der Džuma nicht neu lädt. Aktiv seit Version 2026-11-07.22 (am 07.11. hochgezählt).
 
 ## Hutba: Arabisch automatisch (2026-11-07)
 - Wunsch: ohne Taste Bosnisch und Arabisch sprechen.
