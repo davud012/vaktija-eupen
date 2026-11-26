@@ -358,7 +358,7 @@
       nemaNeta: "Nema interneta za prepoznavanje govora … pokušava ponovo.",
       kljucNe: "Claude ključ ne radi – koristi se Google.",
       prepoznavanje: "Prepoznavanje govora", optAuto: "Preglednik – besplatno (Chrome, Safari)", optGemini: "Gemini – čuje bosanski i arapski zajedno (bez dugmeta)",
-      infoAuto: "Besplatno. Na iPhoneu samo u Safariju.", infoGemini: "Gemini sam sluša zvuk i razumije bosanski i arapski u isto vrijeme – bez dugmeta. Prevodi prevodilac ispod (npr. Haiku). Tekst dolazi oko 5–15 s kasnije. Treba Gemini ključ (besplatno: aistudio.google.com).",
+      infoAuto: "Besplatno u Chromeu, Edgeu, Samsung Internetu i Safariju. Brave i Firefox: koristite Gemini.", infoGemini: "Gemini sam sluša zvuk i razumije bosanski i arapski u isto vrijeme – bez dugmeta. Prevodi prevodilac ispod (npr. Haiku). Tekst dolazi oko 5–15 s kasnije. Treba Gemini ključ (besplatno: aistudio.google.com).",
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
       gNe: "Gemini greška", gIzmisljeno: "Gemini je napisao više nego što je izgovoreno – izostavljeno", gTest: "Testiraj Gemini", gTestOk: "Gemini odgovara", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
@@ -407,7 +407,7 @@
       nemaNeta: "Kein Internet für die Spracherkennung … neuer Versuch.",
       kljucNe: "Claude-Schlüssel ungültig – es wird Google verwendet.",
       prepoznavanje: "Spracherkennung", optAuto: "Browser – kostenlos (Chrome, Safari)", optGemini: "Gemini – hört Bosnisch und Arabisch zusammen (ohne Taste)",
-      infoAuto: "Kostenlos. Auf dem iPhone nur in Safari.", infoGemini: "Gemini hört den Ton selbst und versteht Bosnisch und Arabisch gleichzeitig – ohne Taste. Übersetzt wird mit dem Übersetzer unten (z. B. Haiku). Der Text kommt ca. 5–15 s später. Braucht einen Gemini-Schlüssel (kostenlos: aistudio.google.com).",
+      infoAuto: "Kostenlos in Chrome, Edge, Samsung Internet und Safari. Brave und Firefox: bitte Gemini wählen.", infoGemini: "Gemini hört den Ton selbst und versteht Bosnisch und Arabisch gleichzeitig – ohne Taste. Übersetzt wird mit dem Übersetzer unten (z. B. Haiku). Der Text kommt ca. 5–15 s später. Braucht einen Gemini-Schlüssel (kostenlos: aistudio.google.com).",
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
       gNe: "Gemini-Fehler", gIzmisljeno: "Gemini hat mehr geschrieben als gesprochen wurde – weggelassen", gTest: "Gemini testen", gTestOk: "Gemini antwortet", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
@@ -456,7 +456,7 @@
       nemaNeta: "Pas d'Internet pour la reconnaissance vocale … nouvel essai.",
       kljucNe: "Clé Claude invalide – Google est utilisé.",
       prepoznavanje: "Reconnaissance vocale", optAuto: "Navigateur – gratuit (Chrome, Safari)", optGemini: "Gemini – entend le bosnien et l'arabe ensemble (sans bouton)",
-      infoAuto: "Gratuit. Sur iPhone seulement dans Safari.", infoGemini: "Gemini écoute le son lui-même et comprend le bosnien et l'arabe en même temps – sans bouton. La traduction se fait avec le traducteur ci-dessous (p. ex. Haiku). Le texte arrive env. 5–15 s plus tard. Nécessite une clé Gemini (gratuite : aistudio.google.com).",
+      infoAuto: "Gratuit dans Chrome, Edge, Samsung Internet et Safari. Brave et Firefox : choisir Gemini.", infoGemini: "Gemini écoute le son lui-même et comprend le bosnien et l'arabe en même temps – sans bouton. La traduction se fait avec le traducteur ci-dessous (p. ex. Haiku). Le texte arrive env. 5–15 s plus tard. Nécessite une clé Gemini (gratuite : aistudio.google.com).",
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
       gNe: "Erreur Gemini", gIzmisljeno: "Gemini a écrit plus que ce qui a été dit – ignoré", gTest: "Tester Gemini", gTestOk: "Gemini répond", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
@@ -506,6 +506,9 @@
 
   var IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && "ontouchend" in document);
   var IOS_DRUGI = IOS && (/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|DuckDuckGo|Brave/.test(navigator.userAgent) || !!navigator.brave);
+  // Brave (auch Android/PC) und Firefox: kein nutzbarer Google-Spracherkennungsdienst -> Gemini nehmen
+  // Brave (i Android/PC) i Firefox: nema upotrebljivog Google servisa za govor -> koristi se Gemini
+  var BEZ_GOVORA = IOS_DRUGI || !!navigator.brave || /Firefox\//.test(navigator.userAgent);
   function safariLink() { return "x-safari-" + location.href.split("#")[0]; }
   function iosPoruka(kod) {
     return function () {
@@ -629,7 +632,7 @@
   function nacin() {
     var imaG = !!citaj("hutba-gkljuc");
     if ($("prepoznavanje").value === "gemini") return imaG ? "gemini" : null;
-    if (podrzavaGovor() && !IOS_DRUGI) return "browser";
+    if (podrzavaGovor() && !BEZ_GOVORA) return "browser";
     return imaG ? "gemini" : null;
   }
 
@@ -645,7 +648,7 @@
   function arSPrijevodom() { return $("ar-nacin").value === "prijevod"; }
   function prikaziPrevodioca() {
     var gem = $("prepoznavanje").value === "gemini";
-    $("gemini-dio").classList.toggle("skriveno", !gem && !IOS_DRUGI && $("prevodilac").value !== "gemini");
+    $("gemini-dio").classList.toggle("skriveno", !gem && !BEZ_GOVORA && $("prevodilac").value !== "gemini");
     $("prevodilac-dio").classList.toggle("skriveno", false);   // Gemini samo sluša, prevodilac se bira / Gemini hört nur, Übersetzer wählbar
     $("prepoznavanje-info").textContent = gem ? t("infoGemini") : t("infoAuto");
     $("gkljuc-stanje").textContent = citaj("hutba-gkljuc") ? "  " + t("spremljeno") : "";

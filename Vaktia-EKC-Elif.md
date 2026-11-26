@@ -384,3 +384,8 @@ Google meldet manchmal „503 This model is currently experiencing high demand�
 
 ### Nachtrag 2026-11-26: Schlüssel in den Hutba-Einstellungen anzeigen
 Neben dem Gemini-Schlüssel **und** dem Claude-Schlüssel gibt es jetzt je eine Taste „Schlüssel anzeigen / verbergen“ (Standard: verborgen). Der Schlüssel bleibt nur auf dem Handy gespeichert. Getestet für beide Felder, ES5 geprüft. Kein TV-Update nötig.
+
+### Nachtrag 2026-11-26: Hutba in allen Browsern
+- **Gemini-Modus** (Mikrofon, Tonschnitt, Senden an Gemini) ist browserunabhängig und läuft in Chrome, Brave, Firefox, Edge, Safari auf Handy und PC.
+- **Browser-Spracherkennung** (kostenlos): Chrome, Edge, Samsung Internet, Safari. **Brave und Firefox** (auch Android/PC) haben keinen nutzbaren Google-Dienst; dort wird jetzt automatisch Gemini genommen (`BEZ_GOVORA`), ohne Schlüssel kommt der Hinweis „Gemini wählen“. Vorher galt das nur für iPhone-Browser außer Safari.
+- Getestet mit simuliertem Brave (mit/ohne Schlüssel) und Chrome. Info-Text zur Spracherkennung entsprechend angepasst (bs/de/fr).
