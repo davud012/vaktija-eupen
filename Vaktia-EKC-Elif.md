@@ -393,3 +393,9 @@ Neben dem Gemini-Schlüssel **und** dem Claude-Schlüssel gibt es jetzt je eine 
 ### Nachtrag 2026-11-26: Schlüssel gehen verloren / Meldung „Browser kann keine Sprache erkennen“
 **Ursache (wahrscheinlich):** Gemini- und Claude-Schlüssel wurden nur beim Tippen auf die jeweilige „Speichern“-Taste gespeichert (zwei getrennte Tasten). Wer Gemini als Spracherkennung wählte und den Schlüssel nur eintippte (oder nur die andere Taste drückte), hatte keinen gespeicherten Gemini-Schlüssel – dann kam die irreführende Meldung „Dieser Browser kann keine Sprache erkennen“.
 **Fix:** Beide Schlüssel werden sofort beim Eintippen/Einfügen gespeichert (`input`/`change`/`blur`). Ist Gemini gewählt, aber kein Schlüssel da, kommt eine eigene Meldung „Gemini-Schlüssel ist nicht gespeichert“ (bs/de/fr). Getestet. Inkognito-Hinweis: dort gehen Einstellungen beim Tab-Schließen verloren.
+
+### Nachtrag 2026-11-26: Neue Standard-Einstellungen der Hutba-Seite
+Wer die Seite neu öffnet (oder noch nichts selbst geändert hat), bekommt jetzt: Gesprochene Sprache **Bosanski**, Übersetzen in **Deutsch**, Spracherkennung **Gemini** (Modell `gemini-flash-lite-latest`), Übersetzer **Claude Haiku**, Arabisch in der Hutba **Arabische Schrift + Übersetzung**, Arabisch automatisch erkennen **Ja**. Wer etwas ändert, behält seine Wahl auf seinem Handy.
+- Die frühere einmalige Umstellung auf „Nur arabische Schrift“ (`hutba-v6`) ist entfernt; neuer Standard ist „+ Übersetzung“, ausdrücklich gewähltes „Nur Schrift“ bleibt.
+- **API-Schlüssel sind nie Standard** (öffentliches Repo!). Sie bleiben nur auf dem jeweiligen Handy. Ohne Gemini-Schlüssel und ohne eigene Wahl nimmt die Seite automatisch die Browser-Spracherkennung (wenn der Browser sie hat), statt zu blockieren.
+- Getestet: neues Handy bekommt die Standardwerte, selbst gewählte Werte bleiben.

@@ -577,16 +577,18 @@
 
   /* =================== Postavke / Einstellungen =================== */
   function ucitajPostavkeUFormu() {
-  var j0 = citaj("hutba-jezik"); if (j0) $("jezik").value = /^(hr|sr|bs)/.test(j0) ? "bs-BA" : j0;
-  var c0 = citaj("hutba-cilj"); if (c0) $("cilj").value = c0;
+  // STANDARD (gilt für alle, wer etwas anderes will, ändert es selbst und es bleibt auf seinem Handy gespeichert):
+  // Bosanski -> Deutsch, Gemini hört, Claude Haiku übersetzt, Arabisch mit Übersetzung, Arabisch automatisch.
+  // STANDARD (vrijedi za sve; ko želi drugačije, promijeni i ostaje na njegovom mobitelu).
+  var j0 = citaj("hutba-jezik"); $("jezik").value = j0 ? (/^(hr|sr|bs)/.test(j0) ? "bs-BA" : j0) : "bs-BA";
+  var c0 = citaj("hutba-cilj"); $("cilj").value = c0 || "de";
   // Standard je Claude Haiku (jednom prebaciti sa Claude) / Standard ist Claude Haiku (einmalig von Claude umstellen)
   if (!citaj("hutba-v4")) { if (citaj("hutba-prevodilac") !== "google") pisiTiho("hutba-prevodilac", "claude-haiku"); pisiTiho("hutba-v4", "da"); }
   $("prevodilac").value = /^(claude(-haiku)?|google|gemini)$/.test(citaj("hutba-prevodilac") || "") ? citaj("hutba-prevodilac") : "claude-haiku";
   $("kljuc").value = citaj("hutba-kljuc") || "";
-  if (!citaj("hutba-v6")) { pisiTiho("hutba-arnacin", "samo"); pisiTiho("hutba-v6", "da"); }
-  $("ar-nacin").value = citaj("hutba-arnacin") === "prijevod" ? "prijevod" : "samo";
+  $("ar-nacin").value = citaj("hutba-arnacin") === "samo" ? "samo" : "prijevod";
   $("ar-auto").value = citaj("hutba-arauto") === "ne" ? "ne" : "da";
-  $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "gemini" ? "gemini" : "auto";
+  $("prepoznavanje").value = citaj("hutba-prepoznavanje") === "auto" ? "auto" : "gemini";
   $("gkljuc").value = citaj("hutba-gkljuc") || "";
   $("gmodel").value = citaj("hutba-gmodel") || G_MODEL;
   if (!IZVOR[$("jezik").value]) $("jezik").value = "bs-BA";
@@ -637,7 +639,12 @@
   // Koji način prepoznavanja: "browser", "gemini" ili null / Welche Spracherkennung
   function nacin() {
     var imaG = !!citaj("hutba-gkljuc");
-    if ($("prepoznavanje").value === "gemini") return imaG ? "gemini" : null;
+    if ($("prepoznavanje").value === "gemini") {
+      if (imaG) return "gemini";
+      // Standard Gemini, ali nema ključa i korisnik nije izričito birao: preglednik umjesto toga / Standard Gemini, aber kein Schlüssel und nicht selbst gewählt: stattdessen Browser
+      if (!citaj("hutba-prepoznavanje") && podrzavaGovor() && !BEZ_GOVORA) return "browser";
+      return null;
+    }
     if (podrzavaGovor() && !BEZ_GOVORA) return "browser";
     return imaG ? "gemini" : null;
   }
