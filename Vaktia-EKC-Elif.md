@@ -371,3 +371,6 @@ Die H20-Box hat keine Uhr-Batterie und steht nach dem Strom-Abziehen auf 1970. V
 - Springt die Geräteuhr (über 2 Min.), wird die Korrektur sofort neu berechnet.
 - Getestet mit Playwright (Uhr auf 1970, danach Sprung auf die richtige Zeit): Anzeige stimmt in beiden Fällen.
 Box-Einstellung: *Date & time → Automatic date & time* eingeschaltet lassen (nicht aus- und wieder einschalten nötig).
+
+### Nachtrag 2026-11-26: Gemini „503 high demand“
+Google meldet manchmal „503 This model is currently experiencing high demand“ (Überlastung bei Google, nicht am Handy). Bisher gab die Seite dann sofort auf. Jetzt (`geminiPonovo`, Hutba-Seite): bei 500/502/503/504 kurz warten (2,5 s, 5 s), dann das andere Modell (Flash-Lite ↔ Flash), dann noch einmal warten; erst danach die Fehlermeldung. Getestet mit simuliertem 503 (3× Fehler, 4. Versuch mit dem anderen Modell klappt). Kein TV-Update nötig.

@@ -1065,6 +1065,11 @@
     if (pokusaj >= 6) return false;
     if (/^400/.test(m) && gNacin < maxNacin) { gNacin++; return true; }
     if (/^429/.test(m) && !/per.?day|perday|daily/i.test(m)) return pokusaj < 3 ? "cekaj" : false;   // previše u minuti -> sačekati / zu viele pro Minute -> warten
+    // Google preopterećen (500/502/503/504): kratko sačekati, zatim drugi model, zatim opet sačekati / Google überlastet: kurz warten, dann das andere Modell, dann nochmal warten
+    if (/^(500|502|503|504)/.test(m)) {
+      if (pokusaj === 2 && !citaj("hutba-gmodel")) { gModelSesije = model === G_LITE ? G_FLASH : G_LITE; return true; }
+      return pokusaj < 4 ? "cekaj" : false;
+    }
     if (!citaj("hutba-gmodel") && (/^(429|404)/.test(m) || (/^400/.test(m) && !gModelSesije))) { gModelSesije = model === G_LITE ? G_FLASH : G_LITE; return true; }
     return false;
   }
