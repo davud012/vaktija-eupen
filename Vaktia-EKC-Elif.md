@@ -389,3 +389,7 @@ Neben dem Gemini-Schlüssel **und** dem Claude-Schlüssel gibt es jetzt je eine 
 - **Gemini-Modus** (Mikrofon, Tonschnitt, Senden an Gemini) ist browserunabhängig und läuft in Chrome, Brave, Firefox, Edge, Safari auf Handy und PC.
 - **Browser-Spracherkennung** (kostenlos): Chrome, Edge, Samsung Internet, Safari. **Brave und Firefox** (auch Android/PC) haben keinen nutzbaren Google-Dienst; dort wird jetzt automatisch Gemini genommen (`BEZ_GOVORA`), ohne Schlüssel kommt der Hinweis „Gemini wählen“. Vorher galt das nur für iPhone-Browser außer Safari.
 - Getestet mit simuliertem Brave (mit/ohne Schlüssel) und Chrome. Info-Text zur Spracherkennung entsprechend angepasst (bs/de/fr).
+
+### Nachtrag 2026-11-26: Schlüssel gehen verloren / Meldung „Browser kann keine Sprache erkennen“
+**Ursache (wahrscheinlich):** Gemini- und Claude-Schlüssel wurden nur beim Tippen auf die jeweilige „Speichern“-Taste gespeichert (zwei getrennte Tasten). Wer Gemini als Spracherkennung wählte und den Schlüssel nur eintippte (oder nur die andere Taste drückte), hatte keinen gespeicherten Gemini-Schlüssel – dann kam die irreführende Meldung „Dieser Browser kann keine Sprache erkennen“.
+**Fix:** Beide Schlüssel werden sofort beim Eintippen/Einfügen gespeichert (`input`/`change`/`blur`). Ist Gemini gewählt, aber kein Schlüssel da, kommt eine eigene Meldung „Gemini-Schlüssel ist nicht gespeichert“ (bs/de/fr). Getestet. Inkognito-Hinweis: dort gehen Einstellungen beim Tab-Schließen verloren.

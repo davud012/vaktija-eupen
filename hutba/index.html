@@ -360,7 +360,7 @@
       prepoznavanje: "Prepoznavanje govora", optAuto: "Preglednik – besplatno (Chrome, Safari)", optGemini: "Gemini – čuje bosanski i arapski zajedno (bez dugmeta)",
       infoAuto: "Besplatno u Chromeu, Edgeu, Samsung Internetu i Safariju. Brave i Firefox: koristite Gemini.", infoGemini: "Gemini sam sluša zvuk i razumije bosanski i arapski u isto vrijeme – bez dugmeta. Prevodi prevodilac ispod (npr. Haiku). Tekst dolazi oko 5–15 s kasnije. Treba Gemini ključ (besplatno: aistudio.google.com).",
       gKljuc: "Gemini API ključ", gKljucInfo: "Besplatno na aistudio.google.com → „Get API key“. Ostaje samo na ovom mobitelu.", gModel: "Gemini model",
-      gNe: "Gemini greška", gIzmisljeno: "Gemini je napisao više nego što je izgovoreno – izostavljeno", gTest: "Testiraj Gemini", gTestOk: "Gemini odgovara", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
+      gNe: "Gemini greška", gIzmisljeno: "Gemini je napisao više nego što je izgovoreno – izostavljeno", gTest: "Testiraj Gemini", gKljucFali: "<b>Gemini ključ nije spremljen.</b><br>Unesite ključ u Postavkama i dodirnite „Spremi“. U anonimnom (inkognito) načinu postavke nestaju kad se kartica zatvori – koristite običan način.", gTestOk: "Gemini odgovara", iliGemini: "Ili u Postavkama izaberite <b>Gemini</b> kao prepoznavanje govora – onda radi u svakom pregledniku.", slusam: "Slušam…",
       neuspjelo: "(prijevod nije uspio)", kod: "Kod greške"
     },
     de: {
@@ -409,7 +409,7 @@
       prepoznavanje: "Spracherkennung", optAuto: "Browser – kostenlos (Chrome, Safari)", optGemini: "Gemini – hört Bosnisch und Arabisch zusammen (ohne Taste)",
       infoAuto: "Kostenlos in Chrome, Edge, Samsung Internet und Safari. Brave und Firefox: bitte Gemini wählen.", infoGemini: "Gemini hört den Ton selbst und versteht Bosnisch und Arabisch gleichzeitig – ohne Taste. Übersetzt wird mit dem Übersetzer unten (z. B. Haiku). Der Text kommt ca. 5–15 s später. Braucht einen Gemini-Schlüssel (kostenlos: aistudio.google.com).",
       gKljuc: "Gemini-API-Schlüssel", gKljucInfo: "Kostenlos auf aistudio.google.com → „Get API key“. Bleibt nur auf diesem Handy.", gModel: "Gemini-Modell",
-      gNe: "Gemini-Fehler", gIzmisljeno: "Gemini hat mehr geschrieben als gesprochen wurde – weggelassen", gTest: "Gemini testen", gTestOk: "Gemini antwortet", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
+      gNe: "Gemini-Fehler", gIzmisljeno: "Gemini hat mehr geschrieben als gesprochen wurde – weggelassen", gTest: "Gemini testen", gKljucFali: "<b>Gemini-Schlüssel ist nicht gespeichert.</b><br>Schlüssel in den Einstellungen eintragen und auf „Speichern“ tippen. Im privaten Modus (Inkognito) gehen die Einstellungen beim Schließen des Tabs verloren – bitte den normalen Modus benutzen.", gTestOk: "Gemini antwortet", iliGemini: "Oder in den Einstellungen <b>Gemini</b> als Spracherkennung wählen – dann geht es in jedem Browser.", slusam: "Höre zu…",
       neuspjelo: "(Übersetzung fehlgeschlagen)", kod: "Fehlercode"
     },
     fr: {
@@ -458,7 +458,7 @@
       prepoznavanje: "Reconnaissance vocale", optAuto: "Navigateur – gratuit (Chrome, Safari)", optGemini: "Gemini – entend le bosnien et l'arabe ensemble (sans bouton)",
       infoAuto: "Gratuit dans Chrome, Edge, Samsung Internet et Safari. Brave et Firefox : choisir Gemini.", infoGemini: "Gemini écoute le son lui-même et comprend le bosnien et l'arabe en même temps – sans bouton. La traduction se fait avec le traducteur ci-dessous (p. ex. Haiku). Le texte arrive env. 5–15 s plus tard. Nécessite une clé Gemini (gratuite : aistudio.google.com).",
       gKljuc: "Clé API Gemini", gKljucInfo: "Gratuit sur aistudio.google.com → « Get API key ». Reste uniquement sur ce téléphone.", gModel: "Modèle Gemini",
-      gNe: "Erreur Gemini", gIzmisljeno: "Gemini a écrit plus que ce qui a été dit – ignoré", gTest: "Tester Gemini", gTestOk: "Gemini répond", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
+      gNe: "Erreur Gemini", gIzmisljeno: "Gemini a écrit plus que ce qui a été dit – ignoré", gTest: "Tester Gemini", gKljucFali: "<b>La clé Gemini n'est pas enregistrée.</b><br>Saisissez la clé dans les réglages et touchez « Enregistrer ». En navigation privée, les réglages disparaissent à la fermeture de l'onglet – utilisez le mode normal.", gTestOk: "Gemini répond", iliGemini: "Ou choisissez <b>Gemini</b> comme reconnaissance vocale dans les paramètres – cela fonctionne alors dans tout navigateur.", slusam: "J'écoute…",
       neuspjelo: "(échec de la traduction)", kod: "Code d'erreur"
     }
   };
@@ -613,6 +613,12 @@
         el.textContent = "✗ " + t("gNe") + " (" + model + ", " + gNacin + "): " + String((e && e.message) || e).slice(0, 300);
       });
     })(0);
+  });
+  // Ključ se sprema odmah pri unosu/lijepljenju (ne samo na "Spremi") / Schlüssel wird sofort beim Eintippen/Einfügen gespeichert (nicht erst bei "Speichern")
+  ["gkljuc:hutba-gkljuc", "kljuc:hutba-kljuc"].forEach(function (x) {
+    var d = x.split(":"), polje = $(d[0]);
+    function spremiOdmah() { var v = polje.value.trim(); if (v) pisi(d[1], v); }
+    polje.addEventListener("input", spremiOdmah); polje.addEventListener("change", spremiOdmah); polje.addEventListener("blur", spremiOdmah);
   });
   // Ključ prikazati/sakriti / Schlüssel anzeigen/verbergen
   Array.prototype.forEach.call(document.querySelectorAll(".pokazi-kljuc"), function (d) {
@@ -801,6 +807,11 @@
   $("mikrofon").addEventListener("click", function () {
     if (snima) { ugasiMikrofon(); return; }
     var kako = nacin();
+    if (!kako && $("prepoznavanje").value === "gemini") {
+      upozori(function () { return t("gKljucFali"); });
+      $("detalji").open = true;
+      return;
+    }
     if (!kako) {
       upozori(IOS ? iosPoruka("") : function () { return "<b>" + t("nemaGovora") + "</b><br>" + t("servis1") + "<br><br>" + t("iliGemini"); });
       $("detalji").open = true;
