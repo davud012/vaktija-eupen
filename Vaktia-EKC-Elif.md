@@ -381,3 +381,6 @@ Google meldet manchmal „503 This model is currently experiencing high demand�
 - Fernseher (`index.html`): Last-Will-Nachrichten (`razlog:"veza"`) werden ignoriert. Ist das Handy wirklich weg, blendet der 25-s-Timer aus. Das echte „Beenden“ blendet weiter sofort aus.
 - `prijevod-veza.js`: `keepalive` von 10 auf 30 s, damit kurze Hänger des Handys keine Trennung auslösen.
 - Getestet mit lokalem MQTT-Server: alte Version blendet bei Last-Will aus, neue bleibt sichtbar und blendet beim echten Ende aus.
+
+### Nachtrag 2026-11-26: Schlüssel in den Hutba-Einstellungen anzeigen
+Neben dem Gemini-Schlüssel **und** dem Claude-Schlüssel gibt es jetzt je eine Taste „Schlüssel anzeigen / verbergen“ (Standard: verborgen). Der Schlüssel bleibt nur auf dem Handy gespeichert. Getestet für beide Felder, ES5 geprüft. Kein TV-Update nötig.

@@ -241,6 +241,7 @@
         <div id="gemini-dio">
           <label for="gkljuc" data-t="gKljuc"></label>
           <input id="gkljuc" type="password" placeholder="AIza…" autocomplete="off">
+          <button class="dugme sporedno pokazi-kljuc" data-za="gkljuc" type="button" data-t="prikazi"></button>
           <div class="mali" data-t="gKljucInfo"></div>
           <label for="gmodel" data-t="gModel"></label>
           <input id="gmodel" type="text" autocomplete="off" spellcheck="false">
@@ -263,6 +264,7 @@
         <div id="claude-dio" class="skriveno">
           <label for="kljuc" data-t="kljuc"></label>
           <input id="kljuc" type="password" placeholder="sk-ant-…" autocomplete="off">
+          <button class="dugme sporedno pokazi-kljuc" data-za="kljuc" type="button" data-t="prikazi"></button>
           <div class="mali" data-t="kljucInfo"></div>
           <button class="dugme sporedno" id="spremi-kljuc" type="button" data-t="spremi"></button>
           <span class="mali" id="kljuc-stanje"></span>
@@ -333,7 +335,7 @@
       optGeminiP: "Gemini – po smislu, besplatno", infoGeminiP: "Prevodi po smislu i prepoznaje ajete. Besplatno sa Gemini ključem iz Google AI Studija (aistudio.google.com/apikey). Ključ unesite gore kod Gemini.",
       infoGoogle: "Besplatno, ali prevodi više riječ po riječ. Ajeti se ne prepoznaju.",
       infoClaude: "Najbolji prijevod, prepoznaje ajete i piše cijeli ajet na arapskom sa izvorom. Treba ključ (oko 1,50–2 € po hutbi). Ako nestane kredita, automatski prelazi na Google.",
-      kljuc: "Claude API ključ", kljucInfo: "Ostaje samo na ovom mobitelu.", spremi: "Spremi", spremljeno: "✓ spremljeno",
+      kljuc: "Claude API ključ", kljucInfo: "Ostaje samo na ovom mobitelu.", spremi: "Spremi", prikazi: "Prikaži ključ", sakrijK: "Sakrij ključ", spremljeno: "✓ spremljeno",
       odjava: "Odjava i brisanje", odjavaInfo: "Briše sve izgovoreno i prevedeno – na mobitelu, na TV-u i na serveru.",
       odjavaPitanje: "Odjaviti se i obrisati sve izgovoreno?",
       samoMobitel: "Prijevod je samo na mobitelu. Za TV pritisnite <b>Prikaži na TV-u</b>.",
@@ -382,7 +384,7 @@
       optGeminiP: "Gemini – nach Sinn, kostenlos", infoGeminiP: "Übersetzt nach Sinn und erkennt Koran-Verse. Kostenlos mit einem Gemini-Schlüssel von Google AI Studio (aistudio.google.com/apikey). Den Schlüssel oben bei Gemini eintragen.",
       infoGoogle: "Kostenlos, übersetzt aber eher Wort für Wort. Koran-Verse werden nicht erkannt.",
       infoClaude: "Beste Übersetzung, erkennt Koran-Verse und zeigt den ganzen Vers auf Arabisch mit Quelle. Braucht einen Schlüssel (ca. 1,50–2 € pro Hutba). Ist das Guthaben leer, geht es automatisch mit Google weiter.",
-      kljuc: "Claude-API-Schlüssel", kljucInfo: "Bleibt nur auf diesem Handy gespeichert.", spremi: "Speichern", spremljeno: "✓ gespeichert",
+      kljuc: "Claude-API-Schlüssel", kljucInfo: "Bleibt nur auf diesem Handy gespeichert.", spremi: "Speichern", prikazi: "Schlüssel anzeigen", sakrijK: "Schlüssel verbergen", spremljeno: "✓ gespeichert",
       odjava: "Abmelden & alles löschen", odjavaInfo: "Löscht alles Gesagte und Übersetzte – am Handy, am Fernseher und auf dem Server.",
       odjavaPitanje: "Abmelden und alles Gesagte löschen?",
       samoMobitel: "Die Übersetzung ist nur am Handy. Für den Fernseher <b>Auf Fernseher übertragen</b> drücken.",
@@ -431,7 +433,7 @@
       optGeminiP: "Gemini – selon le sens, gratuit", infoGeminiP: "Traduit selon le sens et reconnaît les versets. Gratuit avec une clé Gemini de Google AI Studio (aistudio.google.com/apikey). Saisir la clé ci-dessus, chez Gemini.",
       infoGoogle: "Gratuit, mais traduit plutôt mot à mot. Les versets du Coran ne sont pas reconnus.",
       infoClaude: "Meilleure traduction, reconnaît les versets du Coran et affiche le verset entier en arabe avec la source. Nécessite une clé (env. 1,50–2 € par khutba). Si le crédit est épuisé, la traduction continue automatiquement avec Google.",
-      kljuc: "Clé API Claude", kljucInfo: "Reste uniquement sur ce téléphone.", spremi: "Enregistrer", spremljeno: "✓ enregistrée",
+      kljuc: "Clé API Claude", kljucInfo: "Reste uniquement sur ce téléphone.", spremi: "Enregistrer", prikazi: "Afficher la clé", sakrijK: "Masquer la clé", spremljeno: "✓ enregistrée",
       odjava: "Se déconnecter et tout effacer", odjavaInfo: "Efface tout ce qui a été dit et traduit – sur le téléphone, la TV et le serveur.",
       odjavaPitanje: "Se déconnecter et tout effacer ?",
       samoMobitel: "La traduction n'est que sur le téléphone. Pour la TV, appuyez sur <b>Afficher sur la TV</b>.",
@@ -608,6 +610,14 @@
         el.textContent = "✗ " + t("gNe") + " (" + model + ", " + gNacin + "): " + String((e && e.message) || e).slice(0, 300);
       });
     })(0);
+  });
+  // Ključ prikazati/sakriti / Schlüssel anzeigen/verbergen
+  Array.prototype.forEach.call(document.querySelectorAll(".pokazi-kljuc"), function (d) {
+    d.addEventListener("click", function () {
+      var polje = $(d.getAttribute("data-za")), vidi = polje.type === "password";
+      polje.type = vidi ? "text" : "password";
+      d.textContent = t(vidi ? "sakrijK" : "prikazi");
+    });
   });
   $("spremi-gkljuc").addEventListener("click", function () {
     if ($("gkljuc").value.trim()) pisi("hutba-gkljuc", $("gkljuc").value.trim());
