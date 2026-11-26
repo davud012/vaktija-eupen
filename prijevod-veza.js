@@ -26,7 +26,7 @@ var PrijevodVeza = (function () {
 
     SERVERI.forEach(function (url, i) {
       var o = {
-        keepalive: 10,
+        keepalive: 30,
         reconnectPeriod: 3000,
         connectTimeout: 8000,
         clean: true,

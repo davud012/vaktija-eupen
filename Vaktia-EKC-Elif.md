@@ -374,3 +374,10 @@ Box-Einstellung: *Date & time → Automatic date & time* eingeschaltet lassen (n
 
 ### Nachtrag 2026-11-26: Gemini „503 high demand“
 Google meldet manchmal „503 This model is currently experiencing high demand“ (Überlastung bei Google, nicht am Handy). Bisher gab die Seite dann sofort auf. Jetzt (`geminiPonovo`, Hutba-Seite): bei 500/502/503/504 kurz warten (2,5 s, 5 s), dann das andere Modell (Flash-Lite ↔ Flash), dann noch einmal warten; erst danach die Fehlermeldung. Getestet mit simuliertem 503 (3× Fehler, 4. Versuch mit dem anderen Modell klappt). Kein TV-Update nötig.
+
+### Nachtrag 2026-11-26: Fernseher springt kurz zur Vaktija und kommt zurück (Version 2026-11-26.2)
+**Ursache:** Das Handy hat bei den kostenlosen MQTT-Servern eine „Last Will“-Nachricht hinterlegt (`aktivno:false, razlog:"veza"`). Verliert auch nur einer der drei Server kurz die Verbindung zum Handy (Funkloch, Server-Aussetzer, Handy kurz beschäftigt), schickt dieser Server die Nachricht an den Fernseher. Der Fernseher blendete die Hutba sofort aus und löschte den Text; 5 s später kam der nächste Puls und er zeigte alles wieder neu. Mit Arabisch hat das nicht zwingend zu tun.
+**Fix:**
+- Fernseher (`index.html`): Last-Will-Nachrichten (`razlog:"veza"`) werden ignoriert. Ist das Handy wirklich weg, blendet der 25-s-Timer aus. Das echte „Beenden“ blendet weiter sofort aus.
+- `prijevod-veza.js`: `keepalive` von 10 auf 30 s, damit kurze Hänger des Handys keine Trennung auslösen.
+- Getestet mit lokalem MQTT-Server: alte Version blendet bei Last-Will aus, neue bleibt sichtbar und blendet beim echten Ende aus.

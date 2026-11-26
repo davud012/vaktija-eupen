@@ -1053,7 +1053,11 @@
     function naPoruku(tema, m, zadrzano) {
       if (blokirana && m && m.s === blokirana) return;   // hutba završena na kraju džume / Predigt am Ende des Freitagsgebets beendet
       if (tema === "stanje") {
-        if (!m.aktivno) { sakrij(); return; }
+        // "Last Will" servera (razlog "veza") = mobitel je na trenutak izgubio vezu s jednim serverom: ne skrivati odmah,
+        // ako se mobitel zaista ugasio, to riješi tajmer od 25 s. Samo prava poruka "kraj" sakriva odmah.
+        // "Last Will" des Servers (razlog "veza") = Handy hat kurz die Verbindung zu einem Server verloren: nicht sofort ausblenden;
+        // ist das Handy wirklich weg, erledigt das der 25-s-Timer. Nur die echte Ende-Meldung blendet sofort aus.
+        if (!m.aktivno) { if (m.razlog === "veza") return; sakrij(); return; }
         // Sačuvana poruka sa servera se ne prikazuje – čeka se živi signal mobitela (svakih 5 s).
         // Ne poredimo satove, jer sat TV-a i mobitela mogu biti različiti.
         // Gespeicherte Nachricht vom Server wird nicht angezeigt – es wird auf das Live-Signal des Handys gewartet (alle 5 s).
