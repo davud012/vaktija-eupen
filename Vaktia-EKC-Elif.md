@@ -363,3 +363,11 @@ Auf Wunsch des Nutzers gibt es nur noch zwei Seiten: https://davud012.github.io/
 
 ### Nachtrag: Gebetsbildschirm – nur ein Quadrat
 Das zweite, um 45° gedrehte Quadrat im Hintergrund-Ornament (`index.html`, `.ve-ornament`) wurde entfernt; es bleibt ein Quadrat mit den Kreisen. Version 2026-11-07.23.
+
+### Nachtrag 2026-11-26: Box-Uhr nach Stromausfall (Version 2026-11-26.1)
+Die H20-Box hat keine Uhr-Batterie und steht nach dem Strom-Abziehen auf 1970. Vorher holte die Seite die Serverzeit nur einmal beim Start (und dann alle 5 Min.); beim Hochfahren hat die Box aber noch kein Internet. Jetzt:
+- Bis die Serverzeit geholt ist (oder solange die Uhr vor 2023 steht), wird alle 10 s neu versucht.
+- `sada()` rechnet immer von der aktuellen Geräteuhr aus. Stellt sich die Box-Uhr später selbst richtig, gibt es keine doppelte Verschiebung.
+- Springt die Geräteuhr (über 2 Min.), wird die Korrektur sofort neu berechnet.
+- Getestet mit Playwright (Uhr auf 1970, danach Sprung auf die richtige Zeit): Anzeige stimmt in beiden Fällen.
+Box-Einstellung: *Date & time → Automatic date & time* eingeschaltet lassen (nicht aus- und wieder einschalten nötig).

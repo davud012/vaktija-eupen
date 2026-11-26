@@ -515,7 +515,9 @@
   // korekcija: razlika između sata uređaja i tačnog vremena sa servera (vidi provjeriNovuVerziju)
   // Korrektur: Unterschied zwischen Geräteuhr und genauer Serverzeit (siehe provjeriNovuVerziju)
   var korekcija = 0;
-  function sada() { var n = Date.now(); return new Date(pocetak + pomak + korekcija + (n - pocetak) * BRZINA); }
+  // Uvijek od trenutnog sata uređaja (ako se sat kasnije sam ispravi, nema dvostrukog pomaka)
+  // Immer von der aktuellen Geräteuhr aus (stellt sich die Uhr später selbst richtig, gibt es keine doppelte Verschiebung)
+  function sada() { var n = Date.now(); return new Date(BRZINA === 1 ? n + pomak + korekcija : pocetak + pomak + korekcija + (n - pocetak) * BRZINA); }
 
   function $(id) { return document.getElementById(id); }
   function dvije(n) { return (n < 10 ? "0" : "") + n; }
@@ -808,7 +810,7 @@
   // Wenn die Seite aus dem Internet kommt: alle 5 Minuten nach Änderungen schauen und neu laden.
   // Bez interneta stranica jednostavno radi dalje sa starim podacima. / Ohne Internet läuft sie einfach weiter.
   var prekoInterneta = location.protocol === "http:" || location.protocol === "https:";
-  var zadnjaVerzija = null;
+  var zadnjaVerzija = null, vrijemeProvjereno = false;
   function provjeriNovuVerziju(ucitajAkoUspije) {
     if (!prekoInterneta) return;
     var x = new XMLHttpRequest(), poslano = Date.now();
@@ -832,7 +834,7 @@
         // uređaja potpuno pogrešan (više od 1 sata, npr. nakon nestanka struje). Inače vrijedi sat uređaja.
         // Die Zeit aus dem Zwischenspeicher kann bis ~10 Minuten abweichen. Deshalb nur korrigieren,
         // wenn die Geräteuhr völlig falsch ist (über 1 Stunde, z. B. nach Stromausfall). Sonst gilt die Geräteuhr.
-        if (!isNaN(razlika)) korekcija = Math.abs(razlika) > 3600000 ? razlika : 0;
+        if (!isNaN(razlika)) { korekcija = Math.abs(razlika) > 3600000 ? razlika : 0; vrijemeProvjereno = true; }
       }
       if (zadnjaVerzija === null) zadnjaVerzija = x.responseText;
       if (ucitajAkoUspije || x.responseText !== zadnjaVerzija) location.reload();
@@ -858,6 +860,17 @@
     try { navigator.serviceWorker.register("sw.js"); } catch (e) { /* stari preglednik / alter Browser */ }
   }
   setInterval(function () { provjeriNovuVerziju(false); }, 5 * 60 * 1000);
+  // Nakon paljenja kutija nema odmah internet i sat je na 1970: dok se tačno vrijeme ne preuzme, pokušavamo svakih 10 s.
+  // Nach dem Einschalten hat die Box nicht sofort Internet und die Uhr steht auf 1970: bis die genaue Zeit geholt ist, alle 10 s versuchen.
+  setInterval(function () { if (!pomak && (!vrijemeProvjereno || Date.now() < 1700000000000)) provjeriNovuVerziju(false); }, 10000);
+  // Sat uređaja skoči (npr. mreža ga sama ispravi): odmah ponovo izračunati
+  // Geräteuhr springt (z. B. Netzwerk stellt sie selbst richtig): sofort neu berechnen
+  var zadnjiTik = Date.now();
+  setInterval(function () {
+    var n = Date.now();
+    if (Math.abs(n - zadnjiTik - 2000) > 120000) { korekcija = 0; vrijemeProvjereno = false; provjeriNovuVerziju(false); }
+    zadnjiTik = n;
+  }, 2000);
 
   /* ---------- Prijevod hutbe uživo (TEST) / Live-Übersetzung der Predigt (TEST) ---------- */
   (function () {
